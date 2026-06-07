@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'detail_costume_page.dart'; // 1. PASTIKAN SUDAH IMPORT FILE DETAILNYA
+import 'detail_costume_page.dart';
 
 class MainHomePage extends StatefulWidget {
   const MainHomePage({Key? key}) : super(key: key);
@@ -9,64 +9,56 @@ class MainHomePage extends StatefulWidget {
 }
 
 class _MainHomePageState extends State<MainHomePage> {
-  // WARNA TEMA PREMIUM
-  final Color bgColor = const Color(0xFF0A0516);
-  final Color cardColor = const Color(0xFF160D29);
-  final Color accentGold = const Color(0xFFFFD700);
-  final Color neonPurple = const Color(0xFF9B51E0);
+  // PALET WARNA KICK AVENUE STYLE (CLEAN & LIGHT)
+  final Color bgColor = Colors.white;
+  final Color cardImageBg = const Color(0xFFF5F5F5); // Abu-abu terang
+  final Color textPrimary = Colors.black;
+  final Color textSecondary = const Color(0xFF888888);
+  final Color priceColor = const Color(0xFF00A651); // Hijau khas harga
 
   int _selectedIndex = 0;
-  String _selectedCategory = "Semua";
 
-  // 2. DATABASE KOSTUM (Data ini yang akan dikirim ke halaman detail saat kartu diklik)
+  // DATABASE KOSTUM (Sistem 1 Vendor)
   final List<Map<String, dynamic>> costumes = [
     {
       "title": "Raiden Shogun",
       "series": "Genshin Impact",
-      "price": "150k",
-      "rating": "4.9",
+      "price": "150.000",
       "image":
-          "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=1000", // Contoh gambar placeholder
+          "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=1000",
       "include": "Full Set Costume, Armor, Wig",
-      "size": "S-M (LD 85-92 cm)",
-      "location": "Jakarta Pusat",
-      "seller": "Inazuma Store"
+      "size": "S-M",
+      "isReady": true,
     },
     {
       "title": "Kafka",
       "series": "Honkai Star Rail",
-      "price": "165k",
-      "rating": "5.0",
+      "price": "165.000",
       "image":
           "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1000",
       "include": "Costume, Wig, Glasses, Prop Gun",
-      "size": "L (LD 95 cm)",
-      "location": "Surabaya",
-      "seller": "Stellar Rent"
+      "size": "L",
+      "isReady": false,
     },
     {
       "title": "Genshin Aether",
       "series": "Genshin Impact",
-      "price": "120k",
-      "rating": "4.8",
+      "price": "120.000",
       "image":
           "https://images.unsplash.com/photo-1578632738908-4521c726eec7?q=80&w=1000",
       "include": "Costume, Wig, Sword Prop",
-      "size": "M (All Size)",
-      "location": "Bandung",
-      "seller": "Teyvat Gear"
+      "size": "All Size",
+      "isReady": true,
     },
     {
       "title": "March 7th",
       "series": "Honkai Star Rail",
-      "price": "135k",
-      "rating": "4.9",
+      "price": "135.000",
       "image":
           "https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=1000",
       "include": "Full Costume, Wig, Bow Prop",
-      "size": "S (LD 80-88 cm)",
-      "location": "Lamongan, Jatim",
-      "seller": "Princeuuu Rent"
+      "size": "S",
+      "isReady": true,
     },
   ];
 
@@ -74,347 +66,240 @@ class _MainHomePageState extends State<MainHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // --- HEADER SECTION ---
-              Padding(
-                padding: const EdgeInsets.all(20.0),
+      appBar: AppBar(
+        backgroundColor: bgColor,
+        elevation: 0,
+        title: Text(
+          "COSVORIA",
+          style: TextStyle(
+            color: textPrimary,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 2,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications_none_rounded, color: textPrimary),
+            onPressed: () {},
+          ),
+          const Padding(
+            padding: EdgeInsets.only(right: 20, left: 8),
+            child: CircleAvatar(
+              radius: 16,
+              backgroundColor: Colors.black,
+              child: Icon(Icons.person, color: Colors.white, size: 18),
+            ),
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // --- SEARCH BAR ---
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                height: 45,
+                decoration: BoxDecoration(
+                  color: cardImageBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Selamat Datang ✨",
-                          style: TextStyle(
-                              color: Colors.purple[100],
-                              fontSize: 14,
-                              letterSpacing: 1),
+                    Icon(Icons.search_rounded, color: textSecondary, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(color: textPrimary),
+                        decoration: InputDecoration(
+                          hintText: "Search for costume, anime, or series...",
+                          hintStyle:
+                              TextStyle(color: textSecondary, fontSize: 13),
+                          border: InputBorder.none,
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Hey, Kaelen!",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: accentGold, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                              color: accentGold.withOpacity(0.3),
-                              blurRadius: 10)
+                  ],
+                ),
+              ),
+            ),
+
+            // --- PROMO BANNER ---
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                width: double.infinity,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -30,
+                      bottom: -20,
+                      child: Icon(Icons.local_fire_department,
+                          size: 150, color: Colors.white.withOpacity(0.1)),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "NEW ARRIVALS",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Explore the latest collections for your next event.",
+                            style: TextStyle(
+                                color: Colors.grey[400], fontSize: 12),
+                          ),
                         ],
                       ),
-                      child: const CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Color(0xFF2D1B4E),
-                        child: Icon(Icons.person_outline, color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-
-              // --- SEARCH & FILTER BAR ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        height: 55,
-                        decoration: BoxDecoration(
-                          color: cardColor,
-                          borderRadius: BorderRadius.circular(16),
-                          border:
-                              Border.all(color: Colors.white.withOpacity(0.05)),
-                        ),
-                        child: const TextField(
-                          style: TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            icon: Icon(Icons.search_rounded,
-                                color: Colors.purpleAccent),
-                            hintText: "Cari karakter, anime, atau game...",
-                            hintStyle:
-                                TextStyle(color: Colors.grey, fontSize: 14),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      height: 55,
-                      width: 55,
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                        border:
-                            Border.all(color: Colors.white.withOpacity(0.05)),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.tune_rounded, color: accentGold),
-                        onPressed: () {},
-                      ),
                     ),
                   ],
                 ),
               ),
+            ),
 
-              const SizedBox(height: 25),
-
-              // --- FEATURED BANNER ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
-                  width: double.infinity,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF4A148C), Color(0xFF1A0033)],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF4A148C).withOpacity(0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      )
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        right: -20,
-                        top: -20,
-                        child: CircleAvatar(
-                          radius: 80,
-                          backgroundColor: accentGold.withOpacity(0.06),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: accentGold,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: const Text(
-                                "PROMO BULAN INI",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              "Diskon 30% Sewa Pertama",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Gunakan kode voucher: COSFEST30",
-                              style: TextStyle(
-                                  color: Colors.purple[100], fontSize: 12),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            // --- HORIZONTAL SLIDER 1 (KATALOG TERBARU) ---
+            _buildSectionHeader("Katalog Terbaru", "Selengkapnya"),
+            const SizedBox(height: 15),
+            SizedBox(
+              // TINGGI DITAMBAH JADI 360 KARENA FOTO PORTRAIT LEBIH PANJANG
+              height: 360,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: costumes.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  return _buildPortraitCard(costumes[index], context);
+                },
               ),
+            ),
 
-              const SizedBox(height: 30),
+            const SizedBox(height: 30),
 
-              // --- CATEGORIES ---
-              SizedBox(
-                height: 45,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(left: 20),
-                  children: [
-                    _buildCategoryChip("Semua"),
-                    _buildCategoryChip("Anime"),
-                    _buildCategoryChip("Genshin Impact"),
-                    _buildCategoryChip("Honkai Star Rail"),
-                    _buildCategoryChip("VTuber"),
-                  ],
-                ),
+            // --- HORIZONTAL SLIDER 2 (REKOMENDASI) ---
+            _buildSectionHeader("Rekomendasi", "Selengkapnya"),
+            const SizedBox(height: 15),
+            SizedBox(
+              height: 360,
+              child: ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: costumes.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 16),
+                itemBuilder: (context, index) {
+                  return _buildPortraitCard(
+                      costumes.reversed.toList()[index], context);
+                },
               ),
-
-              const SizedBox(height: 25),
-
-              // --- POPULAR SECTION ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Rekomendasi Populer",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5),
-                    ),
-                    Text(
-                      "Lihat Semua",
-                      style: TextStyle(
-                          color: accentGold,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // --- 3. GRID KATALOG (SUDAH DIHUBUNGKAN KE LIST COSTUMES) ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.65,
-                  ),
-                  itemCount:
-                      costumes.length, // Dinamis sesuai panjang List data
-                  itemBuilder: (context, index) {
-                    // Mengirim item map dan context agar kartu bisa mengarah ke Detail
-                    return _buildModernCostumeCard(
-                        costumes[index], index, context);
-                  },
-                ),
-              ),
-              const SizedBox(height: 100),
-            ],
-          ),
+            ),
+            const SizedBox(height: 50),
+          ],
         ),
       ),
 
       // --- BOTTOM NAVIGATION BAR ---
       bottomNavigationBar: Container(
-        margin: const EdgeInsets.all(20),
-        height: 65,
         decoration: BoxDecoration(
-          color: cardColor.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 25,
-              offset: const Offset(0, 10),
-            )
+          border: Border(top: BorderSide(color: Colors.grey[200]!, width: 1)),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.grey[400],
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedFontSize: 10,
+          unselectedFontSize: 10,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+          onTap: (index) => setState(() => _selectedIndex = index),
+          items: const [
+            BottomNavigationBarItem(
+                icon: Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Icon(Icons.home_filled)),
+                label: "Home"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Icon(Icons.search)),
+                label: "Browse"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Icon(Icons.favorite_border_rounded)),
+                label: "Saved"),
+            BottomNavigationBarItem(
+                icon: Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Icon(Icons.person_outline_rounded)),
+                label: "Profile"),
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            currentIndex: _selectedIndex,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: accentGold,
-            unselectedItemColor: Colors.grey[600],
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            onTap: (index) => setState(() => _selectedIndex = index),
-            items: const [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_view_rounded, size: 26), label: "Home"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.receipt_long_rounded, size: 26),
-                  label: "Pesanan"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite_rounded, size: 26), label: "Suka"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person_rounded, size: 26), label: "Profil"),
-            ],
-          ),
-        ),
       ),
     );
   }
 
-  Widget _buildCategoryChip(String name) {
-    bool isSelected = _selectedCategory == name;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = name),
-      child: Container(
-        margin: const EdgeInsets.only(right: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(colors: [accentGold, const Color(0xFFFFA500)])
-              : null,
-          color: isSelected ? null : cardColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-              color: isSelected
-                  ? Colors.transparent
-                  : Colors.white.withOpacity(0.05)),
-        ),
-        child: Center(
-          child: Text(
-            name,
+  // WIDGET HEADER SECTION
+  Widget _buildSectionHeader(String title, String action) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
             style: TextStyle(
-              color: isSelected ? Colors.black : Colors.grey[400],
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
+                color: textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              action,
+              style: TextStyle(color: textSecondary, fontSize: 11),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // --- 4. WIDGET KARTU KOSTUM (SUDAH DIBUNGKUS GESTUREDTECTOR & NAVIGASI) ---
-  Widget _buildModernCostumeCard(
-      Map<String, dynamic> data, int index, BuildContext context) {
-    final List<List<Color>> meshGradients = [
-      [const Color(0xFF3A1C71), const Color(0xFFD76D77)],
-      [const Color(0xFF1E3C72), const Color(0xFF2A5298)],
-      [const Color(0xFF0F2027), const Color(0xFF203A43)],
-      [const Color(0xFF11998e), const Color(0xFF38ef7d)],
-    ];
+  // WIDGET KARTU PRODUK PORTRAIT (Adaptasi 1 Vendor)
+  Widget _buildPortraitCard(Map<String, dynamic> data, BuildContext context) {
+    bool isReady = data['isReady'] ?? false;
 
     return GestureDetector(
       onTap: () {
-        // AKSI DIKLIK: Berpindah ke DetailCostumePage membawa data map spesifik
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -422,137 +307,127 @@ class _MainHomePageState extends State<MainHomePage> {
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: meshGradients[index % meshGradients.length],
-                  ),
-                ),
-                child: const Center(
-                  child: Opacity(
-                    opacity: 0.15,
-                    child:
-                        Icon(Icons.auto_awesome, color: Colors.white, size: 60),
-                  ),
-                ),
-              ),
-              Positioned.fill(
-                child: Container(
+      child: SizedBox(
+        width: 150, // Kartu lebih ramping
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. KOTAK GAMBAR PORTRAIT
+            Stack(
+              children: [
+                Container(
+                  height: 220, // Tinggi gambar diperbesar jadi Portrait
+                  width: 150,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.1),
-                        Colors.black.withOpacity(0.3),
-                        Colors.black.withOpacity(0.9),
-                      ],
+                    color: cardImageBg,
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                      image: NetworkImage(data['image'] ?? ""),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 12,
-                left: 12,
-                child: Container(
+                // Badge Ketersediaan
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isReady ? Colors.white : Colors.black,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.grey[300]!, width: 0.5),
+                    ),
+                    child: Text(
+                      isReady ? "Ready" : "Rented",
+                      style: TextStyle(
+                        color: isReady ? Colors.black : Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // 2. NAMA KARAKTER
+            Text(
+              data['title'] ?? "",
+              style: TextStyle(
+                  color: textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+
+            // 3. HARGA SEWA
+            Text(
+              "Rp ${data['price'] ?? "0"} / 3 hari",
+              style: TextStyle(
+                  color: priceColor, fontSize: 13, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+
+            // 4. DETAIL SERIES (Pakai Icon kecil)
+            Row(
+              children: [
+                Icon(Icons.movie_creation_outlined,
+                    size: 12, color: textSecondary),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    data['series'] ?? "",
+                    style: TextStyle(color: textSecondary, fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // 5. CHIPS UKURAN & KONDISI (Adaptasi dari Referensi)
+            Row(
+              children: [
+                Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.star_rounded, color: accentGold, size: 14),
-                      const SizedBox(width: 3),
-                      Text(
-                        data['rating'], // AMBIL DARI DATA MAP
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                  child: Text(
+                    data['size'] ?? "All Size",
+                    style: TextStyle(
+                        color: textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        data['series'].toUpperCase(), // AMBIL DARI DATA MAP
-                        style: TextStyle(
-                            color: accentGold,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        data['title'], // AMBIL DARI DATA MAP
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Harga Sewa",
-                                  style: TextStyle(
-                                      color: Colors.grey[500], fontSize: 9)),
-                              Text(
-                                "Rp ${data['price']}/hari", // AMBIL DARI DATA MAP
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.arrow_forward_rounded,
-                                color: Colors.white, size: 16),
-                          )
-                        ],
-                      ),
-                    ],
+                const SizedBox(width: 6),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    data['condition'] ?? "-",
+                    style: TextStyle(
+                        color: textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );
