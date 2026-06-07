@@ -9,7 +9,7 @@ class MainHomePage extends StatefulWidget {
 }
 
 class _MainHomePageState extends State<MainHomePage> {
-  // PALET WARNA KICK AVENUE STYLE (CLEAN & LIGHT)
+  // PALET WARNA CLEAN & LIGHT
   final Color bgColor = Colors.white;
   final Color cardImageBg = const Color(0xFFF5F5F5); // Abu-abu terang
   final Color textPrimary = Colors.black;
@@ -18,46 +18,58 @@ class _MainHomePageState extends State<MainHomePage> {
 
   int _selectedIndex = 0;
 
-  // DATABASE KOSTUM (Sistem 1 Vendor)
+  // DATABASE KOSTUM (Katalog Pop-Culture Realistis)
   final List<Map<String, dynamic>> costumes = [
     {
-      "title": "Raiden Shogun",
-      "series": "Genshin Impact",
-      "price": "150.000",
+      "title": "Bundle Monkey D. Luffy (Wano)",
+      "series": "One Piece",
+      "price": "120.000",
+      "condition": "95%",
+      // Link gambar sementara bernuansa merah/kuning khas Luffy
       "image":
-          "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=1000",
-      "include": "Full Set Costume, Armor, Wig",
-      "size": "S-M",
+          "https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=1000&auto=format&fit=crop",
+      "include":
+          "Kemeja Merah Terbuka, Celana Pendek, Topi Jerami, Sabuk Kuning",
+      "size": "L - XL",
       "isReady": true,
     },
     {
-      "title": "Kafka",
-      "series": "Honkai Star Rail",
-      "price": "165.000",
+      "title": "Satoru Gojo (Hidden Inventory)",
+      "series": "Jujutsu Kaisen",
+      "price": "145.000",
+      "condition": "98%",
+      // Link gambar nuansa cool/dark
       "image":
-          "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1000",
-      "include": "Costume, Wig, Glasses, Prop Gun",
-      "size": "L",
+          "https://images.unsplash.com/photo-1514316454349-f5091726a575?q=80&w=1000&auto=format&fit=crop",
+      "include":
+          "Kemeja Hitam, Celana Panjang, Kacamata Hitam Bulat, Wig Putih (Sudah Styling)",
+      "size": "M - L",
       "isReady": false,
     },
     {
-      "title": "Genshin Aether",
-      "series": "Genshin Impact",
-      "price": "120.000",
+      "title": "Dalí Mask & Jumpsuit Perampok",
+      "series": "Money Heist (Netflix)",
+      "price": "100.000",
+      "condition": "90%",
+      // Link gambar nuansa topeng/jumpsuit merah
       "image":
-          "https://images.unsplash.com/photo-1578632738908-4521c726eec7?q=80&w=1000",
-      "include": "Costume, Wig, Sword Prop",
+          "https://images.unsplash.com/photo-1627455829638-3486be0092f2?q=80&w=1000&auto=format&fit=crop",
+      "include":
+          "Jumpsuit Merah (Resleting Depan), Topeng Salvador Dalí, Sarung Tangan Hitam, Prop Senjata Dummy",
       "size": "All Size",
       "isReady": true,
     },
     {
-      "title": "March 7th",
-      "series": "Honkai Star Rail",
-      "price": "135.000",
+      "title": "Spider-Man (Miles Morales)",
+      "series": "Marvel / Spider-Verse",
+      "price": "180.000",
+      "condition": "99%",
+      // Link gambar Spiderman
       "image":
-          "https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=1000",
-      "include": "Full Costume, Wig, Bow Prop",
-      "size": "S",
+          "https://images.unsplash.com/photo-1635805737707-575885ab0820?q=80&w=1000&auto=format&fit=crop",
+      "include":
+          "Full Body Suit (Spandex Premium), Topeng Lensa Jaring, Jaket Hoodie Hijau, Celana Pendek Abu-abu",
+      "size": "M (Fit Body)",
       "isReady": true,
     },
   ];
@@ -180,7 +192,6 @@ class _MainHomePageState extends State<MainHomePage> {
             _buildSectionHeader("Katalog Terbaru", "Selengkapnya"),
             const SizedBox(height: 15),
             SizedBox(
-              // TINGGI DITAMBAH JADI 360 KARENA FOTO PORTRAIT LEBIH PANJANG
               height: 360,
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -294,7 +305,7 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // WIDGET KARTU PRODUK PORTRAIT (Adaptasi 1 Vendor)
+  // WIDGET KARTU PRODUK PORTRAIT
   Widget _buildPortraitCard(Map<String, dynamic> data, BuildContext context) {
     bool isReady = data['isReady'] ?? false;
 
@@ -308,7 +319,7 @@ class _MainHomePageState extends State<MainHomePage> {
         );
       },
       child: SizedBox(
-        width: 150, // Kartu lebih ramping
+        width: 150,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -316,7 +327,7 @@ class _MainHomePageState extends State<MainHomePage> {
             Stack(
               children: [
                 Container(
-                  height: 220, // Tinggi gambar diperbesar jadi Portrait
+                  height: 220,
                   width: 150,
                   decoration: BoxDecoration(
                     color: cardImageBg,
@@ -373,7 +384,7 @@ class _MainHomePageState extends State<MainHomePage> {
             ),
             const SizedBox(height: 8),
 
-            // 4. DETAIL SERIES (Pakai Icon kecil)
+            // 4. DETAIL SERIES
             Row(
               children: [
                 Icon(Icons.movie_creation_outlined,
@@ -391,7 +402,7 @@ class _MainHomePageState extends State<MainHomePage> {
             ),
             const SizedBox(height: 8),
 
-            // 5. CHIPS UKURAN & KONDISI (Adaptasi dari Referensi)
+            // 5. CHIPS UKURAN & KONDISI
             Row(
               children: [
                 Container(
