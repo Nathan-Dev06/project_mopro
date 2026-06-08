@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 
 import 'detail_costume_page.dart';
@@ -38,6 +39,8 @@ class CostumeData {
     this.rating = 4.8,
     this.reviewCount = 12,
   });
+
+  String get id => '$title|$series';
 
   /// Daftar ukuran sebagai list. "All Size" → ['All Size']
   List<String> get sizeList {
@@ -497,6 +500,36 @@ class _MainHomePageState extends State<MainHomePage>
   // GlobalKey untuk katalog "Jelajahi Semua"
   final GlobalKey _catalogKey = GlobalKey();
 
+  Set<String> _savedCostumeIds = {};
+
+  List<CostumeData> get _savedCostumes =>
+      kCostumes.where((c) => _savedCostumeIds.contains(c.id)).toList();
+
+  bool _isSaved(CostumeData costume) => _savedCostumeIds.contains(costume.id);
+
+  Future<void> _initSavedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _savedCostumeIds = prefs.getStringList('saved_costume_ids')?.toSet() ?? {};
+    });
+  }
+
+  Future<void> _saveSavedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('saved_costume_ids', _savedCostumeIds.toList());
+  }
+
+  void _toggleSaved(CostumeData costume) {
+    setState(() {
+      if (_savedCostumeIds.contains(costume.id)) {
+        _savedCostumeIds.remove(costume.id);
+      } else {
+        _savedCostumeIds.add(costume.id);
+      }
+    });
+    _saveSavedPreferences();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -504,6 +537,7 @@ class _MainHomePageState extends State<MainHomePage>
       duration: const Duration(seconds: 30),
       vsync: this,
     )..repeat();
+    _initSavedPreferences();
   }
 
   @override
@@ -523,13 +557,20 @@ class _MainHomePageState extends State<MainHomePage>
     }
   }
 
-  /// Filter kostum berdasarkan kategori aktif
+  /// Filter kostum berdasarkan kategori aktif dan pencarian.
   List<CostumeData> get _filteredCostumes {
     final catName = kCategories[_selectedCategory].name;
-    if (catName == 'Trending') {
-      return kCostumes.where((c) => c.isReady).toList();
-    }
-    return kCostumes.where((c) => c.category == catName).toList();
+    var costumes = catName == 'Trending'
+        ? kCostumes.where((c) => c.isReady).toList()
+        : kCostumes.where((c) => c.category == catName).toList();
+
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isEmpty) return costumes;
+
+    return costumes.where((c) {
+      final normalized = '${c.title} ${c.series} ${c.category}'.toLowerCase();
+      return normalized.contains(query);
+    }).toList();
   }
 
   @override
@@ -538,89 +579,109 @@ class _MainHomePageState extends State<MainHomePage>
       key: const Key('main_home_page_scaffold'),
       backgroundColor: CosvoriaColors.bgColor,
       appBar: _buildAppBar(),
-      body: Stack(
-        children: [
-          _buildAnimatedOrbs(),
-          _buildMainContent(),
-        ],
-      ),
+      body: _buildPageBody(),
       bottomNavigationBar: _buildBottomNav(),
     );
   }
 
   // ── APP BAR ──────────────────────────────────────────────────────────
   PreferredSizeWidget _buildAppBar() {
+    if (_selectedIndex == 0) {
+      return AppBar(
+        key: const Key('cosvoria_app_bar'),
+        backgroundColor: Colors.white.withOpacity(0.92),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        title: Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                  color: CosvoriaColors.textPrimary,
+                  borderRadius: BorderRadius.circular(7)),
+              child: const Center(
+                child: Text("C",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16,
+                        fontFamily: 'Georgia')),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text("COSVORIA",
+                style: TextStyle(
+                    color: CosvoriaColors.textPrimary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4,
+                    fontSize: 16,
+                    fontFamily: 'Georgia')),
+          ],
+        ),
+        centerTitle: false,
+        actions: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                key: const Key('notification_button'),
+                icon: const Icon(Icons.notifications_none_rounded,
+                    color: CosvoriaColors.textPrimary),
+                onPressed: () {},
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                      color: CosvoriaColors.accentWarm, shape: BoxShape.circle),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16, left: 4),
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: CosvoriaColors.hairlineStrong, width: 1.5)),
+              child: const CircleAvatar(
+                radius: 14,
+                backgroundColor: CosvoriaColors.bgSurface,
+                child: Icon(Icons.person_rounded,
+                    color: CosvoriaColors.textSecondary, size: 16),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    const labels = ["Home", "Browse", "Events", "Saved", "Profil"];
     return AppBar(
       key: const Key('cosvoria_app_bar'),
       backgroundColor: Colors.white.withOpacity(0.92),
       elevation: 0,
       surfaceTintColor: Colors.transparent,
-      title: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-                color: CosvoriaColors.textPrimary,
-                borderRadius: BorderRadius.circular(7)),
-            child: const Center(
-              child: Text("C",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                      fontFamily: 'Georgia')),
-            ),
-          ),
-          const SizedBox(width: 8),
-          const Text("COSVORIA",
-              style: TextStyle(
-                  color: CosvoriaColors.textPrimary,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  fontSize: 16,
-                  fontFamily: 'Georgia')),
-        ],
-      ),
+      title: Text(labels[_selectedIndex],
+          style: const TextStyle(
+              color: CosvoriaColors.textPrimary,
+              fontFamily: 'Georgia',
+              fontSize: 20,
+              fontWeight: FontWeight.w700)),
       centerTitle: false,
       actions: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            IconButton(
-              key: const Key('notification_button'),
-              icon: const Icon(Icons.notifications_none_rounded,
-                  color: CosvoriaColors.textPrimary),
-              onPressed: () {},
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                    color: CosvoriaColors.accentWarm, shape: BoxShape.circle),
-              ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(right: 16, left: 4),
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: CosvoriaColors.hairlineStrong, width: 1.5)),
-            child: const CircleAvatar(
-              radius: 14,
-              backgroundColor: CosvoriaColors.bgSurface,
-              child: Icon(Icons.person_rounded,
-                  color: CosvoriaColors.textSecondary, size: 16),
-            ),
+        if (_selectedIndex == 1)
+          IconButton(
+            icon: const Icon(Icons.filter_list_rounded,
+                color: CosvoriaColors.textSecondary),
+            onPressed: () {},
           ),
-        ),
       ],
     );
   }
@@ -699,8 +760,24 @@ class _MainHomePageState extends State<MainHomePage>
     );
   }
 
-  // ── MAIN CONTENT ──────────────────────────────────────────────────────
-  Widget _buildMainContent() {
+  // ── PAGE SHELL ───────────────────────────────────────────────────────
+  Widget _buildPageBody() {
+    return IndexedStack(
+      index: _selectedIndex,
+      children: [
+        Stack(children: [
+          _buildAnimatedOrbs(),
+          _buildHomePageBody(),
+        ]),
+        _buildBrowsePage(),
+        _buildEventsPage(),
+        _buildSavedPage(),
+        _buildProfilePage(),
+      ],
+    );
+  }
+
+  Widget _buildHomePageBody() {
     return SingleChildScrollView(
       key: const Key('home_scroll_view'),
       controller: _scrollController,
@@ -741,6 +818,295 @@ class _MainHomePageState extends State<MainHomePage>
           // Grid hasil filter — key dipasang di sini untuk scroll target
           SizedBox(key: _catalogKey, child: _buildCostumeGrid()),
           const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBrowsePage() {
+    final results = _filteredCostumes;
+    return SingleChildScrollView(
+      key: const Key('browse_page'),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Browse Koleksi",
+                    style: TextStyle(
+                        color: CosvoriaColors.textPrimary,
+                        fontFamily: 'Georgia',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500)),
+                const SizedBox(height: 8),
+                const Text("Temukan kostum favoritmu dengan cepat.",
+                    style: TextStyle(
+                        color: CosvoriaColors.textSecondary,
+                        fontFamily: 'Inter',
+                        fontSize: 13)),
+                const SizedBox(height: 18),
+                _buildSearchBar(),
+                const SizedBox(height: 20),
+                _buildCategoryChips(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildSectionHeader("Hasil Browse", "${results.length} koleksi"),
+          const SizedBox(height: 14),
+          _buildCostumeGrid(results,
+              results.isEmpty ? "Tidak ada kostum yang cocok. Coba kata kunci lain." : "Temukan kostum yang pas untuk eventmu."),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEventsPage() {
+    return SingleChildScrollView(
+      key: const Key('events_page'),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          _buildSectionHeader("Event Cosplay 🎭", "Jadwal"),
+          const SizedBox(height: 14),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: ListView.separated(
+              key: const Key('event_list_page'),
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: kEvents.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              itemBuilder: (context, index) => _buildEventCard(kEvents[index]),
+            ),
+          ),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedPage() {
+    final saved = _savedCostumes;
+    return SingleChildScrollView(
+      key: const Key('saved_page'),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Wishlist Favorit",
+                    style: TextStyle(
+                        color: CosvoriaColors.textPrimary,
+                        fontFamily: 'Georgia',
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500)),
+                const SizedBox(height: 8),
+                Text(
+                    saved.isEmpty
+                        ? "Simpan kostum yang kamu suka untuk mengaksesnya kapan saja."
+                        : "${saved.length} kostum tersimpan",
+                    style: const TextStyle(
+                        color: CosvoriaColors.textSecondary,
+                        fontFamily: 'Inter',
+                        fontSize: 13)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          _buildCostumeGrid(saved,
+              "Kamu belum menyimpan kostum favorit. Temukan kostum di halaman Browse."),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfilePage() {
+    return SingleChildScrollView(
+      key: const Key('profile_page'),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 28,
+                  backgroundColor: CosvoriaColors.orbMint,
+                  child: Text('C',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w900,
+                          fontSize: 24)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text("Halo, Cosplayer!",
+                          style: TextStyle(
+                              color: CosvoriaColors.textPrimary,
+                              fontFamily: 'Georgia',
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600)),
+                      SizedBox(height: 6),
+                      Text("Akun Premium · Level Euphoria",
+                          style: TextStyle(
+                              color: CosvoriaColors.textSecondary,
+                              fontFamily: 'Inter',
+                              fontSize: 13)),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          const SizedBox(height: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                  color: CosvoriaColors.cardBg,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: CosvoriaColors.hairlineStrong)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Ringkasan Akun",
+                      style: TextStyle(
+                          color: CosvoriaColors.textPrimary,
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildProfileStat("Sewa Aktif", "3"),
+                      _buildProfileStat("Favorit", "${_savedCostumes.length}"),
+                      _buildProfileStat("Poin", "120"),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              children: [
+                _buildProfileOption(
+                    icon: Icons.receipt_long_rounded,
+                    title: "Pesanan Saya",
+                    subtitle: "Lihat status sewa dan riwayat"),
+                const SizedBox(height: 12),
+                _buildProfileOption(
+                    icon: Icons.favorite_rounded,
+                    title: "Favorit Saya",
+                    subtitle: "Kostum yang sudah kamu simpan"),
+                const SizedBox(height: 12),
+                _buildProfileOption(
+                    icon: Icons.support_agent_rounded,
+                    title: "Bantuan",
+                    subtitle: "Hubungi tim support Cosvoria"),
+                const SizedBox(height: 12),
+                _buildProfileOption(
+                    icon: Icons.settings_rounded,
+                    title: "Pengaturan",
+                    subtitle: "Kelola notifikasi dan akun"),
+              ],
+            ),
+          ),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileStat(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(value,
+            style: const TextStyle(
+                color: CosvoriaColors.textPrimary,
+                fontFamily: 'Georgia',
+                fontSize: 24,
+                fontWeight: FontWeight.w700)),
+        const SizedBox(height: 6),
+        Text(label,
+            style: const TextStyle(
+                color: CosvoriaColors.textSecondary,
+                fontFamily: 'Inter',
+                fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildProfileOption(
+      {required IconData icon,
+      required String title,
+      required String subtitle}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: CosvoriaColors.cardBg,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CosvoriaColors.hairlineStrong)),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: CosvoriaColors.accentLight,
+                borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon, color: CosvoriaColors.accent, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: CosvoriaColors.textPrimary,
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(subtitle,
+                    style: const TextStyle(
+                        color: CosvoriaColors.textSecondary,
+                        fontFamily: 'Inter',
+                        fontSize: 12)),
+              ],
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios_rounded,
+              size: 16, color: CosvoriaColors.textTertiary),
         ],
       ),
     );
@@ -840,6 +1206,8 @@ class _MainHomePageState extends State<MainHomePage>
             child: TextField(
               key: const Key('search_field'),
               controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              textInputAction: TextInputAction.search,
               style: const TextStyle(
                   color: CosvoriaColors.textPrimary,
                   fontFamily: 'Inter',
@@ -1462,8 +1830,10 @@ class _MainHomePageState extends State<MainHomePage>
         physics: const BouncingScrollPhysics(),
         itemCount: costumes.length,
         separatorBuilder: (_, __) => const SizedBox(width: 14),
-        itemBuilder: (context, index) =>
-            _buildPortraitCard(costumes[index], context),
+        itemBuilder: (context, index) => _buildPortraitCard(
+            costumes[index], context,
+            isSaved: _isSaved(costumes[index]),
+            onSaveTap: () => _toggleSaved(costumes[index])),
       ),
     );
   }
@@ -1513,24 +1883,24 @@ class _MainHomePageState extends State<MainHomePage>
   }
 
   // ── COSTUME GRID ──────────────────────────────────────────────────────
-  Widget _buildCostumeGrid() {
-    final filtered = _filteredCostumes;
+  Widget _buildCostumeGrid([
+      List<CostumeData>? costumes,
+      String emptyMessage = "Belum ada kostum di kategori ini."]) {
+    final filtered = costumes ?? _filteredCostumes;
     if (filtered.isEmpty) {
       return Padding(
-        // <--- HAPUS 'const' di sini
-        padding: const EdgeInsets.symmetric(
-            horizontal: 20, vertical: 40), // Pindah ke sini
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              // <--- Tambahkan 'const' di sini untuk isi list
-              Icon(Icons.search_off_rounded,
+            children: [
+              const Icon(Icons.search_off_rounded,
                   size: 40, color: CosvoriaColors.textTertiary),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Text(
-                "Belum ada kostum di kategori ini.",
-                style: TextStyle(
+                emptyMessage,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   color: CosvoriaColors.textSecondary,
                   fontFamily: 'Inter',
                   fontSize: 13,
@@ -1554,8 +1924,11 @@ class _MainHomePageState extends State<MainHomePage>
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        itemBuilder: (context, index) =>
-            _buildPortraitCard(filtered[index], context, isGrid: true),
+        itemBuilder: (context, index) => _buildPortraitCard(
+            filtered[index], context,
+            isGrid: true,
+            isSaved: _isSaved(filtered[index]),
+            onSaveTap: () => _toggleSaved(filtered[index])),
       ),
     );
   }
@@ -1597,7 +1970,9 @@ class _MainHomePageState extends State<MainHomePage>
 
   // ── PORTRAIT CARD ─────────────────────────────────────────────────────
   Widget _buildPortraitCard(CostumeData data, BuildContext context,
-      {bool isGrid = false}) {
+      {bool isGrid = false,
+      bool isSaved = false,
+      VoidCallback? onSaveTap}) {
     final double imgH = isGrid ? 170 : 180;
     final double cardW = isGrid ? double.infinity : 148.0;
 
@@ -1670,6 +2045,27 @@ class _MainHomePageState extends State<MainHomePage>
               ]),
             ),
           ),
+          Positioned(
+            top: 8,
+            right: 8,
+            child: GestureDetector(
+              key: Key('save_button_${data.id}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: onSaveTap,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Icon(
+                  isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                  size: 18,
+                  color: isSaved ? Colors.redAccent : CosvoriaColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
         ]),
         const SizedBox(height: 9),
         // ── Judul
@@ -1719,8 +2115,11 @@ class _MainHomePageState extends State<MainHomePage>
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>
-                  DetailCostumePage(costumeData: data.toMap())),
+              builder: (context) => DetailCostumePage(
+                    costumeData: data.toMap(),
+                    isSaved: _isSaved(data),
+                    onSaveToggle: () => _toggleSaved(data),
+                  )),
         );
       },
       child: isGrid ? cardContent : SizedBox(width: 148, child: cardContent),

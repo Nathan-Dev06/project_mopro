@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
 import 'booking_page.dart';
 
-class DetailCostumePage extends StatelessWidget {
+class DetailCostumePage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
+  final bool isSaved;
+  final VoidCallback? onSaveToggle;
 
-  const DetailCostumePage({Key? key, required this.costumeData})
-      : super(key: key);
+  const DetailCostumePage({
+    Key? key,
+    required this.costumeData,
+    this.isSaved = false,
+    this.onSaveToggle,
+  }) : super(key: key);
+
+  @override
+  State<DetailCostumePage> createState() => _DetailCostumePageState();
+}
+
+class _DetailCostumePageState extends State<DetailCostumePage> {
+  late bool _isSaved;
+
+  @override
+  void initState() {
+    super.initState();
+    _isSaved = widget.isSaved;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +39,27 @@ class DetailCostumePage extends StatelessWidget {
             pinned: true,
             backgroundColor: Colors.white,
             elevation: 0,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isSaved = !_isSaved;
+                    });
+                    widget.onSaveToggle?.call();
+                  },
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.white.withOpacity(0.9),
+                    child: Icon(
+                      _isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      color: _isSaved ? Colors.redAccent : Colors.black,
+                    ),
+                  ),
+                ),
+              )
+            ],
             // Tombol kembali dengan lingkaran putih transparan agar selalu kontras
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -38,9 +78,9 @@ class DetailCostumePage extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Memastikan jika image URL kosong/error tidak membuat aplikasi crash
-                  costumeData['image'] != null
+                  widget.costumeData['image'] != null
                       ? Image.network(
-                          costumeData['image'],
+                          widget.costumeData['image'],
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return const Center(
@@ -86,12 +126,12 @@ class DetailCostumePage extends StatelessWidget {
                   _buildBadge("READY TO RENT"),
                   const SizedBox(height: 12),
                   Text(
-                    costumeData['title'] ?? 'Nama Kostum',
+                    widget.costumeData['title'] ?? 'Nama Kostum',
                     style: const TextStyle(
                         fontSize: 26, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    costumeData['series'] ?? 'Serial',
+                    widget.costumeData['series'] ?? 'Serial',
                     style: const TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                   const SizedBox(height: 20),
@@ -109,7 +149,7 @@ class DetailCostumePage extends StatelessWidget {
                   // KELENGKAPAN
                   _buildSectionTitle("Apa saja yang didapat?"),
                   const SizedBox(height: 10),
-                  _buildIncludeList(costumeData['include'] ??
+                  _buildIncludeList(widget.costumeData['include'] ??
                       'Tidak ada deskripsi kelengkapan.'),
                   const SizedBox(height: 30),
 
@@ -140,7 +180,7 @@ class DetailCostumePage extends StatelessWidget {
           const Text("Harga Sewa",
               style: TextStyle(fontWeight: FontWeight.w600)),
           Text(
-            "Rp ${costumeData['price'] ?? '0'}",
+            "Rp ${widget.costumeData['price'] ?? '0'}",
             style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -154,7 +194,7 @@ class DetailCostumePage extends StatelessWidget {
   Widget _buildSizeGrid() {
     return Row(
       children: [
-        _statChip(Icons.straighten, "Size: ${costumeData['size'] ?? '-'}"),
+        _statChip(Icons.straighten, "Size: ${widget.costumeData['size'] ?? '-'}"),
         const SizedBox(width: 10),
         _statChip(Icons.person_outline, "TB: 160-170cm"),
       ],
@@ -228,7 +268,7 @@ class DetailCostumePage extends StatelessWidget {
         onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => BookingPage(costumeData: costumeData))),
+                builder: (context) => BookingPage(costumeData: widget.costumeData))),
         child: const Text("SEWA SEKARANG",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
