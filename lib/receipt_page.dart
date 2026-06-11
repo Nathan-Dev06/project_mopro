@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'main.dart';
 
 class ReceiptPage extends StatelessWidget {
   final Map<String, dynamic> costumeData;
@@ -69,7 +70,7 @@ class ReceiptPage extends StatelessWidget {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
-          "Bukti Sewa",
+          "Booking Receipt",
           style: TextStyle(
             fontFamily: 'EB Garamond',
             fontSize: 22,
@@ -146,7 +147,7 @@ class ReceiptPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Text(
-                    "Transaksi Berhasil",
+                    "Transaction Successful",
                     style: TextStyle(
                       fontFamily: 'EB Garamond',
                       fontSize: 26,
@@ -156,7 +157,7 @@ class ReceiptPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Pesanan cosplay Anda telah berhasil dijadwalkan.",
+                    "Your cosplay order has been successfully scheduled.",
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 14,
@@ -193,7 +194,7 @@ class ReceiptPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "ID TRANSAKSI",
+                                    "TRANSACTION ID",
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: 10,
@@ -224,7 +225,7 @@ class ReceiptPage extends StatelessWidget {
                                       color: semanticSuccess.withOpacity(0.3)),
                                 ),
                                 child: Text(
-                                  "LUNAS",
+                                  "PAID",
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 10,
@@ -258,7 +259,7 @@ class ReceiptPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "DETAIL PENYEWAAN",
+                                "RENTAL DETAILS",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 10,
@@ -287,12 +288,12 @@ class ReceiptPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _buildTicketDetailRow("Periode Sewa",
+                              _buildTicketDetailRow("Rental Period",
                                   "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"),
                               _buildTicketDetailRow(
-                                  "Durasi", "$totalDays Hari"),
+                                  "Duration", "$totalDays Days"),
                               _buildTicketDetailRow(
-                                  "Metode Pembayaran", paymentMethod),
+                                  "Payment Method", paymentMethod),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16.0),
@@ -304,7 +305,7 @@ class ReceiptPage extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "TOTAL DIBAYAR",
+                                    "TOTAL PAID",
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: 11,
@@ -346,7 +347,7 @@ class ReceiptPage extends StatelessWidget {
                       onPressed: () => _showReceiptPreview(context),
                       icon: const Icon(Icons.receipt_long_outlined, size: 18),
                       label: const Text(
-                        "Cetak Bukti",
+                        "Print Receipt",
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w600,
@@ -365,11 +366,15 @@ class ReceiptPage extends StatelessWidget {
                         shape: const StadiumBorder(),
                       ),
                       onPressed: () {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (_) => const MainNavigationWrapper(initialIndex: 1),
+                          ),
+                          (route) => false,
+                        );
                       },
                       child: const Text(
-                        "Kembali ke Beranda",
+                        "Back to Home",
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.bold,
@@ -457,7 +462,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Struk_${widget.transactionId}.png berhasil diunduh ke folder Downloads!",
+              "Receipt_${widget.transactionId}.png saved to Downloads!",
               style: const TextStyle(fontFamily: 'Inter', fontSize: 13),
             ),
             backgroundColor: const Color(0xFF16A34A),
@@ -504,7 +509,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Pratinjau Nota Cetak",
+            "Print Receipt Preview",
             style: TextStyle(
                 color: widget.inkTextPrimary,
                 fontFamily: 'Inter',
@@ -531,7 +536,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
             child: Column(
               children: [
                 const Text(
-                  "BUKTI TRANSAKSI RESMI",
+                  "OFFICIAL TRANSACTION RECEIPT",
                   style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 13,
@@ -564,13 +569,13 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 ),
                 const SizedBox(height: 12),
                 _buildRowThermal(
-                    "Item Penyewaan", widget.costumeData['title'] ?? '-'),
+                    "Rental Item", widget.costumeData['title'] ?? '-'),
                 _buildRowThermal(
-                    "Seri / Karakter", widget.costumeData['series'] ?? '-'),
-                _buildRowThermal("Durasi Sewa", "${widget.totalDays} Hari"),
-                _buildRowThermal("Mulai", dateFormat.format(widget.startDate)),
-                _buildRowThermal("Selesai", dateFormat.format(widget.endDate)),
-                _buildRowThermal("Pembayaran", widget.paymentMethod),
+                    "Series / Character", widget.costumeData['series'] ?? '-'),
+                _buildRowThermal("Rental Duration", "${widget.totalDays} Days"),
+                _buildRowThermal("Start", dateFormat.format(widget.startDate)),
+                _buildRowThermal("End", dateFormat.format(widget.endDate)),
+                _buildRowThermal("Payment", widget.paymentMethod),
                 const SizedBox(height: 12),
                 Row(
                   children: List.generate(
@@ -591,7 +596,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "TOTAL LUNAS",
+                      "TOTAL PAID",
                       style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 11,
@@ -610,7 +615,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Terima kasih telah melakukan penyewaan!",
+                  "Thank you for your rental!",
                   style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 9,
@@ -650,7 +655,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                         Icon(Icons.file_download_outlined, size: 18),
                         SizedBox(width: 8),
                         Text(
-                          "Unduh Struk",
+                          "Download Receipt",
                           style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,

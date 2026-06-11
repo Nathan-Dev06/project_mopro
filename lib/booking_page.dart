@@ -92,8 +92,8 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     // Parsing harga
-    int pricePer3Days =
-        int.parse(widget.costumeData['price'].replaceAll('.', ''));
+    int pricePer3Days = int.parse(
+        widget.costumeData['price'].replaceAll(RegExp(r'[^0-9]'), ''));
     int pricePerDay = pricePer3Days ~/ 3;
     int totalRentPrice = pricePerDay * _totalDays;
     int grandTotal = totalRentPrice + _deposit;

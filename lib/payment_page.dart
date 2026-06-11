@@ -169,7 +169,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
+                        child: Image.asset(
                           widget.costumeData['image'],
                           height: 70,
                           width: 60,

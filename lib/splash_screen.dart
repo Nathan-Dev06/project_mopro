@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
+import 'main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           // Pindah ke halaman Home dengan efek Fade (Bukan geser) biar kerasa premium
-          pageBuilder: (_, __, ___) => const MainHomePage(),
+          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },
