@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'receipt_page.dart';
+import 'voucher_manager.dart';
+import 'rental_manager.dart';
 
 class PaymentPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -9,7 +11,10 @@ class PaymentPage extends StatefulWidget {
   final int totalDays;
   final int totalRentPrice;
   final int deposit;
+  final int discountAmount;
+  final String? voucherCode;
   final int grandTotal;
+  final Map<String, String>? shippingAddress;
 
   const PaymentPage({
     Key? key,
@@ -19,7 +24,10 @@ class PaymentPage extends StatefulWidget {
     required this.totalDays,
     required this.totalRentPrice,
     required this.deposit,
+    this.discountAmount = 0,
+    this.voucherCode,
     required this.grandTotal,
+    this.shippingAddress,
   }) : super(key: key);
 
   @override
@@ -169,7 +177,7 @@ class _PaymentPageState extends State<PaymentPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
+                        child: Image.asset(
                           widget.costumeData['image'],
                           height: 70,
                           width: 60,
@@ -228,6 +236,74 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 const SizedBox(height: 28),
 
+                // ALAMAT PENGIRIMAN (jika tersedia)
+                if (widget.shippingAddress != null) ...[
+                  Text(
+                    "Alamat Pengiriman",
+                    style: TextStyle(
+                      fontFamily: 'EB Garamond',
+                      fontWeight: FontWeight.w300,
+                      fontSize: 18,
+                      color: inkTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: surfaceLightElevated,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: hairlineStrong),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.shippingAddress!['recipient'] ?? '-',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: inkTextPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${widget.shippingAddress!['phone'] ?? '-'} · ${widget.shippingAddress!['postal'] ?? ''}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            color: inkTextSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 13,
+                            color: inkTextPrimary,
+                          ),
+                        ),
+                        if ((widget.shippingAddress!['notes'] ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              'Catatan: ${widget.shippingAddress!['notes']}',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 12,
+                                color: inkTextSecondary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                ],
+
                 // RINCIAN TAGIHAN
                 Text(
                   "Rincian Pembayaran",
@@ -260,6 +336,14 @@ class _PaymentPageState extends State<PaymentPage> {
                         "Biaya Sewa (${widget.totalDays} Hari)",
                         currencyFormat.format(widget.totalRentPrice),
                       ),
+                      if (widget.discountAmount > 0) ...[
+                        const SizedBox(height: 12),
+                        _buildBillingRow(
+                          "Diskon Promo (${widget.voucherCode})",
+                          "-${currencyFormat.format(widget.discountAmount)}",
+                          textColor: const Color(0xFF16A34A),
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       _buildBillingRow(
                         "Uang Jaminan (Refundable Deposit)",
@@ -431,8 +515,27 @@ class _PaymentPageState extends State<PaymentPage> {
               onPressed: _selectedMethod == null
                   ? null
                   : () {
+                      if (widget.voucherCode != null) {
+                        VoucherManager.instance.useVoucher(widget.voucherCode!);
+                      }
+                      
                       final generatedTrxId =
                           "TRX-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}";
+
+                      // Add to RentalManager
+                      RentalManager.instance.addRental(
+                        Rental(
+                          transactionId: generatedTrxId,
+                          costumeName: widget.costumeData['title'] ?? 'Unknown Costume',
+                          costumeSeries: widget.costumeData['series'] ?? 'Unknown Series',
+                          size: 'L', // Or passed from booking page
+                          imagePath: widget.costumeData['image'] ?? 'assets/images/default.jpg',
+                          startDate: widget.startDate,
+                          endDate: widget.endDate,
+                          status: 'Renting',
+                        ),
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -441,9 +544,12 @@ class _PaymentPageState extends State<PaymentPage> {
                             startDate: widget.startDate,
                             endDate: widget.endDate,
                             totalDays: widget.totalDays,
+                            discountAmount: widget.discountAmount,
+                            voucherCode: widget.voucherCode,
                             grandTotal: widget.grandTotal,
                             paymentMethod: _selectedMethod!,
                             transactionId: generatedTrxId,
+                            shippingAddress: widget.shippingAddress,
                           ),
                         ),
                       );
@@ -466,7 +572,7 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  Widget _buildBillingRow(String label, String value) {
+  Widget _buildBillingRow(String label, String value, {Color? textColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -475,7 +581,7 @@ class _PaymentPageState extends State<PaymentPage> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
-            color: inkTextSecondary,
+            color: textColor ?? inkTextSecondary,
           ),
         ),
         Text(
@@ -484,7 +590,7 @@ class _PaymentPageState extends State<PaymentPage> {
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            color: inkTextPrimary,
+            color: textColor ?? inkTextPrimary,
           ),
         ),
       ],

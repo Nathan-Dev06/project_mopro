@@ -1,12 +1,12 @@
 name: project_mopro
 description: A new Flutter project.
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.18.5 <3.0.0'
+  sdk: ">=2.18.5 <3.0.0"
 
 dependencies:
   flutter:
@@ -16,6 +16,9 @@ dependencies:
   flutter_staggered_grid_view: ^0.6.2
   intl: ^0.18.1
   table_calendar: ^3.0.9
+  firebase_core: ^2.4.1
+  firebase_auth: ^4.2.5
+  cloud_firestore: ^4.3.0
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +27,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'payment_page.dart';
+import 'user_profile.dart';
+import 'voucher_manager.dart';
 
 class BookingPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -32,6 +34,17 @@ class _BookingPageState extends State<BookingPage> {
   DateTime? _rangeEnd;
   int _totalDays = 0;
   final int _deposit = 50000;
+  Voucher? _selectedVoucher;
+
+  // Alamat pengiriman
+  final _addressFormKey = GlobalKey<FormState>();
+  final TextEditingController _recipientController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalController = TextEditingController();
+  final TextEditingController _provinceController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   // DUMMY TANGGAL YANG SUDAH DI-BOOKING
   final List<DateTime> _bookedDates = [
@@ -89,14 +102,87 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
+  void _fillFromProfile() {
+    setState(() {
+      _recipientController.text = UserProfile.name;
+      _phoneController.text = UserProfile.phone;
+      _streetController.text = UserProfile.address;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Alamat diisi dari profil')),
+    );
+  }
+
+  void _showVoucherSelector() {
+    final availableVouchers = VoucherManager.instance.availableVouchers;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Pilih Voucher",
+                style: TextStyle(
+                  fontFamily: 'Georgia',
+                  fontSize: 18,
+                  color: textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (availableVouchers.isEmpty)
+                Text(
+                  "Tidak ada voucher yang tersedia.",
+                  style: TextStyle(color: textSecondary, fontFamily: 'Inter'),
+                )
+              else
+                ...availableVouchers.map((v) {
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.local_offer, color: Colors.green),
+                    title: Text(v.code, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text(v.description),
+                    onTap: () {
+                      setState(() {
+                        _selectedVoucher = v;
+                      });
+                      Navigator.pop(context);
+                    },
+                  );
+                }).toList(),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Parsing harga
-    int pricePer3Days =
-        int.parse(widget.costumeData['price'].replaceAll('.', ''));
+    int pricePer3Days = int.parse(
+        widget.costumeData['price'].replaceAll(RegExp(r'[^0-9]'), ''));
     int pricePerDay = pricePer3Days ~/ 3;
     int totalRentPrice = pricePerDay * _totalDays;
-    int grandTotal = totalRentPrice + _deposit;
+    
+    int discountAmount = 0;
+    if (_selectedVoucher != null && _totalDays > 0) {
+      discountAmount = (totalRentPrice * (_selectedVoucher!.discountPercent / 100)).round();
+    }
+    
+    int grandTotal = totalRentPrice - discountAmount + _deposit;
 
     final currencyFormat =
         NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0);
@@ -358,6 +444,150 @@ class _BookingPageState extends State<BookingPage> {
 
                 const SizedBox(height: 32),
 
+                // ALAMAT PENGIRIMAN
+                Text(
+                  "Alamat Pengiriman",
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 18,
+                    color: textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _fillFromProfile,
+                    child: const Text('Isi dari Profil'),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Form(
+                  key: _addressFormKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: hairlineStrong),
+                    ),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _recipientController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nama Penerima',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan nama penerima'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(
+                            labelText: 'No. Telepon',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan nomor telepon'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _streetController,
+                          decoration: const InputDecoration(
+                            labelText: 'Jalan / Alamat',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan alamat lengkap'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _cityController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Kota/Kabupaten'),
+                                validator: (v) => (v == null || v.trim().isEmpty)
+                                    ? 'Kota dibutuhkan'
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _postalController,
+                                keyboardType: TextInputType.number,
+                                decoration:
+                                    const InputDecoration(labelText: 'Kode Pos'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _provinceController,
+                          decoration: const InputDecoration(labelText: 'Provinsi'),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _notesController,
+                          decoration: const InputDecoration(
+                              labelText: 'Catatan Pengiriman (opsional)'),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // helper to prefill from profile
+
+                // VOUCHER SELECTION
+                GestureDetector(
+                  onTap: _showVoucherSelector,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    margin: const EdgeInsets.only(bottom: 24),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: accentMint.withOpacity(0.5)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accentMint.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.local_offer_rounded, color: accentMint, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _selectedVoucher == null
+                                ? "Makin hemat pakai promo"
+                                : "Promo: ${_selectedVoucher!.code} dipakai!",
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 14,
+                              fontWeight: _selectedVoucher == null ? FontWeight.normal : FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                        ),
+                        Icon(Icons.chevron_right_rounded, color: textSecondary, size: 20),
+                      ],
+                    ),
+                  ),
+                ),
+
                 // RINCIAN BIAYA
                 Text(
                   "Rincian Pembayaran",
@@ -387,6 +617,12 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       _buildCostRow("Biaya Sewa ($_totalDays Hari)",
                           currencyFormat.format(totalRentPrice)),
+                      if (discountAmount > 0) ...[
+                        const SizedBox(height: 12),
+                        _buildCostRow("Diskon Promo (${_selectedVoucher!.code})",
+                            "-${currencyFormat.format(discountAmount)}",
+                            textColor: Colors.green),
+                      ],
                       const SizedBox(height: 12),
                       _buildCostRow("Deposit (Uang Jaminan)",
                           currencyFormat.format(_deposit)),
@@ -450,6 +686,27 @@ class _BookingPageState extends State<BookingPage> {
               onPressed: _rangeStart == null
                   ? null
                   : () {
+                      // Validasi alamat sebelum lanjut
+                      if (!_addressFormKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Periksa kembali data alamat pengiriman.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final shippingAddress = {
+                        'recipient': _recipientController.text.trim(),
+                        'phone': _phoneController.text.trim(),
+                        'street': _streetController.text.trim(),
+                        'city': _cityController.text.trim(),
+                        'postal': _postalController.text.trim(),
+                        'province': _provinceController.text.trim(),
+                        'notes': _notesController.text.trim(),
+                      };
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -460,7 +717,10 @@ class _BookingPageState extends State<BookingPage> {
                             totalDays: _totalDays,
                             totalRentPrice: totalRentPrice,
                             deposit: _deposit,
+                            discountAmount: discountAmount,
+                            voucherCode: _selectedVoucher?.code,
                             grandTotal: grandTotal,
+                            shippingAddress: shippingAddress,
                           ),
                         ),
                       );
@@ -481,7 +741,7 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Widget _buildCostRow(String label, String value) {
+  Widget _buildCostRow(String label, String value, {Color? textColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -489,7 +749,7 @@ class _BookingPageState extends State<BookingPage> {
           label,
           style: TextStyle(
             fontFamily: 'Inter',
-            color: textSecondary,
+            color: textColor ?? textSecondary,
             fontSize: 13,
           ),
         ),
@@ -499,7 +759,7 @@ class _BookingPageState extends State<BookingPage> {
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             fontSize: 13,
-            color: textPrimary,
+            color: textColor ?? textPrimary,
           ),
         ),
       ],

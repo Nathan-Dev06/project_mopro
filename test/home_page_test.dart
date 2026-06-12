@@ -6,7 +6,9 @@ import 'package:project_mopro/detail_costume_page.dart';
 import 'test_helper.dart';
 
 void main() {
-  testWidgets('MainHomePage renders with Dark Fantasy theme and navigates to Detail page', (WidgetTester tester) async {
+  testWidgets(
+      'MainHomePage renders with Dark Fantasy theme and navigates to Detail page',
+      (WidgetTester tester) async {
     HttpOverrides.global = MockHttpOverrides();
     await tester.pumpWidget(const MaterialApp(
       home: MainHomePage(),

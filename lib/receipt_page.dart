@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'main.dart';
+import 'profile_subpages.dart';
 
 class ReceiptPage extends StatelessWidget {
   final Map<String, dynamic> costumeData;
@@ -9,6 +11,9 @@ class ReceiptPage extends StatelessWidget {
   final int grandTotal;
   final String paymentMethod;
   final String transactionId;
+  final int discountAmount;
+  final String? voucherCode;
+  final Map<String, String>? shippingAddress;
 
   const ReceiptPage({
     Key? key,
@@ -19,6 +24,9 @@ class ReceiptPage extends StatelessWidget {
     required this.grandTotal,
     required this.paymentMethod,
     required this.transactionId,
+    this.discountAmount = 0,
+    this.voucherCode,
+    this.shippingAddress,
   }) : super(key: key);
 
   // ELEVENLABS LIGHT SYSTEM COLORS (Diubah dari varian gelap)
@@ -48,6 +56,9 @@ class ReceiptPage extends StatelessWidget {
           totalDays: totalDays,
           grandTotal: grandTotal,
           paymentMethod: paymentMethod,
+          discountAmount: discountAmount,
+          voucherCode: voucherCode,
+          shippingAddress: shippingAddress,
           canvasLight: canvasLight,
           inkTextPrimary: inkTextPrimary,
           hairlineStrong: hairlineStrong,
@@ -69,7 +80,7 @@ class ReceiptPage extends StatelessWidget {
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
-          "Bukti Sewa",
+          "Booking Receipt",
           style: TextStyle(
             fontFamily: 'EB Garamond',
             fontSize: 22,
@@ -146,7 +157,7 @@ class ReceiptPage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   Text(
-                    "Transaksi Berhasil",
+                    "Transaction Successful",
                     style: TextStyle(
                       fontFamily: 'EB Garamond',
                       fontSize: 26,
@@ -156,7 +167,7 @@ class ReceiptPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    "Pesanan cosplay Anda telah berhasil dijadwalkan.",
+                    "Your cosplay order has been successfully scheduled.",
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 14,
@@ -193,7 +204,7 @@ class ReceiptPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "ID TRANSAKSI",
+                                    "TRANSACTION ID",
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: 10,
@@ -224,7 +235,7 @@ class ReceiptPage extends StatelessWidget {
                                       color: semanticSuccess.withOpacity(0.3)),
                                 ),
                                 child: Text(
-                                  "LUNAS",
+                                  "PAID",
                                   style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 10,
@@ -258,7 +269,7 @@ class ReceiptPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "DETAIL PENYEWAAN",
+                                "RENTAL DETAILS",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 10,
@@ -287,12 +298,32 @@ class ReceiptPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _buildTicketDetailRow("Periode Sewa",
+                              _buildTicketDetailRow("Rental Period",
                                   "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"),
                               _buildTicketDetailRow(
-                                  "Durasi", "$totalDays Hari"),
+                                  "Duration", "$totalDays Days"),
                               _buildTicketDetailRow(
-                                  "Metode Pembayaran", paymentMethod),
+                                  "Payment Method", paymentMethod),
+                              if (discountAmount > 0)
+                                _buildTicketDetailRow(
+                                  "Discount (${voucherCode})",
+                                  "-Rp ${NumberFormat('#,###', 'id').format(discountAmount)}",
+                                  textColor: semanticSuccess,
+                                ),
+                                if (shippingAddress != null) ...[
+                                Padding(
+                                  padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                  child: Divider(color: hairlineStrong, height: 1),
+                                ),
+                                _buildTicketDetailRow("Recipient",
+                                  shippingAddress!['recipient'] ?? '-'),
+                                _buildTicketDetailRow(
+                                  "Phone", shippingAddress!['phone'] ?? '-'),
+                                _buildTicketDetailRow(
+                                  "Address",
+                                  "${shippingAddress!['street'] ?? '-'}, ${shippingAddress!['city'] ?? '-'}, ${shippingAddress!['province'] ?? '-'} ${shippingAddress!['postal'] ?? ''}"),
+                                ],
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16.0),
@@ -304,7 +335,7 @@ class ReceiptPage extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "TOTAL DIBAYAR",
+                                    "TOTAL PAID",
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontSize: 11,
@@ -332,47 +363,96 @@ class ReceiptPage extends StatelessWidget {
 
                   const SizedBox(height: 36),
 
-                  // BUTTON UTAMA: Pemicu Bottom Sheet Struk Fisik
+                  // 1. View My Rentals (Primary)
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: inkTextPrimary,
                         foregroundColor: canvasLight,
-                        shape: const StadiumBorder(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
-                      onPressed: () => _showReceiptPreview(context),
-                      icon: const Icon(Icons.receipt_long_outlined, size: 18),
-                      label: const Text(
-                        "Cetak Bukti",
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MainNavigationWrapper(initialIndex: 0)),
+                          (route) => false,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MyRentalsPage()),
+                        );
+                      },
+                      child: const Text(
+                        "View My Rentals",
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
+
+                  // 2. Print Receipt (Outlined)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: inkTextPrimary,
+                        side: BorderSide(color: inkTextPrimary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => _showReceiptPreview(context),
+                      icon: const Icon(Icons.receipt_long_outlined, size: 18),
+                      label: const Text(
+                        "Print Receipt",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 3. Back to Home (TextButton)
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: inkTextSecondary,
-                        shape: const StadiumBorder(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () {
-                        Navigator.of(context)
-                            .popUntil((route) => route.isFirst);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MainNavigationWrapper(initialIndex: 0)),
+                          (route) => false,
+                        );
                       },
                       child: const Text(
-                        "Kembali ke Beranda",
+                        "Back to Home",
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
                       ),
@@ -387,7 +467,7 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTicketDetailRow(String label, String value) {
+  Widget _buildTicketDetailRow(String label, String value, {Color? textColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -401,7 +481,7 @@ class ReceiptPage extends StatelessWidget {
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
-                  color: inkTextPrimary)),
+                  color: textColor ?? inkTextPrimary)),
         ],
       ),
     );
@@ -417,6 +497,9 @@ class _ReceiptThermalSlip extends StatefulWidget {
   final int totalDays;
   final int grandTotal;
   final String paymentMethod;
+  final int discountAmount;
+  final String? voucherCode;
+  final Map<String, String>? shippingAddress;
   final Color canvasLight;
   final Color inkTextPrimary;
   final Color hairlineStrong;
@@ -430,6 +513,9 @@ class _ReceiptThermalSlip extends StatefulWidget {
     required this.totalDays,
     required this.grandTotal,
     required this.paymentMethod,
+    this.discountAmount = 0,
+    this.voucherCode,
+    this.shippingAddress,
     required this.canvasLight,
     required this.inkTextPrimary,
     required this.hairlineStrong,
@@ -457,7 +543,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              "Struk_${widget.transactionId}.png berhasil diunduh ke folder Downloads!",
+              "Receipt_${widget.transactionId}.png saved to Downloads!",
               style: const TextStyle(fontFamily: 'Inter', fontSize: 13),
             ),
             backgroundColor: const Color(0xFF16A34A),
@@ -491,8 +577,9 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
               offset: const Offset(0, -4),
             )
           ]),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 40,
@@ -504,7 +591,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Pratinjau Nota Cetak",
+            "Print Receipt Preview",
             style: TextStyle(
                 color: widget.inkTextPrimary,
                 fontFamily: 'Inter',
@@ -531,7 +618,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
             child: Column(
               children: [
                 const Text(
-                  "BUKTI TRANSAKSI RESMI",
+                  "OFFICIAL TRANSACTION RECEIPT",
                   style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 13,
@@ -564,13 +651,26 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 ),
                 const SizedBox(height: 12),
                 _buildRowThermal(
-                    "Item Penyewaan", widget.costumeData['title'] ?? '-'),
+                    "Rental Item", widget.costumeData['title'] ?? '-'),
                 _buildRowThermal(
-                    "Seri / Karakter", widget.costumeData['series'] ?? '-'),
-                _buildRowThermal("Durasi Sewa", "${widget.totalDays} Hari"),
-                _buildRowThermal("Mulai", dateFormat.format(widget.startDate)),
-                _buildRowThermal("Selesai", dateFormat.format(widget.endDate)),
-                _buildRowThermal("Pembayaran", widget.paymentMethod),
+                    "Series / Character", widget.costumeData['series'] ?? '-'),
+                _buildRowThermal("Rental Duration", "${widget.totalDays} Days"),
+                _buildRowThermal("Start", dateFormat.format(widget.startDate)),
+                _buildRowThermal("End", dateFormat.format(widget.endDate)),
+                _buildRowThermal("Payment", widget.paymentMethod),
+                if (widget.discountAmount > 0)
+                  _buildRowThermal("Discount (${widget.voucherCode})",
+                      "-Rp ${NumberFormat('#,###', 'id').format(widget.discountAmount)}"),
+                if (widget.shippingAddress != null) ...[
+                  const SizedBox(height: 6),
+                  _buildRowThermal(
+                    "Recipient", widget.shippingAddress!['recipient'] ?? '-'),
+                  _buildRowThermal(
+                    "Phone", widget.shippingAddress!['phone'] ?? '-'),
+                  _buildRowThermal(
+                    "Address",
+                    "${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'} ${widget.shippingAddress!['postal'] ?? ''}"),
+                ],
                 const SizedBox(height: 12),
                 Row(
                   children: List.generate(
@@ -591,7 +691,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "TOTAL LUNAS",
+                      "TOTAL PAID",
                       style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 11,
@@ -610,7 +710,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Terima kasih telah melakukan penyewaan!",
+                  "Thank you for your rental!",
                   style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 9,
@@ -650,7 +750,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                         Icon(Icons.file_download_outlined, size: 18),
                         SizedBox(width: 8),
                         Text(
-                          "Unduh Struk",
+                          "Download Receipt",
                           style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.bold,
@@ -662,7 +762,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildRowThermal(String label, String value) {
