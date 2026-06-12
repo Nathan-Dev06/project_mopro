@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'payment_page.dart';
+import 'user_profile.dart';
 
 class BookingPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -32,6 +33,16 @@ class _BookingPageState extends State<BookingPage> {
   DateTime? _rangeEnd;
   int _totalDays = 0;
   final int _deposit = 50000;
+
+  // Alamat pengiriman
+  final _addressFormKey = GlobalKey<FormState>();
+  final TextEditingController _recipientController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalController = TextEditingController();
+  final TextEditingController _provinceController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   // DUMMY TANGGAL YANG SUDAH DI-BOOKING
   final List<DateTime> _bookedDates = [
@@ -87,6 +98,17 @@ class _BookingPageState extends State<BookingPage> {
         _totalDays = 0;
       }
     });
+  }
+
+  void _fillFromProfile() {
+    setState(() {
+      _recipientController.text = UserProfile.name;
+      _phoneController.text = UserProfile.phone;
+      _streetController.text = UserProfile.address;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Alamat diisi dari profil')),
+    );
   }
 
   @override
@@ -358,6 +380,109 @@ class _BookingPageState extends State<BookingPage> {
 
                 const SizedBox(height: 32),
 
+                // ALAMAT PENGIRIMAN
+                Text(
+                  "Alamat Pengiriman",
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 18,
+                    color: textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _fillFromProfile,
+                    child: const Text('Isi dari Profil'),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Form(
+                  key: _addressFormKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: hairlineStrong),
+                    ),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: _recipientController,
+                          decoration: InputDecoration(
+                            labelText: 'Nama Penerima',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan nama penerima'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _phoneController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(
+                            labelText: 'No. Telepon',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan nomor telepon'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _streetController,
+                          decoration: InputDecoration(
+                            labelText: 'Jalan / Alamat',
+                          ),
+                          validator: (v) => (v == null || v.trim().isEmpty)
+                              ? 'Masukkan alamat lengkap'
+                              : null,
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _cityController,
+                                decoration:
+                                    InputDecoration(labelText: 'Kota/Kabupaten'),
+                                validator: (v) => (v == null || v.trim().isEmpty)
+                                    ? 'Kota dibutuhkan'
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextFormField(
+                                controller: _postalController,
+                                keyboardType: TextInputType.number,
+                                decoration:
+                                    InputDecoration(labelText: 'Kode Pos'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _provinceController,
+                          decoration: InputDecoration(labelText: 'Provinsi'),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _notesController,
+                          decoration: InputDecoration(
+                              labelText: 'Catatan Pengiriman (opsional)'),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // helper to prefill from profile
+
                 // RINCIAN BIAYA
                 Text(
                   "Rincian Pembayaran",
@@ -450,6 +575,27 @@ class _BookingPageState extends State<BookingPage> {
               onPressed: _rangeStart == null
                   ? null
                   : () {
+                      // Validasi alamat sebelum lanjut
+                      if (!_addressFormKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Periksa kembali data alamat pengiriman.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final shippingAddress = {
+                        'recipient': _recipientController.text.trim(),
+                        'phone': _phoneController.text.trim(),
+                        'street': _streetController.text.trim(),
+                        'city': _cityController.text.trim(),
+                        'postal': _postalController.text.trim(),
+                        'province': _provinceController.text.trim(),
+                        'notes': _notesController.text.trim(),
+                      };
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -461,6 +607,7 @@ class _BookingPageState extends State<BookingPage> {
                             totalRentPrice: totalRentPrice,
                             deposit: _deposit,
                             grandTotal: grandTotal,
+                            shippingAddress: shippingAddress,
                           ),
                         ),
                       );

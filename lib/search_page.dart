@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'detail_costume_page.dart';
+import 'category_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -22,6 +23,7 @@ class _SearchPageState extends State<SearchPage> {
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
+  bool _showReadyOnly = false;
 
   final List<String> _recentSearches = [
     "Satoru Gojo",
@@ -30,11 +32,11 @@ class _SearchPageState extends State<SearchPage> {
   ];
 
   final List<String> _popularCategories = [
-    "Valorant",
     "Anime",
+    "Games",
     "Movies",
-    "School Uniform",
-    "Armors",
+    "Props & Weapons",
+    "Accessories",
   ];
 
   @override
@@ -55,10 +57,11 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter costumes based on search query
+    // Filter costumes based on search query and ready status
     final filteredCostumes = _searchQuery.isEmpty
         ? <CostumeData>[]
         : kCostumes.where((c) {
+            if (_showReadyOnly && !c.isReady) return false;
             return c.title.toLowerCase().contains(_searchQuery) ||
                 c.series.toLowerCase().contains(_searchQuery) ||
                 c.category.toLowerCase().contains(_searchQuery);
@@ -129,12 +132,95 @@ class _SearchPageState extends State<SearchPage> {
                     child: IconButton(
                       icon: const Icon(Icons.tune_rounded,
                           color: _black, size: 20),
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) {
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                return Container(
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: const BoxDecoration(
+                                    color: _bg,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(24),
+                                      topRight: Radius.circular(24),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "Filters",
+                                            style: TextStyle(
+                                              color: _black,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Inter',
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            icon: const Icon(Icons.close_rounded, color: _black),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 24),
+                                      GestureDetector(
+                                        onTap: () {
+                                          // Update state di dalam modal
+                                          setModalState(() {
+                                            _showReadyOnly = !_showReadyOnly;
+                                          });
+                                          // Update state di halaman utama (SearchPage)
+                                          setState(() {});
+                                        },
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              _showReadyOnly
+                                                  ? Icons.check_box_rounded
+                                                  : Icons.check_box_outline_blank_rounded,
+                                              color: _showReadyOnly
+                                                  ? const Color(0xFF22C55E)
+                                                  : _grey500,
+                                              size: 24,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              "Show Ready Only",
+                                              style: TextStyle(
+                                                color: _showReadyOnly ? _black : _grey500,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: 'Inter',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 48), // Spacing for bottom safe area
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ),
+
+
 
             // Scrollable Content
             Expanded(
@@ -238,7 +324,7 @@ class _SearchPageState extends State<SearchPage> {
         Wrap(
           spacing: 8,
           runSpacing: 12,
-          children: _popularCategories.map((category) {
+          children: _popularCategories.take(3).map((category) {
             return GestureDetector(
               onTap: () {
                 _searchController.text = category;
@@ -267,7 +353,7 @@ class _SearchPageState extends State<SearchPage> {
 
         const SizedBox(height: 36),
 
-        // 4. RECOMMENDED
+        // 4. RECOMMENDED (Dummy)
         const Text(
           "You Might Like",
           style: TextStyle(
@@ -278,20 +364,111 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         const SizedBox(height: 16),
-        // Menampilkan 2 kostum pertama dari kCostumes sebagai Dummy
+        SizedBox(
+          height: 280,
+          child: Builder(builder: (context) {
+            final dummyItems = kCostumes
+                .where((c) => !_showReadyOnly || c.isReady)
+                .take(4)
+                .toList();
+
+            return ListView.separated(
+              clipBehavior: Clip.none,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: dummyItems.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                return SizedBox(
+                  width: 160,
+                  child: _buildCostumeCard(dummyItems[index]),
+                );
+              },
+            );
+          }),
+        ),
+        const SizedBox(height: 36),
+
+        // 5. ALL CATEGORY CAROUSELS
+        ..._popularCategories.map((category) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: _buildCategoryCarousel(category),
+          );
+        }).toList(),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildCategoryCarousel(String categoryName) {
+    final List<CostumeData> categoryItems = kCostumes
+        .where((c) => c.category.toLowerCase() == categoryName.toLowerCase())
+        .where((c) => !_showReadyOnly || c.isReady)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: _buildCostumeCard(kCostumes.first),
+            Text(
+              categoryName,
+              style: const TextStyle(
+                color: _black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildCostumeCard(kCostumes[1]),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CategoryPage(categoryName: categoryName),
+                  ),
+                );
+              },
+              behavior: HitTestBehavior.opaque,
+              child: const Text(
+                "See All >",
+                style: TextStyle(
+                  color: _grey500,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Inter',
+                ),
+              ),
             ),
           ],
         ),
-
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 280,
+          child: categoryItems.isEmpty
+              ? const Center(
+                  child: Text("Belum ada kostum",
+                      style: TextStyle(color: _grey500)),
+                )
+              : ListView.separated(
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount:
+                      categoryItems.length > 5 ? 5 : categoryItems.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 16),
+                  itemBuilder: (context, index) {
+                    return SizedBox(
+                      width: 160,
+                      child: _buildCostumeCard(categoryItems[index]),
+                    );
+                  },
+                ),
+        ),
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'user_profile.dart';
 
 // =============================================
 // PROFILE SUBPAGES — Kick Avenue Clean Minimalist
@@ -800,12 +801,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void _saveProfile() {
-    Navigator.pop(context, {
+    final result = {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
       'address': _addressController.text.trim(),
-    });
+    };
+    UserProfile.updateFromMap(result);
+    Navigator.pop(context, result);
   }
 
   @override
