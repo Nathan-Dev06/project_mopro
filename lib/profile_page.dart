@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'profile_subpages.dart';
 import 'admin_dashboard.dart';
 import 'login_page.dart';
-import 'services/user_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -34,39 +33,39 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   Future<void> _loadUserData() async {
-  try {
-    final user = FirebaseAuth.instance.currentUser;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
-      setState(() {
-        _userName = 'Guest';
-        _userEmail = '';
-      });
-      return;
+      if (user == null) {
+        setState(() {
+          _userName = 'Guest';
+          _userEmail = '';
+        });
+        return;
+      }
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+
+        setState(() {
+          _userName = data['name'] ?? '';
+          _userEmail = data['email'] ?? '';
+          _userPhone = data['phone'] ?? '';
+          _userAddress = data['address'] ?? '';
+          _isAdmin = data['isAdmin'] ?? false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error load profile: $e');
     }
-
-    final doc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
-
-    if (doc.exists) {
-      final data = doc.data()!;
-
-      setState(() {
-        _userName = data['name'] ?? '';
-        _userEmail = data['email'] ?? '';
-        _userPhone = data['phone'] ?? '';
-        _userAddress = data['address'] ?? '';
-        _isAdmin = data['isAdmin'] ?? false;
-      });
-    }
-  } catch (e) {
-    debugPrint('Error load profile: $e');
   }
-}
+
   // ── Mutable user biodata ──
   String _userName = "tes_nama";
   String _userEmail = "tes@gmail.com";
@@ -81,16 +80,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _logout() async {
-  await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(builder: (_) => const LoginPage()),
-    (route) => false,
-  );
-}
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
 
   // Shorthand accessors for design tokens
   Color get _bg => ProfilePage.bg;
@@ -156,16 +155,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // ── User Info Row (Tappable → EditProfilePage) ──
               GestureDetector(
-                onTap: _userEmail.isEmpty ? () async {
-                  // Open login when not logged in
-                  final res = await Navigator.push<bool?>(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                  );
-                  if (res == true) {
-                    _loadUserData();
-                  }
-                } : _openEditProfile,
+                onTap: _userEmail.isEmpty
+                    ? () async {
+                        // Open login when not logged in
+                        final res = await Navigator.push<bool?>(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginPage()),
+                        );
+                        if (res == true) {
+                          _loadUserData();
+                        }
+                      }
+                    : _openEditProfile,
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -203,7 +204,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 3),
                             Text(
-                                _userEmail.isEmpty ? 'Tap to login or register' : _userEmail,
+                              _userEmail.isEmpty
+                                  ? 'Tap to login or register'
+                                  : _userEmail,
                               style: TextStyle(
                                 color: _grey500,
                                 fontSize: 12,
@@ -365,7 +368,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               // Admin Dashboard (hanya terlihat jika UserProfile.isAdmin)
-              
+
               if (_isAdmin) ...[
                 Divider(
                     color: _grey200,

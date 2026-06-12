@@ -55,10 +55,10 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
   late int _selectedIndex;
 
   // ── Pages displayed for each tab ──
-  static const List<Widget> _pages = <Widget>[
-    MainHomePage(), // Index 0: Home
-    SearchPage(), // Index 1: Search
-    ProfilePage(), // Index 2: Profile
+  late final List<Widget> _pages = <Widget>[
+    MainHomePage(onProfileTapped: () => _onTabTapped(2)), // Index 0: Home
+    const SearchPage(), // Index 1: Search
+    const ProfilePage(), // Index 2: Profile
   ];
 
   @override

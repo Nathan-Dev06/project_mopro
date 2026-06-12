@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'detail_costume_page.dart';
 import 'category_page.dart';
+import 'wishlist_manager.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -479,10 +480,10 @@ class _SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.only(top: 60),
         child: Center(
           child: Column(
-            children: [
+            children: const [
               Icon(Icons.search_off_rounded, size: 64, color: _grey300),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 "No results found",
                 style: TextStyle(
                   color: _black,
@@ -491,7 +492,7 @@ class _SearchPageState extends State<SearchPage> {
                   fontFamily: 'Inter',
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 "Try searching for something else\nor use a different keyword.",
                 textAlign: TextAlign.center,
@@ -573,7 +574,7 @@ class _SearchPageState extends State<SearchPage> {
                           child: const Center(
                             child: Icon(
                               Icons.image_not_supported_outlined,
-                              color: Color(0xFFBBB),
+                              color: Color(0x000ffbbb),
                               size: 32,
                             ),
                           ),
@@ -603,6 +604,35 @@ class _SearchPageState extends State<SearchPage> {
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                         ),
+                      ),
+                    ),
+                  ),
+                  // Favorite Icon
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        WishlistManager.instance.toggleWishlist(data.title);
+                      },
+                      child: ValueListenableBuilder<List<String>>(
+                        valueListenable: WishlistManager.instance.wishlistNotifier,
+                        builder: (context, wishlist, _) {
+                          final isLiked = wishlist.contains(data.title);
+                          return Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              color: isLiked ? Colors.red : _black,
+                              size: 14,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

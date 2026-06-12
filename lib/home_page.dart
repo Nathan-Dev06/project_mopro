@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'detail_costume_page.dart';
+import 'notification_page.dart';
+import 'profile_page.dart';
+import 'voucher_manager.dart';
+import 'wishlist_manager.dart';
 
 // =============================================
 // DESIGN SYSTEM — Kick Avenue Aesthetic
@@ -786,7 +790,8 @@ const List<CostumeData> kCostumes = [
 
 // ==================== MAIN HOME PAGE ====================
 class MainHomePage extends StatefulWidget {
-  const MainHomePage({Key? key}) : super(key: key);
+  final VoidCallback? onProfileTapped;
+  const MainHomePage({Key? key, this.onProfileTapped}) : super(key: key);
   @override
   State<MainHomePage> createState() => _MainHomePageState();
 }
@@ -804,6 +809,14 @@ class _MainHomePageState extends State<MainHomePage> {
     'Props & Weapons',
     'Accessories',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -881,22 +894,39 @@ class _MainHomePageState extends State<MainHomePage> {
           key: const Key('notification_button'),
           icon: const Icon(Icons.notifications_none_rounded,
               color: _C.black, size: 22),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationPage()),
+            );
+          },
           splashRadius: 20,
         ),
         // Profile circle avatar
-        Padding(
-          padding: const EdgeInsets.only(right: 16, left: 2),
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _C.surface,
-              border: Border.all(color: _C.grey300, width: 1),
+        GestureDetector(
+          onTap: () {
+            if (widget.onProfileTapped != null) {
+              widget.onProfileTapped!();
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 16, left: 2),
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _C.surface,
+                border: Border.all(color: _C.grey300, width: 1),
+              ),
+              child:
+                  const Icon(Icons.person_rounded, color: _C.grey500, size: 16),
             ),
-            child:
-                const Icon(Icons.person_rounded, color: _C.grey500, size: 16),
           ),
         ),
       ],
@@ -1078,25 +1108,41 @@ class _MainHomePageState extends State<MainHomePage> {
                   ),
                   const SizedBox(height: 12),
                   // Single prominent CTA: "Claim Voucher"
-                  GestureDetector(
-                    key: const Key('claim_voucher_button'),
-                    onTap: () {},
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _C.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        "Claim Voucher",
-                        style: TextStyle(
-                          color: _C.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                  ValueListenableBuilder<List<Voucher>>(
+                    valueListenable: VoucherManager.instance.vouchersNotifier,
+                    builder: (context, vouchers, _) {
+                      final voucher = VoucherManager.instance.getVoucher('EUPHORIA20');
+                      final isClaimed = voucher?.isClaimed ?? false;
+                      
+                      return GestureDetector(
+                        key: const Key('claim_voucher_button'),
+                        onTap: isClaimed ? null : () {
+                          VoucherManager.instance.claimVoucher('EUPHORIA20');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Voucher claimed successfully!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isClaimed ? _C.grey300 : _C.black,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            isClaimed ? "Claimed" : "Claim Voucher",
+                            style: TextStyle(
+                              color: isClaimed ? _C.grey500 : _C.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -1146,19 +1192,24 @@ class _MainHomePageState extends State<MainHomePage> {
   }
 
   Widget _buildCatalogGrid() {
-    // Filter costumes berdasarkan tab yang dipilih
-    final filteredCostumes = _selectedTab == 'All'
-        ? kCostumes
-        : kCostumes
-            .where((costume) => costume.category == _selectedTab)
-            .toList();
+    final searchQuery = _searchController.text.trim().toLowerCase();
+
+    // Filter costumes berdasarkan tab yang dipilih dan search query
+    final filteredCostumes = kCostumes.where((costume) {
+      final matchesTab = _selectedTab == 'All' || costume.category == _selectedTab;
+      final matchesSearch = searchQuery.isEmpty ||
+          costume.title.toLowerCase().contains(searchQuery) ||
+          costume.series.toLowerCase().contains(searchQuery) ||
+          costume.category.toLowerCase().contains(searchQuery);
+      return matchesTab && matchesSearch;
+    }).toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: filteredCostumes.isEmpty
-          ? Center(
+          ? const Center(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
+                padding: EdgeInsets.symmetric(vertical: 40),
                 child: Text(
                   'No costumes available in this category',
                   style: TextStyle(
@@ -1233,7 +1284,7 @@ class _CatalogProductCard extends StatelessWidget {
                           child: const Center(
                             child: Icon(
                               Icons.image_not_supported_outlined,
-                              color: Color(0xFFBBB),
+                              color: Color(0x000ffbbb),
                               size: 32,
                             ),
                           ),
@@ -1268,17 +1319,28 @@ class _CatalogProductCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: _C.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.favorite_border_rounded,
-                        color: _C.black,
-                        size: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        WishlistManager.instance.toggleWishlist(data.title);
+                      },
+                      child: ValueListenableBuilder<List<String>>(
+                        valueListenable: WishlistManager.instance.wishlistNotifier,
+                        builder: (context, wishlist, _) {
+                          final isLiked = wishlist.contains(data.title);
+                          return Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: _C.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isLiked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              color: isLiked ? Colors.red : _C.black,
+                              size: 16,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'receipt_page.dart';
+import 'voucher_manager.dart';
+import 'rental_manager.dart';
 
 class PaymentPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -9,6 +11,8 @@ class PaymentPage extends StatefulWidget {
   final int totalDays;
   final int totalRentPrice;
   final int deposit;
+  final int discountAmount;
+  final String? voucherCode;
   final int grandTotal;
   final Map<String, String>? shippingAddress;
 
@@ -20,6 +24,8 @@ class PaymentPage extends StatefulWidget {
     required this.totalDays,
     required this.totalRentPrice,
     required this.deposit,
+    this.discountAmount = 0,
+    this.voucherCode,
     required this.grandTotal,
     this.shippingAddress,
   }) : super(key: key);
@@ -330,6 +336,14 @@ class _PaymentPageState extends State<PaymentPage> {
                         "Biaya Sewa (${widget.totalDays} Hari)",
                         currencyFormat.format(widget.totalRentPrice),
                       ),
+                      if (widget.discountAmount > 0) ...[
+                        const SizedBox(height: 12),
+                        _buildBillingRow(
+                          "Diskon Promo (${widget.voucherCode})",
+                          "-${currencyFormat.format(widget.discountAmount)}",
+                          textColor: const Color(0xFF16A34A),
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       _buildBillingRow(
                         "Uang Jaminan (Refundable Deposit)",
@@ -501,8 +515,27 @@ class _PaymentPageState extends State<PaymentPage> {
               onPressed: _selectedMethod == null
                   ? null
                   : () {
+                      if (widget.voucherCode != null) {
+                        VoucherManager.instance.useVoucher(widget.voucherCode!);
+                      }
+                      
                       final generatedTrxId =
                           "TRX-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}";
+
+                      // Add to RentalManager
+                      RentalManager.instance.addRental(
+                        Rental(
+                          transactionId: generatedTrxId,
+                          costumeName: widget.costumeData['title'] ?? 'Unknown Costume',
+                          costumeSeries: widget.costumeData['series'] ?? 'Unknown Series',
+                          size: 'L', // Or passed from booking page
+                          imagePath: widget.costumeData['image'] ?? 'assets/images/default.jpg',
+                          startDate: widget.startDate,
+                          endDate: widget.endDate,
+                          status: 'Renting',
+                        ),
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -511,6 +544,8 @@ class _PaymentPageState extends State<PaymentPage> {
                             startDate: widget.startDate,
                             endDate: widget.endDate,
                             totalDays: widget.totalDays,
+                            discountAmount: widget.discountAmount,
+                            voucherCode: widget.voucherCode,
                             grandTotal: widget.grandTotal,
                             paymentMethod: _selectedMethod!,
                             transactionId: generatedTrxId,
@@ -537,7 +572,7 @@ class _PaymentPageState extends State<PaymentPage> {
     );
   }
 
-  Widget _buildBillingRow(String label, String value) {
+  Widget _buildBillingRow(String label, String value, {Color? textColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -546,7 +581,7 @@ class _PaymentPageState extends State<PaymentPage> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
-            color: inkTextSecondary,
+            color: textColor ?? inkTextSecondary,
           ),
         ),
         Text(
@@ -555,7 +590,7 @@ class _PaymentPageState extends State<PaymentPage> {
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            color: inkTextPrimary,
+            color: textColor ?? inkTextPrimary,
           ),
         ),
       ],

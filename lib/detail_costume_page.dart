@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'booking_page.dart';
+import 'wishlist_manager.dart';
 
 class DetailCostumePage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -29,7 +30,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   static const Color _accentRedBg = Color(0xFFFEE2E2);
   static const Color _gold = Color(0xFFF59E0B);
 
-  bool _isFavorited = false;
+
   late String _selectedSize;
   late AnimationController _favController;
   late Animation<double> _favScale;
@@ -59,7 +60,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   }
 
   void _toggleFavorite() {
-    setState(() => _isFavorited = !_isFavorited);
+    WishlistManager.instance.toggleWishlist(data['title']);
     _favController.forward().then((_) => _favController.reverse());
     HapticFeedback.lightImpact();
   }
@@ -147,13 +148,19 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0, right: 8.0),
-          child: ScaleTransition(
-            scale: _favScale,
-            child: _circleButton(
-              icon: _isFavorited ? Icons.favorite : Icons.favorite_border,
-              iconColor: _isFavorited ? _accentRed : _textPrimary,
-              onTap: _toggleFavorite,
-            ),
+          child: ValueListenableBuilder<List<String>>(
+            valueListenable: WishlistManager.instance.wishlistNotifier,
+            builder: (context, wishlist, _) {
+              final isLiked = wishlist.contains(data['title']);
+              return ScaleTransition(
+                scale: _favScale,
+                child: _circleButton(
+                  icon: isLiked ? Icons.favorite : Icons.favorite_border,
+                  iconColor: isLiked ? _accentRed : _textPrimary,
+                  onTap: _toggleFavorite,
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -235,7 +242,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: [
+                  children: const [
                     Icon(Icons.photo_library_outlined,
                         size: 14, color: Colors.white),
                     SizedBox(width: 4),
@@ -656,7 +663,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
+            children: const [
               Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
@@ -763,7 +770,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     'Higienis & Siap Pakai',
                     style: TextStyle(
@@ -801,7 +808,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
+            children: const [
               Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(

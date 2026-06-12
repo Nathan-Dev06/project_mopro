@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart'; // import kCostumes and CostumeData
 import 'detail_costume_page.dart';
+import 'wishlist_manager.dart';
 
 class CategoryPage extends StatelessWidget {
   final String categoryName;
@@ -122,6 +123,38 @@ class CategoryPage extends StatelessWidget {
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                         ),
+                      ),
+                    ),
+                  ),
+                  // Favorite Icon
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        WishlistManager.instance.toggleWishlist(data.title);
+                      },
+                      child: ValueListenableBuilder<List<String>>(
+                        valueListenable:
+                            WishlistManager.instance.wishlistNotifier,
+                        builder: (context, wishlist, _) {
+                          final isLiked = wishlist.contains(data.title);
+                          return Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isLiked
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              color: isLiked ? Colors.red : Colors.black,
+                              size: 14,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -86,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primary = const Color(0xFF111111);
+    const primary = Color(0xFF111111);
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -203,11 +203,11 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             _SocialButton(icon: Icons.apple, label: 'Apple'),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             _SocialButton(icon: Icons.facebook, label: 'Facebook'),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             _SocialButton(icon: Icons.g_mobiledata, label: 'Google'),
                           ],
                         )

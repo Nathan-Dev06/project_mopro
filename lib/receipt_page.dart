@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'main.dart';
+import 'profile_subpages.dart';
 
 class ReceiptPage extends StatelessWidget {
   final Map<String, dynamic> costumeData;
@@ -10,6 +11,8 @@ class ReceiptPage extends StatelessWidget {
   final int grandTotal;
   final String paymentMethod;
   final String transactionId;
+  final int discountAmount;
+  final String? voucherCode;
   final Map<String, String>? shippingAddress;
 
   const ReceiptPage({
@@ -21,6 +24,8 @@ class ReceiptPage extends StatelessWidget {
     required this.grandTotal,
     required this.paymentMethod,
     required this.transactionId,
+    this.discountAmount = 0,
+    this.voucherCode,
     this.shippingAddress,
   }) : super(key: key);
 
@@ -51,6 +56,8 @@ class ReceiptPage extends StatelessWidget {
           totalDays: totalDays,
           grandTotal: grandTotal,
           paymentMethod: paymentMethod,
+          discountAmount: discountAmount,
+          voucherCode: voucherCode,
           shippingAddress: shippingAddress,
           canvasLight: canvasLight,
           inkTextPrimary: inkTextPrimary,
@@ -297,6 +304,12 @@ class ReceiptPage extends StatelessWidget {
                                   "Duration", "$totalDays Days"),
                               _buildTicketDetailRow(
                                   "Payment Method", paymentMethod),
+                              if (discountAmount > 0)
+                                _buildTicketDetailRow(
+                                  "Discount (${voucherCode})",
+                                  "-Rp ${NumberFormat('#,###', 'id').format(discountAmount)}",
+                                  textColor: semanticSuccess,
+                                ),
                                 if (shippingAddress != null) ...[
                                 Padding(
                                   padding:
@@ -350,16 +363,56 @@ class ReceiptPage extends StatelessWidget {
 
                   const SizedBox(height: 36),
 
-                  // BUTTON UTAMA: Pemicu Bottom Sheet Struk Fisik
+                  // 1. View My Rentals (Primary)
                   SizedBox(
                     width: double.infinity,
                     height: 48,
-                    child: ElevatedButton.icon(
+                    child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: inkTextPrimary,
                         foregroundColor: canvasLight,
-                        shape: const StadiumBorder(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
+                      ),
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const MainNavigationWrapper(initialIndex: 0)),
+                          (route) => false,
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MyRentalsPage()),
+                        );
+                      },
+                      child: const Text(
+                        "View My Rentals",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // 2. Print Receipt (Outlined)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: inkTextPrimary,
+                        side: BorderSide(color: inkTextPrimary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () => _showReceiptPreview(context),
                       icon: const Icon(Icons.receipt_long_outlined, size: 18),
@@ -367,26 +420,31 @@ class ReceiptPage extends StatelessWidget {
                         "Print Receipt",
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           fontSize: 14,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
+
+                  // 3. Back to Home (TextButton)
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: inkTextSecondary,
-                        shape: const StadiumBorder(),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
+                        Navigator.pushAndRemoveUntil(
+                          context,
                           MaterialPageRoute(
-                            builder: (_) => const MainNavigationWrapper(initialIndex: 1),
-                          ),
+                              builder: (context) =>
+                                  const MainNavigationWrapper(initialIndex: 0)),
                           (route) => false,
                         );
                       },
@@ -394,7 +452,7 @@ class ReceiptPage extends StatelessWidget {
                         "Back to Home",
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
                       ),
@@ -409,7 +467,7 @@ class ReceiptPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTicketDetailRow(String label, String value) {
+  Widget _buildTicketDetailRow(String label, String value, {Color? textColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -423,7 +481,7 @@ class ReceiptPage extends StatelessWidget {
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
-                  color: inkTextPrimary)),
+                  color: textColor ?? inkTextPrimary)),
         ],
       ),
     );
@@ -439,6 +497,8 @@ class _ReceiptThermalSlip extends StatefulWidget {
   final int totalDays;
   final int grandTotal;
   final String paymentMethod;
+  final int discountAmount;
+  final String? voucherCode;
   final Map<String, String>? shippingAddress;
   final Color canvasLight;
   final Color inkTextPrimary;
@@ -453,6 +513,8 @@ class _ReceiptThermalSlip extends StatefulWidget {
     required this.totalDays,
     required this.grandTotal,
     required this.paymentMethod,
+    this.discountAmount = 0,
+    this.voucherCode,
     this.shippingAddress,
     required this.canvasLight,
     required this.inkTextPrimary,
@@ -515,8 +577,9 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
               offset: const Offset(0, -4),
             )
           ]),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 40,
@@ -595,6 +658,9 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 _buildRowThermal("Start", dateFormat.format(widget.startDate)),
                 _buildRowThermal("End", dateFormat.format(widget.endDate)),
                 _buildRowThermal("Payment", widget.paymentMethod),
+                if (widget.discountAmount > 0)
+                  _buildRowThermal("Discount (${widget.voucherCode})",
+                      "-Rp ${NumberFormat('#,###', 'id').format(widget.discountAmount)}"),
                 if (widget.shippingAddress != null) ...[
                   const SizedBox(height: 6),
                   _buildRowThermal(
@@ -696,7 +762,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildRowThermal(String label, String value) {
