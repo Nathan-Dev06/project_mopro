@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'profile_subpages.dart';
 import 'admin_dashboard.dart';
-import 'login_page.dart';
+import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_page.dart';
+import 'wallet_pages.dart';
+import 'rental_manager.dart';
 
 // =============================================
 // PROFILE PAGE — Kick Avenue Clean Minimalist
@@ -59,6 +62,8 @@ class _ProfilePageState extends State<ProfilePage> {
           _userPhone = data['phone'] ?? '';
           _userAddress = data['address'] ?? '';
           _isAdmin = data['isAdmin'] ?? false;
+          _depositBalance = (data['deposit_balance'] ?? 0).toInt();
+          _cosmoPoints = (data['cosmo_points'] ?? 0).toInt();
         });
       }
     } catch (e) {
@@ -72,6 +77,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String _userPhone = "";
   String _userAddress = "";
   bool _isAdmin = false;
+  int _depositBalance = 0;
+  int _cosmoPoints = 0;
 
   @override
   void initState() {
@@ -235,22 +242,28 @@ class _ProfilePageState extends State<ProfilePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: const [
+                  children: [
                     // ── Deposit Balance ──
                     Expanded(
                       child: _WalletCard(
                         icon: Icons.account_balance_wallet_outlined,
                         label: "Deposit Balance",
-                        value: "Rp 150.000",
+                        value: NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_depositBalance),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const DepositBalancePage()));
+                        },
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     // ── Cosmo Points ──
                     Expanded(
                       child: _WalletCard(
                         icon: Icons.star_outline_rounded,
                         label: "Cosmo Points",
-                        value: "450 KP",
+                        value: "$_cosmoPoints KP",
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CosmoPointsPage()));
+                        },
                       ),
                     ),
                   ],
@@ -265,16 +278,22 @@ class _ProfilePageState extends State<ProfilePage> {
               Divider(color: _grey200, height: 1, thickness: 1),
 
               // 1. My Rentals
-              _MenuTile(
-                icon: Icons.shopping_bag_outlined,
-                title: "My Rentals",
-                trailing: widget.activeRentals > 0
-                    ? _ActiveBadge(count: widget.activeRentals)
-                    : null,
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MyRentalsPage()),
-                ),
+              ValueListenableBuilder<List<Rental>>(
+                valueListenable: RentalManager.instance.rentalsNotifier,
+                builder: (context, rentals, child) {
+                  final activeCount = RentalManager.instance.activeRentals.length;
+                  return _MenuTile(
+                    icon: Icons.shopping_bag_outlined,
+                    title: "My Rentals",
+                    trailing: activeCount > 0
+                        ? _ActiveBadge(count: activeCount)
+                        : null,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MyRentalsPage()),
+                    ),
+                  );
+                },
               ),
               Divider(
                   color: _grey200,
@@ -388,20 +407,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               Divider(color: _grey200, height: 1, thickness: 1),
 
-              // Tap to Logout
-              Divider(
-                color: _grey200,
-                height: 1,
-                thickness: 1,
-                indent: 20,
-                endIndent: 20,
-              ),
 
-              _MenuTile(
-                icon: Icons.logout_rounded,
-                title: "Logout",
-                onTap: _logout,
-              ),
 
               // ═══════════════════════════════════════
               //  HELP CENTER
@@ -452,7 +458,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   width: double.infinity,
                   height: 48,
                   child: OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const RentalTermsPage(),
+                        ),
+                      );
+                    },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: _black,
                       side: BorderSide(color: _black, width: 1.5),
@@ -462,6 +475,36 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: const Text(
                       "Rental Terms & Rules",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // ── Logout Button ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: _logout,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFEF4444),
+                      side: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "Log Out",
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
@@ -505,47 +548,55 @@ class _WalletCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final VoidCallback onTap;
 
   const _WalletCard({
     required this.icon,
     required this.label,
     required this.value,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFE8E8E8), width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: const Color(0xFF111111), size: 20),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF888888),
-              fontSize: 11,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w500,
-            ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: const Color(0xFF111111), size: 20),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Color(0xFF888888),
+                  fontSize: 11,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Color(0xFF111111),
+                  fontSize: 16,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Color(0xFF111111),
-              fontSize: 16,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

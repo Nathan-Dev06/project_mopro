@@ -38,6 +38,14 @@
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
+  <style>
+    /* Prevent browsers like Edge from injecting their own password reveal icon,
+       which conflicts with our custom Flutter suffixIcon (causing a double icon). */
+    input::-ms-reveal,
+    input::-ms-clear {
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <script>

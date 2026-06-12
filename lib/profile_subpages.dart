@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'user_profile.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_page.dart';
+import 'user_profile.dart';
 import 'home_page.dart';
 import 'detail_costume_page.dart';
 import 'wishlist_manager.dart';
@@ -1427,42 +1429,155 @@ class WishlistPage extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════
 //  6. SETTINGS PAGE — Empty state
 // ═══════════════════════════════════════════════════════════════
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _K.bg,
       appBar: _minimalAppBar(context, "Settings"),
-      body: Center(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.settings_outlined, size: 56, color: _K.grey300),
-            SizedBox(height: 16),
-            Text(
-              "Settings",
-              style: TextStyle(
-                color: _K.grey800,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Inter',
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "App preferences, notifications,\nand account settings — coming soon.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: _K.grey400,
-                fontSize: 13,
-                fontFamily: 'Inter',
-                height: 1.5,
-              ),
-            ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10),
+            _buildSectionHeader("Account & Security"),
+            _buildListTile("Change Password", Icons.lock_outline, onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const ChangePasswordPage()));
+            }),
+            _buildListTile("Delete Account", Icons.person_remove_outlined, isDestructive: true, onTap: () {
+              _showDeleteAccountDialog();
+            }),
+            const SizedBox(height: 20),
+            _buildSectionHeader("App Preferences"),
+            _buildListTile("Language", Icons.language_outlined, trailingText: "English"),
+            _buildListTile("Clear Cache", Icons.cleaning_services_outlined, onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Cache cleared successfully.")));
+            }),
+            const SizedBox(height: 20),
+            _buildSectionHeader("Legal & About"),
+            _buildListTile("Privacy Policy", Icons.privacy_tip_outlined, onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()));
+            }),
+            _buildListTile("Terms of Service", Icons.description_outlined, onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const RentalTermsPage()));
+            }),
+            _buildListTile("Rate App", Icons.star_border_rounded, onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Redirecting to App Store...")));
+            }),
+            const SizedBox(height: 40),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: _K.grey500,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Inter',
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListTile(String title, IconData icon, {VoidCallback? onTap, bool isDestructive = false, String? trailingText}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: _K.grey200, width: 1)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: isDestructive ? _K.red : _K.black),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isDestructive ? _K.red : _K.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            ),
+            if (trailingText != null)
+              Text(
+                trailingText,
+                style: const TextStyle(
+                  color: _K.grey400,
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+              ),
+            if (trailingText == null && onTap != null)
+              const Icon(Icons.chevron_right_rounded, size: 20, color: _K.grey300),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: _K.bg,
+        title: const Text("Delete Account", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to permanently delete your account? This action cannot be undone.", style: TextStyle(fontFamily: 'Inter')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: _K.black))),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+              try {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  // Delete user data from Firestore
+                  await FirebaseFirestore.instance.collection('users').doc(user.uid).delete();
+                  // Delete auth account
+                  await user.delete();
+                  
+                  if (!mounted) return;
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                    (route) => false,
+                  );
+                }
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'requires-recent-login') {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("For security reasons, please log out and log back in before deleting your account.")));
+                } else {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? "Failed to delete account")));
+                }
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+              }
+            },
+            child: const Text("Delete", style: TextStyle(color: _K.red)),
+          ),
+        ],
       ),
     );
   }
@@ -1683,6 +1798,370 @@ class _EditProfilePageState extends State<EditProfilePage> {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
+    );
+  }
+}
+
+// =============================================
+// RENTAL TERMS & RULES PAGE
+// =============================================
+class RentalTermsPage extends StatelessWidget {
+  const RentalTermsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _K.bg,
+      appBar: _minimalAppBar(context, "Rental Terms & Rules"),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle("1. Deposit Requirement"),
+            _buildSectionText(
+                "A deposit is required for all costume rentals. The deposit amount varies depending on the costume's value and tier. This deposit will be fully refunded within 1-2 business days after the costume is returned in good condition."),
+            const SizedBox(height: 20),
+            
+            _buildSectionTitle("2. Rental Duration"),
+            _buildSectionText(
+                "The standard rental duration starts from the moment the costume is delivered until the end of the rental period specified in your booking. Late returns will be subject to a daily penalty of 10% from the total rental cost."),
+            const SizedBox(height: 20),
+            
+            _buildSectionTitle("3. Costume Condition & Care"),
+            _buildSectionText(
+                "Please treat the costumes with respect. Do not wash, alter, or iron the costumes using high heat. Minor wear and tear are expected, but any permanent stains, rips, or missing accessories will incur deduction from your deposit."),
+            const SizedBox(height: 20),
+
+            _buildSectionTitle("4. Cancellations"),
+            _buildSectionText(
+                "Cancellations made 7 days prior to the rental date will receive a full refund. Cancellations made within 3 days will receive a 50% refund. No refunds will be issued for cancellations made within 24 hours of the rental date."),
+            const SizedBox(height: 20),
+
+            _buildSectionTitle("5. Shipping & Return"),
+            _buildSectionText(
+                "You are responsible for safely returning the costume using a trackable shipping method or returning it directly to our physical store. Please ensure the costume is packed securely to prevent any damage during transit."),
+            const SizedBox(height: 40),
+
+            Center(
+              child: Text(
+                "Last updated: June 2026",
+                style: TextStyle(
+                  color: _K.grey400,
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: _K.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Inter',
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: _K.grey800,
+        fontSize: 14,
+        height: 1.6,
+        fontFamily: 'Inter',
+      ),
+    );
+  }
+}
+
+// =============================================
+// PRIVACY POLICY PAGE
+// =============================================
+class PrivacyPolicyPage extends StatelessWidget {
+  const PrivacyPolicyPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _K.bg,
+      appBar: _minimalAppBar(context, "Privacy Policy"),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Privacy Policy",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildText("At Cosvoria, we are committed to protecting your privacy and personal data. This Privacy Policy outlines how we collect, use, and safeguard your information when you use our application."),
+            const SizedBox(height: 20),
+            
+            _buildTitle("1. Information We Collect"),
+            _buildText("We collect information you provide directly to us, such as your name, email address, phone number, physical address, and payment information when you make a booking or create an account."),
+            const SizedBox(height: 20),
+            
+            _buildTitle("2. How We Use Your Information"),
+            _buildText("We use the information we collect to process your transactions, communicate with you regarding your rentals, send you promotional offers (if you have opted in), and improve our application's overall performance."),
+            const SizedBox(height: 20),
+            
+            _buildTitle("3. Data Security"),
+            _buildText("We implement a variety of security measures to maintain the safety of your personal information. Your data is contained behind secured networks and is only accessible by a limited number of persons who have special access rights."),
+            const SizedBox(height: 40),
+
+            const Center(
+              child: Text(
+                "Last updated: June 2026",
+                style: TextStyle(
+                  color: _K.grey400,
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: _K.black,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Inter',
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildText(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        color: _K.grey800,
+        fontSize: 14,
+        height: 1.6,
+        fontFamily: 'Inter',
+      ),
+    );
+  }
+}
+
+// =============================================
+// CHANGE PASSWORD PAGE
+// =============================================
+class ChangePasswordPage extends StatefulWidget {
+  const ChangePasswordPage({Key? key}) : super(key: key);
+
+  @override
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
+}
+
+class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final _oldPassController = TextEditingController();
+  final _newPassController = TextEditingController();
+  final _confirmPassController = TextEditingController();
+
+  bool _obscureOld = true;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+
+  @override
+  void dispose() {
+    _oldPassController.dispose();
+    _newPassController.dispose();
+    _confirmPassController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updatePassword() async {
+    final oldPass = _oldPassController.text;
+    final newPass = _newPassController.text;
+    final confirmPass = _confirmPassController.text;
+
+    if (oldPass.isEmpty || newPass.isEmpty || confirmPass.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please fill all fields")));
+      return;
+    }
+    if (newPass != confirmPass) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("New passwords do not match")));
+      return;
+    }
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.email == null) return;
+
+      // Re-authenticate
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: oldPass,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // Update password
+      await user.updatePassword(newPass);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated successfully!")));
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      String msg = e.message ?? "Failed to update password";
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        msg = "Kata sandi saat ini salah.";
+      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _K.bg,
+      appBar: _minimalAppBar(context, "Change Password"),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Create a new password",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Your new password must be different from previous used passwords.",
+              style: TextStyle(
+                color: _K.grey500,
+                fontSize: 14,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 32),
+            _buildPasswordField("Current Password", _oldPassController, _obscureOld, () {
+              setState(() => _obscureOld = !_obscureOld);
+            }),
+            const SizedBox(height: 20),
+            _buildPasswordField("New Password", _newPassController, _obscureNew, () {
+              setState(() => _obscureNew = !_obscureNew);
+            }),
+            const SizedBox(height: 20),
+            _buildPasswordField("Confirm New Password", _confirmPassController, _obscureConfirm, () {
+              setState(() => _obscureConfirm = !_obscureConfirm);
+            }),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _updatePassword,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _K.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text(
+                  "Update Password",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(String label, TextEditingController controller, bool obscure, VoidCallback onToggle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: _K.black,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Inter',
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: _K.grey200, width: 1.5),
+          ),
+          child: TextField(
+            controller: controller,
+            obscureText: obscure,
+            style: const TextStyle(
+              color: _K.black,
+              fontSize: 15,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: InputDecoration(
+              prefixIcon: const Icon(Icons.lock_outline, color: _K.grey400, size: 20),
+              suffixIcon: IconButton(
+                icon: Icon(obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: _K.grey400, size: 20),
+                onPressed: onToggle,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
