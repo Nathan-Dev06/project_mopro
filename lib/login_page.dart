@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'register_page.dart';
 import 'main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'forgot_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -178,7 +179,20 @@ class _LoginPageState extends State<LoginPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  TextButton(onPressed: () {/* forgot password placeholder */}, child: const Text('Lupa password?', style: TextStyle(fontSize: 13))),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const ForgotPasswordPage(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Lupa password?',
+                                      style: TextStyle(fontSize: 13),
+                                    ),
+                                  ),
                                   TextButton(
                                     onPressed: () async {
                                       final registered = await Navigator.push<bool?>(

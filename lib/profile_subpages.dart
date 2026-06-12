@@ -490,8 +490,14 @@ class SizeProfilePage extends StatefulWidget {
 }
 
 class _SizeProfilePageState extends State<SizeProfilePage> {
-  final _heightController = TextEditingController(text: "170");
-  final _weightController = TextEditingController(text: "65");
+  final _heightController = TextEditingController();
+  final _weightController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSizeProfile();
+  }
 
   @override
   void dispose() {
@@ -499,6 +505,64 @@ class _SizeProfilePageState extends State<SizeProfilePage> {
     _weightController.dispose();
     super.dispose();
   }
+
+  Future<void> _loadSizeProfile() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data()!;
+
+      _heightController.text =
+          (data['height'] ?? '').toString();
+
+      _weightController.text =
+          (data['weight'] ?? '').toString();
+
+      setState(() {});
+    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+}
+
+Future<void> _saveSizeProfile() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .set({
+      'height': int.tryParse(_heightController.text) ?? 0,
+      'weight': int.tryParse(_weightController.text) ?? 0,
+    }, SetOptions(merge: true));
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Size profile saved!'),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Gagal menyimpan data: $e'),
+      ),
+    );
+  }
+}
+  
 
   @override
   Widget build(BuildContext context) {
@@ -557,15 +621,7 @@ class _SizeProfilePageState extends State<SizeProfilePage> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Size profile saved!"),
-                      backgroundColor: _K.black,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
+                onPressed: _saveSizeProfile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _K.black,
                   foregroundColor: Colors.white,
