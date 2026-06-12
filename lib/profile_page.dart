@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'profile_subpages.dart';
 import 'user_profile.dart';
+import 'admin_dashboard.dart';
+import 'login_page.dart';
+import 'services/auth_service.dart';
 
 // =============================================
 // PROFILE PAGE — Kick Avenue Clean Minimalist
@@ -52,6 +55,16 @@ class _ProfilePageState extends State<ProfilePage> {
     if (UserProfile.address.isNotEmpty) {
       _userAddress = UserProfile.address;
     }
+  }
+
+  // Refresh local fields from UserProfile
+  void _refreshFromProfile() {
+    setState(() {
+      _userName = UserProfile.name.isNotEmpty ? UserProfile.name : _userName;
+      _userEmail = UserProfile.email.isNotEmpty ? UserProfile.email : _userEmail;
+      _userPhone = UserProfile.phone.isNotEmpty ? UserProfile.phone : _userPhone;
+      _userAddress = UserProfile.address.isNotEmpty ? UserProfile.address : _userAddress;
+    });
   }
 
   // Shorthand accessors for design tokens
@@ -118,7 +131,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // ── User Info Row (Tappable → EditProfilePage) ──
               GestureDetector(
-                onTap: _openEditProfile,
+                onTap: _userEmail.isEmpty ? () async {
+                  // Open login when not logged in
+                  final res = await Navigator.push<bool?>(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
+                  );
+                  if (res == true) {
+                    _refreshFromProfile();
+                  }
+                } : _openEditProfile,
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -156,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             const SizedBox(height: 3),
                             Text(
-                              _userEmail,
+                                _userEmail.isEmpty ? 'Tap to login or register' : _userEmail,
                               style: TextStyle(
                                 color: _grey500,
                                 fontSize: 12,
@@ -316,6 +338,24 @@ class _ProfilePageState extends State<ProfilePage> {
                   MaterialPageRoute(builder: (_) => const SettingsPage()),
                 ),
               ),
+
+              // Admin Dashboard (hanya terlihat jika UserProfile.isAdmin)
+              if (UserProfile.isAdmin) ...[
+                Divider(
+                    color: _grey200,
+                    height: 1,
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20),
+                _MenuTile(
+                  icon: Icons.dashboard_customize_outlined,
+                  title: "Admin Dashboard",
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminDashboard()),
+                  ),
+                ),
+              ],
 
               Divider(color: _grey200, height: 1, thickness: 1),
 

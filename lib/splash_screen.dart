@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'main.dart';
+import 'user_profile.dart';
+import 'login_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -45,10 +47,14 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Timer dipersingkat jadi 2.5 detik (Best practice aplikasi modern jangan terlalu lama)
     Timer(const Duration(milliseconds: 2500), () {
+      final Widget nextPage = (UserProfile.email.isEmpty)
+          ? const LoginPage()
+          : const MainNavigationWrapper();
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          // Pindah ke halaman Home dengan efek Fade (Bukan geser) biar kerasa premium
-          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
+          // Pindah ke halaman Login atau Home dengan efek Fade
+          pageBuilder: (_, __, ___) => nextPage,
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },

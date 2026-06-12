@@ -3,6 +3,8 @@ class UserProfile {
   static String email = '';
   static String phone = '';
   static String address = '';
+  // Jika true, menu Admin akan terlihat (bisa di-set saat development)
+  static bool isAdmin = false;
 
   static Map<String, String> asMap() {
     return {
