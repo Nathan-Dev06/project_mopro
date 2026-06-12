@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'profile_subpages.dart';
+import 'user_profile.dart';
 
 // =============================================
 // PROFILE PAGE — Kick Avenue Clean Minimalist
@@ -34,6 +35,24 @@ class _ProfilePageState extends State<ProfilePage> {
   String _userEmail = "tes@gmail.com";
   String _userPhone = "";
   String _userAddress = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // Load persisted in-memory profile if available
+    if (UserProfile.name.isNotEmpty) {
+      _userName = UserProfile.name;
+    }
+    if (UserProfile.email.isNotEmpty) {
+      _userEmail = UserProfile.email;
+    }
+    if (UserProfile.phone.isNotEmpty) {
+      _userPhone = UserProfile.phone;
+    }
+    if (UserProfile.address.isNotEmpty) {
+      _userAddress = UserProfile.address;
+    }
+  }
 
   // Shorthand accessors for design tokens
   Color get _bg => ProfilePage.bg;

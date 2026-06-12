@@ -10,6 +10,7 @@ class PaymentPage extends StatefulWidget {
   final int totalRentPrice;
   final int deposit;
   final int grandTotal;
+  final Map<String, String>? shippingAddress;
 
   const PaymentPage({
     Key? key,
@@ -20,6 +21,7 @@ class PaymentPage extends StatefulWidget {
     required this.totalRentPrice,
     required this.deposit,
     required this.grandTotal,
+    this.shippingAddress,
   }) : super(key: key);
 
   @override
@@ -227,6 +229,74 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
 
                 const SizedBox(height: 28),
+
+                // ALAMAT PENGIRIMAN (jika tersedia)
+                if (widget.shippingAddress != null) ...[
+                  Text(
+                    "Alamat Pengiriman",
+                    style: TextStyle(
+                      fontFamily: 'EB Garamond',
+                      fontWeight: FontWeight.w300,
+                      fontSize: 18,
+                      color: inkTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: surfaceLightElevated,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: hairlineStrong),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.shippingAddress!['recipient'] ?? '-',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: inkTextPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${widget.shippingAddress!['phone'] ?? '-'} · ${widget.shippingAddress!['postal'] ?? ''}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            color: inkTextSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'}',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 13,
+                            color: inkTextPrimary,
+                          ),
+                        ),
+                        if ((widget.shippingAddress!['notes'] ?? '').isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              'Catatan: ${widget.shippingAddress!['notes']}',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 12,
+                                color: inkTextSecondary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                ],
 
                 // RINCIAN TAGIHAN
                 Text(
@@ -444,6 +514,7 @@ class _PaymentPageState extends State<PaymentPage> {
                             grandTotal: widget.grandTotal,
                             paymentMethod: _selectedMethod!,
                             transactionId: generatedTrxId,
+                            shippingAddress: widget.shippingAddress,
                           ),
                         ),
                       );

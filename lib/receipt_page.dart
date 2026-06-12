@@ -10,6 +10,7 @@ class ReceiptPage extends StatelessWidget {
   final int grandTotal;
   final String paymentMethod;
   final String transactionId;
+  final Map<String, String>? shippingAddress;
 
   const ReceiptPage({
     Key? key,
@@ -20,6 +21,7 @@ class ReceiptPage extends StatelessWidget {
     required this.grandTotal,
     required this.paymentMethod,
     required this.transactionId,
+    this.shippingAddress,
   }) : super(key: key);
 
   // ELEVENLABS LIGHT SYSTEM COLORS (Diubah dari varian gelap)
@@ -49,6 +51,7 @@ class ReceiptPage extends StatelessWidget {
           totalDays: totalDays,
           grandTotal: grandTotal,
           paymentMethod: paymentMethod,
+          shippingAddress: shippingAddress,
           canvasLight: canvasLight,
           inkTextPrimary: inkTextPrimary,
           hairlineStrong: hairlineStrong,
@@ -294,6 +297,20 @@ class ReceiptPage extends StatelessWidget {
                                   "Duration", "$totalDays Days"),
                               _buildTicketDetailRow(
                                   "Payment Method", paymentMethod),
+                                if (shippingAddress != null) ...[
+                                Padding(
+                                  padding:
+                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                  child: Divider(color: hairlineStrong, height: 1),
+                                ),
+                                _buildTicketDetailRow("Recipient",
+                                  shippingAddress!['recipient'] ?? '-'),
+                                _buildTicketDetailRow(
+                                  "Phone", shippingAddress!['phone'] ?? '-'),
+                                _buildTicketDetailRow(
+                                  "Address",
+                                  "${shippingAddress!['street'] ?? '-'}, ${shippingAddress!['city'] ?? '-'}, ${shippingAddress!['province'] ?? '-'} ${shippingAddress!['postal'] ?? ''}"),
+                                ],
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16.0),
@@ -422,6 +439,7 @@ class _ReceiptThermalSlip extends StatefulWidget {
   final int totalDays;
   final int grandTotal;
   final String paymentMethod;
+  final Map<String, String>? shippingAddress;
   final Color canvasLight;
   final Color inkTextPrimary;
   final Color hairlineStrong;
@@ -435,6 +453,7 @@ class _ReceiptThermalSlip extends StatefulWidget {
     required this.totalDays,
     required this.grandTotal,
     required this.paymentMethod,
+    this.shippingAddress,
     required this.canvasLight,
     required this.inkTextPrimary,
     required this.hairlineStrong,
@@ -576,6 +595,16 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                 _buildRowThermal("Start", dateFormat.format(widget.startDate)),
                 _buildRowThermal("End", dateFormat.format(widget.endDate)),
                 _buildRowThermal("Payment", widget.paymentMethod),
+                if (widget.shippingAddress != null) ...[
+                  const SizedBox(height: 6),
+                  _buildRowThermal(
+                    "Recipient", widget.shippingAddress!['recipient'] ?? '-'),
+                  _buildRowThermal(
+                    "Phone", widget.shippingAddress!['phone'] ?? '-'),
+                  _buildRowThermal(
+                    "Address",
+                    "${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'} ${widget.shippingAddress!['postal'] ?? ''}"),
+                ],
                 const SizedBox(height: 12),
                 Row(
                   children: List.generate(
