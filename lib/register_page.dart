@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'services/auth_service.dart';
 import 'login_page.dart';
 import 'main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -21,31 +22,88 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscure = true;
 
   Future<void> _doRegister() async {
-    if (!_formKey.currentState!.validate()) return;
-    if (_passwordCtrl.text != _confirmCtrl.text) {
-      setState(() => _error = 'Password dan konfirmasi tidak cocok');
-      return;
-    }
-    setState(() { _loading = true; _error = null; });
-    await Future.delayed(const Duration(milliseconds: 300));
-    final ok = AuthService.register(_emailCtrl.text.trim(), _nameCtrl.text.trim(), _passwordCtrl.text);
-    setState(() { _loading = false; });
-    if (ok) {
-      // Auto-login the new user and navigate to main wrapper
-      AuthService.login(_emailCtrl.text.trim(), _passwordCtrl.text);
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
-          transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
-        (route) => false,
-      );
-    } else {
-      setState(() => _error = 'Email sudah terdaftar');
-    }
+  if (!_formKey.currentState!.validate()) return;
+
+  if (_passwordCtrl.text != _confirmCtrl.text) {
+    setState(() {
+      _error = 'Password dan konfirmasi tidak cocok';
+    });
+    return;
   }
+
+  setState(() {
+    _loading = true;
+    _error = null;
+  });
+
+  try {
+    UserCredential credential =
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+    email: _emailCtrl.text.trim(),
+    password: _passwordCtrl.text.trim(),
+    );
+
+    await FirebaseFirestore.instance
+    .collection('users')
+    .doc(credential.user!.uid)
+    .set({
+    'name': _nameCtrl.text.trim(),
+    'email': _emailCtrl.text.trim(),
+    'phone': '',
+    'address': '',
+    'isAdmin': false,
+    });
+
+    await FirebaseAuth.instance.currentUser?.updateDisplayName(
+    _nameCtrl.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _loading = false;
+    });
+
+    Navigator.of(context).pushAndRemoveUntil(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
+        transitionsBuilder: (_, animation, __, child) =>
+            FadeTransition(opacity: animation, child: child),
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+      (route) => false,
+    );
+  } on FirebaseAuthException catch (e) {
+    String message;
+
+    switch (e.code) {
+      case 'email-already-in-use':
+        message = 'Email sudah terdaftar';
+        break;
+
+      case 'weak-password':
+        message = 'Password minimal 6 karakter';
+        break;
+
+      case 'invalid-email':
+        message = 'Format email tidak valid';
+        break;
+
+      default:
+        message = e.message ?? 'Registrasi gagal';
+    }
+
+    setState(() {
+      _loading = false;
+      _error = message;
+    });
+  } catch (e) {
+    setState(() {
+      _loading = false;
+      _error = e.toString();
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {

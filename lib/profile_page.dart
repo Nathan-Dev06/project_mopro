@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'profile_subpages.dart';
-import 'user_profile.dart';
 import 'admin_dashboard.dart';
 import 'login_page.dart';
-import 'services/auth_service.dart';
+import 'services/user_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // =============================================
 // PROFILE PAGE — Kick Avenue Clean Minimalist
@@ -33,39 +34,63 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
+  Future<void> _loadUserData() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      setState(() {
+        _userName = 'Guest';
+        _userEmail = '';
+      });
+      return;
+    }
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data()!;
+
+      setState(() {
+        _userName = data['name'] ?? '';
+        _userEmail = data['email'] ?? '';
+        _userPhone = data['phone'] ?? '';
+        _userAddress = data['address'] ?? '';
+        _isAdmin = data['isAdmin'] ?? false;
+      });
+    }
+  } catch (e) {
+    debugPrint('Error load profile: $e');
+  }
+}
   // ── Mutable user biodata ──
   String _userName = "tes_nama";
   String _userEmail = "tes@gmail.com";
   String _userPhone = "";
   String _userAddress = "";
+  bool _isAdmin = false;
 
   @override
   void initState() {
     super.initState();
-    // Load persisted in-memory profile if available
-    if (UserProfile.name.isNotEmpty) {
-      _userName = UserProfile.name;
-    }
-    if (UserProfile.email.isNotEmpty) {
-      _userEmail = UserProfile.email;
-    }
-    if (UserProfile.phone.isNotEmpty) {
-      _userPhone = UserProfile.phone;
-    }
-    if (UserProfile.address.isNotEmpty) {
-      _userAddress = UserProfile.address;
-    }
+    _loadUserData();
   }
 
-  // Refresh local fields from UserProfile
-  void _refreshFromProfile() {
-    setState(() {
-      _userName = UserProfile.name.isNotEmpty ? UserProfile.name : _userName;
-      _userEmail = UserProfile.email.isNotEmpty ? UserProfile.email : _userEmail;
-      _userPhone = UserProfile.phone.isNotEmpty ? UserProfile.phone : _userPhone;
-      _userAddress = UserProfile.address.isNotEmpty ? UserProfile.address : _userAddress;
-    });
-  }
+  Future<void> _logout() async {
+  await FirebaseAuth.instance.signOut();
+
+  if (!mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const LoginPage()),
+    (route) => false,
+  );
+}
 
   // Shorthand accessors for design tokens
   Color get _bg => ProfilePage.bg;
@@ -138,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     MaterialPageRoute(builder: (_) => const LoginPage()),
                   );
                   if (res == true) {
-                    _refreshFromProfile();
+                    _loadUserData();
                   }
                 } : _openEditProfile,
                 behavior: HitTestBehavior.opaque,
@@ -340,7 +365,8 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               // Admin Dashboard (hanya terlihat jika UserProfile.isAdmin)
-              if (UserProfile.isAdmin) ...[
+              
+              if (_isAdmin) ...[
                 Divider(
                     color: _grey200,
                     height: 1,
@@ -359,7 +385,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
               Divider(color: _grey200, height: 1, thickness: 1),
 
-              const SizedBox(height: 32),
+              // Tap to Logout
+              Divider(
+                color: _grey200,
+                height: 1,
+                thickness: 1,
+                indent: 20,
+                endIndent: 20,
+              ),
+
+              _MenuTile(
+                icon: Icons.logout_rounded,
+                title: "Logout",
+                onTap: _logout,
+              ),
 
               // ═══════════════════════════════════════
               //  HELP CENTER

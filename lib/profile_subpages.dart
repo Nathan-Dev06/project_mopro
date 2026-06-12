@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'user_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // =============================================
 // PROFILE SUBPAGES — Kick Avenue Clean Minimalist
@@ -800,16 +802,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  void _saveProfile() {
+  Future<void> _saveProfile() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
     final result = {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
       'address': _addressController.text.trim(),
     };
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .update(result);
+
+    await user.updateDisplayName(
+      _nameController.text.trim(),
+    );
+
     UserProfile.updateFromMap(result);
+
+    if (!mounted) return;
+
     Navigator.pop(context, result);
+
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Gagal menyimpan profile: $e'),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

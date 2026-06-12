@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'services/auth_service.dart';
 import 'register_page.dart';
 import 'main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -19,35 +19,70 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscure = true;
 
   Future<void> _doLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
+  if (!_formKey.currentState!.validate()) return;
 
-    final user = AuthService.login(_emailCtrl.text.trim(), _passwordCtrl.text);
-    await Future.delayed(const Duration(milliseconds: 300));
+  setState(() {
+    _loading = true;
+    _error = null;
+  });
+
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text.trim(),
+    );
+
     if (!mounted) return;
+
     setState(() => _loading = false);
-    if (user != null) {
-      // If there's a route to pop (e.g., opened from Profile), pop with success.
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context, true);
-      } else {
-        // Otherwise (e.g., launched from Splash via pushReplacement),
-        // replace with main navigation wrapper.
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
-            transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
-            transitionDuration: const Duration(milliseconds: 400),
-          ),
-        );
-      }
+
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context, true);
     } else {
-      setState(() => _error = 'Email atau password salah');
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+          transitionDuration: const Duration(milliseconds: 400),
+        ),
+      );
     }
+  } on FirebaseAuthException catch (e) {
+    String message;
+
+    switch (e.code) {
+      case 'user-not-found':
+        message = 'Email belum terdaftar';
+        break;
+
+      case 'wrong-password':
+        message = 'Password salah';
+        break;
+
+      case 'invalid-email':
+        message = 'Format email tidak valid';
+        break;
+
+      case 'invalid-credential':
+        message = 'Email atau password salah';
+        break;
+
+      default:
+        message = e.message ?? 'Login gagal';
+    }
+
+    setState(() {
+      _loading = false;
+      _error = message;
+    });
+  } catch (e) {
+    setState(() {
+      _loading = false;
+      _error = e.toString();
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
