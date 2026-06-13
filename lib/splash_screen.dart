@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'main.dart';
 import 'user_profile.dart';
 import 'login_page.dart';
+import 'admin_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -46,10 +49,31 @@ class _SplashScreenState extends State<SplashScreen>
     _animationController.forward();
 
     // Timer dipersingkat jadi 2.5 detik (Best practice aplikasi modern jangan terlalu lama)
-    Timer(const Duration(milliseconds: 2500), () {
-      final Widget nextPage = (UserProfile.email.isEmpty)
-          ? const LoginPage()
-          : const MainNavigationWrapper();
+    Timer(const Duration(milliseconds: 2500), () async {
+      Widget nextPage = const LoginPage();
+      
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        try {
+          final doc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+          if (doc.exists) {
+            bool isAdmin = doc.data()?['isAdmin'] ?? false;
+            UserProfile.isAdmin = isAdmin;
+            UserProfile.name = doc.data()?['name'] ?? '';
+            UserProfile.email = doc.data()?['email'] ?? '';
+            
+            if (isAdmin) {
+              nextPage = const AdminNavigationWrapper();
+            } else {
+              nextPage = const MainNavigationWrapper();
+            }
+          }
+        } catch (e) {
+          debugPrint('Error fetching role on splash: $e');
+        }
+      }
+
+      if (!mounted) return;
 
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(

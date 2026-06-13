@@ -10,60 +10,182 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  // ── Design Tokens ──
+  static const Color _bg = Color(0xFFFFFFFF);
+  static const Color _black = Color(0xFF111111);
+  static const Color _grey500 = Color(0xFF888888);
+  static const Color _grey200 = Color(0xFFE8E8E8);
+
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
     final todayIncome = ReportService.incomeForDay(today);
     final monthIncome = ReportService.incomeForMonth(today.year, today.month);
-    final top = ReportService.topCostumes(limit: 10);
+    final top = ReportService.topCostumes(limit: 5);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0.5,
-      ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
+      backgroundColor: _bg,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              // ── Header ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Dashboard",
+                          style: TextStyle(
+                            color: _black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Welcome back, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}',
+                          style: const TextStyle(
+                            color: _grey500,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _grey200),
+                      ),
+                      child: const Icon(Icons.person_outline, color: _black),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
 
-            // Summary cards
-            Row(
-              children: [
-                _SummaryCard(title: 'Today Income', value: ReportService.formatCurrency(todayIncome)),
-                const SizedBox(width: 12),
-                _SummaryCard(title: 'This Month', value: ReportService.formatCurrency(monthIncome)),
-              ],
-            ),
+              // ── Summary Cards ──
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _SummaryCard(
+                      title: 'Today Income',
+                      value: ReportService.formatCurrency(todayIncome),
+                      icon: Icons.payments_outlined,
+                    ),
+                    const SizedBox(width: 12),
+                    _SummaryCard(
+                      title: 'This Month',
+                      value: ReportService.formatCurrency(monthIncome),
+                      icon: Icons.account_balance_wallet_outlined,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _SummaryCard(
+                      title: 'Active Rentals',
+                      value: '12',
+                      icon: Icons.local_mall_outlined,
+                    ),
+                    const SizedBox(width: 12),
+                    _SummaryCard(
+                      title: 'Pending Verify',
+                      value: '4',
+                      icon: Icons.verified_user_outlined,
+                    ),
+                  ],
+                ),
+              ),
 
-            const SizedBox(height: 18),
-            const Text('Top Rented Costumes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
+              const SizedBox(height: 32),
+              
+              // ── Top Rented Section ──
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Top Rented Costumes',
+                  style: TextStyle(
+                    color: _black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              
+              ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: top.keys.length,
+                separatorBuilder: (context, index) => Divider(color: _grey200, height: 1),
                 itemBuilder: (context, index) {
                   final key = top.keys.elementAt(index);
                   final count = top[key]!;
                   return ListTile(
-                    leading: CircleAvatar(child: Text('${index + 1}')),
-                    title: Text(key),
-                    trailing: Text('$count times'),
-                    subtitle: Text('$count sewa'),
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '#${index + 1}',
+                          style: const TextStyle(
+                            color: _black,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      key,
+                      style: const TextStyle(
+                        color: _black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    subtitle: Text(
+                      '$count rentals this month',
+                      style: const TextStyle(
+                        color: _grey500,
+                        fontSize: 12,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
                   );
                 },
               ),
-            ),
-          ],
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
@@ -73,26 +195,47 @@ class _AdminDashboardState extends State<AdminDashboard> {
 class _SummaryCard extends StatelessWidget {
   final String title;
   final String value;
+  final IconData icon;
 
-  const _SummaryCard({required this.title, required this.value});
+  const _SummaryCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFFE8E8E8)),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 6)],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.black54, fontSize: 12)),
-            const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+            Icon(icon, color: const Color(0xFFB0B0B0), size: 22),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Color(0xFF888888),
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Color(0xFF111111),
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'Inter',
+              ),
+            ),
           ],
         ),
       ),

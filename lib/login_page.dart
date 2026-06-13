@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'register_page.dart';
 import 'main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'forgot_password_page.dart';
+import 'admin_navigation.dart';
+import 'user_profile.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -37,15 +40,48 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _loading = false);
 
-    Navigator.of(context).pushAndRemoveUntil(
-  PageRouteBuilder(
-    pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
-    transitionsBuilder: (_, animation, __, child) =>
-        FadeTransition(opacity: animation, child: child),
-    transitionDuration: const Duration(milliseconds: 400),
-  ),
-  (route) => false,
-);
+    // Ambil data user dari Firestore untuk cek role (sinkronisasi dengan database)
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    bool isAdmin = false;
+    
+    if (currentUser != null) {
+      try {
+        final doc = await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get();
+        if (doc.exists) {
+          isAdmin = doc.data()?['isAdmin'] ?? false;
+          // Update local profile
+          UserProfile.isAdmin = isAdmin;
+          UserProfile.name = doc.data()?['name'] ?? '';
+          UserProfile.email = doc.data()?['email'] ?? '';
+        }
+      } catch (e) {
+        debugPrint('Error fetching user role: $e');
+      }
+    }
+
+    if (!mounted) return;
+
+    if (isAdmin) {
+      Navigator.of(context).pushAndRemoveUntil(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const AdminNavigationWrapper(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+          transitionDuration: const Duration(milliseconds: 400),
+        ),
+        (route) => false,
+      );
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+          transitionDuration: const Duration(milliseconds: 400),
+        ),
+        (route) => false,
+      );
+    }
 
   } on FirebaseAuthException catch (e) {
     String message;
