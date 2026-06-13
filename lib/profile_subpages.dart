@@ -1591,6 +1591,9 @@ class EditProfilePage extends StatefulWidget {
   final String email;
   final String phone;
   final String address;
+  final String city;
+  final String province;
+  final String postal;
 
   const EditProfilePage({
     Key? key,
@@ -1598,6 +1601,9 @@ class EditProfilePage extends StatefulWidget {
     required this.email,
     required this.phone,
     required this.address,
+    required this.city,
+    required this.province,
+    required this.postal,
   }) : super(key: key);
 
   @override
@@ -1609,6 +1615,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
+  late TextEditingController _cityController;
+  late TextEditingController _provinceController;
+  late TextEditingController _postalController;
 
   @override
   void initState() {
@@ -1617,6 +1626,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController = TextEditingController(text: widget.email);
     _phoneController = TextEditingController(text: widget.phone);
     _addressController = TextEditingController(text: widget.address);
+    _cityController = TextEditingController(text: widget.city);
+    _provinceController = TextEditingController(text: widget.province);
+    _postalController = TextEditingController(text: widget.postal);
   }
 
   @override
@@ -1625,6 +1637,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
+    _postalController.dispose();
     super.dispose();
   }
 
@@ -1639,6 +1654,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
         'address': _addressController.text.trim(),
+        'city': _cityController.text.trim(),
+        'province': _provinceController.text.trim(),
+        'postal': _postalController.text.trim(),
       };
 
       await FirebaseFirestore.instance
@@ -1651,6 +1669,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
 
       UserProfile.updateFromMap(result);
+
+     if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Profil berhasil diperbarui'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+
+      await Future.delayed(const Duration(seconds: 1));
 
       if (!mounted) return;
 
@@ -1743,8 +1776,59 @@ class _EditProfilePageState extends State<EditProfilePage> {
             const SizedBox(height: 8),
             _buildTextField(_addressController, Icons.home_outlined),
 
-            const SizedBox(height: 32),
+            // City
+            const Text(
+              "City / Regency",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              _cityController,
+              Icons.location_city_outlined,
+            ),
 
+            const SizedBox(height: 20),
+
+            // Province
+            const Text(
+              "Province",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              _provinceController,
+              Icons.map_outlined,
+            ),
+
+            const SizedBox(height: 20),
+
+            // Postal Code
+            const Text(
+              "Postal Code",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 8),
+            _buildTextField(
+              _postalController,
+              Icons.markunread_mailbox_outlined,
+              inputType: TextInputType.number,
+            ),
+            const SizedBox(height: 32),
             // Save button
             SizedBox(
               width: double.infinity,

@@ -4,6 +4,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'payment_page.dart';
 import 'user_profile.dart';
 import 'voucher_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookingPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -45,6 +47,12 @@ class _BookingPageState extends State<BookingPage> {
   final TextEditingController _postalController = TextEditingController();
   final TextEditingController _provinceController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+
+    @override
+  void initState() {
+    super.initState();
+    _fillFromProfile();
+  }
 
   // DUMMY TANGGAL YANG SUDAH DI-BOOKING
   final List<DateTime> _bookedDates = [
@@ -102,16 +110,50 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
-  void _fillFromProfile() {
+  Future<void> _fillFromProfile() async {
+  try {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    if (!doc.exists) return;
+
+    final data = doc.data()!;
+
     setState(() {
-      _recipientController.text = UserProfile.name;
-      _phoneController.text = UserProfile.phone;
-      _streetController.text = UserProfile.address;
+      _recipientController.text =
+          data['name']?.toString() ?? '';
+
+      _phoneController.text =
+          data['phone']?.toString() ?? '';
+
+      _streetController.text =
+          data['address']?.toString() ?? '';
+
+      _cityController.text =
+          data['city']?.toString() ?? '';
+
+      _postalController.text =
+          data['postal']?.toString() ?? '';
+
+      _provinceController.text =
+          data['province']?.toString() ?? '';
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Alamat diisi dari profil')),
+      const SnackBar(
+        content: Text('Data profil berhasil dimuat'),
+      ),
     );
+  } catch (e) {
+    debugPrint(e.toString());
   }
+}
 
   void _showVoucherSelector() {
     final availableVouchers = VoucherManager.instance.availableVouchers;

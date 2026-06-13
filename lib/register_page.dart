@@ -52,11 +52,17 @@ class _RegisterPageState extends State<RegisterPage> {
     'phone': '',
     'address': '',
     'isAdmin': false,
+
+    // Wallet
+    'deposit_balance': 0,
+    'cosmo_points': 0,
     });
 
     await FirebaseAuth.instance.currentUser?.updateDisplayName(
     _nameCtrl.text.trim(),
     );
+
+    await FirebaseAuth.instance.currentUser?.reload();
 
     if (!mounted) return;
 
@@ -188,7 +194,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Text('Sudah punya akun? '),
-                                  TextButton(onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginPage())); }, child: const Text('Masuk')),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Masuk'),
+                                  ),
                                 ],
                               ),
                             ],
