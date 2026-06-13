@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
-import 'splash_screen.dart'; // Hanya butuh import splash screen saja
+import 'firebase_options.dart';
+import 'splash_screen.dart';
+import 'home_page.dart';
+import 'profile_page.dart';
+import 'search_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp( options: DefaultFirebaseOptions.currentPlatform,);
   runApp(const MyApp());
 }
 
@@ -11,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+<<<<<<< HEAD
 <<<<<<< HEAD
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -116,6 +124,141 @@ class _MyHomePageState extends State<MyHomePage> {
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(), // Aplikasi dimulai dari sini
 >>>>>>> c398caf8113b5e073710abb9adc28575880054e7
+=======
+      title: 'Cosvoria — Premium Cosplay Rental',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Inter',
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF111111),
+          onPrimary: Colors.white,
+          surface: Colors.white,
+        ),
+      ),
+      home: const SplashScreen(),
+>>>>>>> c762c3a1c90eb2d31e618e84a8411bbd7a232cf6
     );
   }
 }
+
+// =============================================
+// Main Navigation Wrapper
+// Centralized Bottom Navigation Bar controller
+// 3 Tabs: Home (0), Search (1), Profile (2)
+// =============================================
+class MainNavigationWrapper extends StatefulWidget {
+  /// Optional [initialIndex] allows other pages to programmatically
+  /// route to a specific tab (e.g., deep-link to Profile).
+  final int initialIndex;
+
+  const MainNavigationWrapper({Key? key, this.initialIndex = 0})
+      : super(key: key);
+
+  @override
+  State<MainNavigationWrapper> createState() => _MainNavigationWrapperState();
+}
+
+class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
+  late int _selectedIndex;
+
+  // ── Pages displayed for each tab ──
+  late final List<Widget> _pages = <Widget>[
+    MainHomePage(onProfileTapped: () => _onTabTapped(2)), // Index 0: Home
+    const SearchPage(), // Index 1: Search
+    const ProfilePage(), // Index 2: Profile
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
+
+  void _onTabTapped(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const Key('main_navigation_scaffold'),
+      // IndexedStack preserves page state when switching tabs
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE8E8E8), width: 0.5),
+          ),
+        ),
+        child: BottomNavigationBar(
+          key: const Key('main_bottom_nav'),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          currentIndex: _selectedIndex,
+          type: BottomNavigationBarType.fixed,
+          // Active tab: solid black | Inactive tab: muted grey
+          selectedItemColor: const Color(0xFF111111),
+          unselectedItemColor: const Color(0xFFB0B0B0),
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Inter',
+            letterSpacing: 0.2,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w400,
+            fontFamily: 'Inter',
+          ),
+          onTap: _onTabTapped,
+          items: const [
+            // ── Home: outline → filled on active ──
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.home_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.home_filled),
+              ),
+              label: "Home",
+            ),
+            // ── Search: outline → filled on active ──
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.search_outlined),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.search_rounded),
+              ),
+              label: "Search",
+            ),
+            // ── Profile: outline → filled on active ──
+            BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.person_outline_rounded),
+              ),
+              activeIcon: Padding(
+                padding: EdgeInsets.only(bottom: 3),
+                child: Icon(Icons.person_rounded),
+              ),
+              label: "Profile",
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

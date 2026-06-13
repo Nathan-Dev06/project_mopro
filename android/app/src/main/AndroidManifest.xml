@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.project_mopro">
+    package="com.cosvoria">
    <application
-        android:label="project_mopro"
+        android:label="cosvoria"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

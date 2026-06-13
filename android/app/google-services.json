@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110078252087",
+    "project_id": "cosvoria-36f86",
+    "storage_bucket": "cosvoria-36f86.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110078252087:android:1f494749819d7bd4919bb2",
+        "android_client_info": {
+          "package_name": "com.cosvoria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3X6iFYB0NR-xysQkWg2VVKZbyXfY8KTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
