@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'splash_screen.dart'; // Hanya butuh import splash screen saja
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+<<<<<<< HEAD
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -110,6 +111,11 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+=======
+      title: 'Cosvoria Demo',
+      debugShowCheckedModeBanner: false,
+      home: const SplashScreen(), // Aplikasi dimulai dari sini
+>>>>>>> c398caf8113b5e073710abb9adc28575880054e7
     );
   }
 }
