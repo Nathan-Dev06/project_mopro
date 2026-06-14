@@ -17,6 +17,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey400 = Color(0xFFB0B0B0);
   static const Color _grey200 = Color(0xFFE8E8E8);
+  static const Color _redBadge = Color(0xFFE53935); // Warna lencana merah notifikasi
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
@@ -35,12 +36,13 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
       backgroundColor: _bg,
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   "Admin Profile",
                   style: TextStyle(
@@ -101,16 +103,29 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 ),
               ),
               const SizedBox(height: 32),
-              Divider(color: _grey200, height: 1, thickness: 1),
+              const Divider(color: _grey200, height: 1, thickness: 1),
               
+              // ── Deretan Menu yang Sudah Ditambahkan Fitur Lencana Notifikasi ──
               _MenuTile(icon: Icons.storefront_outlined, title: "Store Settings", onTap: () {}),
-              Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
               
               _MenuTile(icon: Icons.people_outline, title: "Manage Users", onTap: () {}),
-              Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
               
               _MenuTile(icon: Icons.account_balance_outlined, title: "Payout & Financials", onTap: () {}),
-              Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+
+              // MENU BARU 1: Identity Verification dengan angka penanda 4 merah
+              _MenuTile(icon: Icons.gpp_good_outlined, title: "Identity Verification", badgeCount: "4", onTap: () {}),
+              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+
+              // MENU BARU 2: Voucher & Point
+              _MenuTile(icon: Icons.confirmation_number_outlined, title: "Voucher & Point", onTap: () {}),
+              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+
+              // MENU BARU 3: Notification Settings
+              _MenuTile(icon: Icons.notifications_none_outlined, title: "Notification Settings", onTap: () {}),
+              const Divider(color: _grey200, height: 1, thickness: 1),
 
               const SizedBox(height: 32),
               Padding(
@@ -150,6 +165,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 30),
             ],
           ),
         ),
@@ -158,14 +174,17 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   }
 }
 
+// ── Widget Kustom Menu Tile yang Sudah Ditambahkan Fitur Lencana Bulat ──
 class _MenuTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String? badgeCount; // Ditambahkan parameter opsional untuk penanda angka
   final VoidCallback onTap;
 
   const _MenuTile({
     required this.icon,
     required this.title,
+    this.badgeCount, // Default-nya null kalau tidak diisi
     required this.onTap,
   });
 
@@ -190,6 +209,26 @@ class _MenuTile extends StatelessWidget {
                 ),
               ),
             ),
+            // Jika badgeCount diisi, maka kotak merah notifikasi akan muncul di sini
+            if (badgeCount != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53935).withOpacity(0.12), // Merah transparan lembut
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeCount!,
+                  style: const TextStyle(
+                    color: Color(0xFFE53935),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
             const Icon(
               Icons.chevron_right_rounded,
               color: Color(0xFFB0B0B0),
