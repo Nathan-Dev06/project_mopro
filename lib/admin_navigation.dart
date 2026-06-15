@@ -23,11 +23,17 @@ class _AdminNavigationWrapperState extends State<AdminNavigationWrapper> {
   late int _selectedIndex;
 
   // ── Pages displayed for each tab ──
-  late final List<Widget> _pages = const [
-    AdminDashboard(), // Index 0: Dashboard
-    AdminOrdersPage(), // Index 1: Orders
-    AdminCatalogPage(), // Index 2: Catalog
-    AdminProfilePage(), // Index 3: Profile
+  // Kata kunci 'const' di sini sudah dihapus supaya tidak bikin eror merah lagi!
+  late final List<Widget> _pages = [
+    AdminDashboard(
+      onSeeAllPressed: () {
+        // Ketika "Lihat semua" diklik, pindah otomatis ke index 2 (Catalog)
+        _onTabTapped(2);
+      },
+    ), // Index 0: Dashboard
+    const AdminOrdersPage(),  // Index 1: Orders
+    const AdminCatalogPage(), // Index 2: Catalog
+    const AdminProfilePage(), // Index 3: Profile
   ];
 
   @override
@@ -60,7 +66,6 @@ class _AdminNavigationWrapperState extends State<AdminNavigationWrapper> {
           elevation: 0,
           currentIndex: _selectedIndex,
           type: BottomNavigationBarType.fixed,
-          // Active tab: solid black | Inactive tab: muted grey
           selectedItemColor: const Color(0xFF111111),
           unselectedItemColor: const Color(0xFFB0B0B0),
           showSelectedLabels: true,
