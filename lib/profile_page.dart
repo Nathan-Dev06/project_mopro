@@ -61,6 +61,9 @@ class _ProfilePageState extends State<ProfilePage> {
           _userEmail = data['email'] ?? '';
           _userPhone = data['phone'] ?? '';
           _userAddress = data['address'] ?? '';
+          _userCity = data['city'] ?? '';
+          _userProvince = data['province'] ?? '';
+          _userPostal = data['postal'] ?? '';
           _isAdmin = data['isAdmin'] ?? false;
           _depositBalance = (data['deposit_balance'] ?? 0).toInt();
           _cosmoPoints = (data['cosmo_points'] ?? 0).toInt();
@@ -76,6 +79,9 @@ class _ProfilePageState extends State<ProfilePage> {
   String _userEmail = "tes@gmail.com";
   String _userPhone = "";
   String _userAddress = "";
+  String _userCity = "";
+  String _userProvince = "";
+  String _userPostal = "";
   bool _isAdmin = false;
   int _depositBalance = 0;
   int _cosmoPoints = 0;
@@ -113,11 +119,14 @@ class _ProfilePageState extends State<ProfilePage> {
       context,
       MaterialPageRoute(
         builder: (_) => EditProfilePage(
-          name: _userName,
-          email: _userEmail,
-          phone: _userPhone,
-          address: _userAddress,
-        ),
+        name: _userName,
+        email: _userEmail,
+        phone: _userPhone,
+        address: _userAddress,
+        city: _userCity,
+        province: _userProvince,
+        postal: _userPostal,
+),
       ),
     );
 
@@ -127,6 +136,9 @@ class _ProfilePageState extends State<ProfilePage> {
         _userEmail = result['email'] ?? _userEmail;
         _userPhone = result['phone'] ?? _userPhone;
         _userAddress = result['address'] ?? _userAddress;
+        _userCity = result['city'] ?? _userCity;
+        _userProvince = result['province'] ?? _userProvince;
+        _userPostal = result['postal'] ?? _userPostal;
       });
     }
   }

@@ -37,18 +37,16 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _loading = false);
 
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context, true);
-    } else {
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
-          transitionsBuilder: (_, animation, __, child) =>
-              FadeTransition(opacity: animation, child: child),
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
-      );
-    }
+    Navigator.of(context).pushAndRemoveUntil(
+  PageRouteBuilder(
+    pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
+    transitionsBuilder: (_, animation, __, child) =>
+        FadeTransition(opacity: animation, child: child),
+    transitionDuration: const Duration(milliseconds: 400),
+  ),
+  (route) => false,
+);
+
   } on FirebaseAuthException catch (e) {
     String message;
 
