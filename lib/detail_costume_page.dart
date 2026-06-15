@@ -34,7 +34,6 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   late String _selectedSize;
   late AnimationController _favController;
   late Animation<double> _favScale;
-
   // Shortcut accessor
   Map<String, dynamic> get data => widget.costumeData;
   bool get isReady => data['isReady'] == true;
@@ -240,9 +239,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   color: Colors.black.withOpacity(0.55),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
+                  children: [
                     Icon(Icons.photo_library_outlined,
                         size: 14, color: Colors.white),
                     SizedBox(width: 4),
@@ -662,8 +661,8 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
@@ -767,10 +766,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ),
             ),
             const SizedBox(width: 14),
-            Expanded(
+            const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Higienis & Siap Pakai',
                     style: TextStyle(
@@ -807,8 +806,8 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: const [
+          const Row(
+            children: [
               Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(

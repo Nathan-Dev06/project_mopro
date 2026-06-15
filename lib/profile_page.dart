@@ -439,10 +439,10 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 14),
 
               // ── Contact Row ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: const [
+                  children: [
                     _ContactChip(
                       icon: Icons.email_outlined,
                       label: "cs@cosvoria.com",

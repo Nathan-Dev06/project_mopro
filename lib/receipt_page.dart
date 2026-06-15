@@ -306,7 +306,7 @@ class ReceiptPage extends StatelessWidget {
                                   "Payment Method", paymentMethod),
                               if (discountAmount > 0)
                                 _buildTicketDetailRow(
-                                  "Discount (${voucherCode})",
+                                  "Discount ($voucherCode)",
                                   "-Rp ${NumberFormat('#,###', 'id').format(discountAmount)}",
                                   textColor: semanticSuccess,
                                 ),
@@ -744,9 +744,9 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : Row(
+                  : const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(Icons.file_download_outlined, size: 18),
                         SizedBox(width: 8),
                         Text(

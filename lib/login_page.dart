@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: primary,
+                                    backgroundColor: const Color.fromARGB(255, 241, 234, 234),
                                     padding: const EdgeInsets.symmetric(vertical: 14),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                   ),
@@ -249,9 +249,9 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 8),
                         const Text('atau masuk dengan', style: TextStyle(color: Colors.black54, fontSize: 12)),
                         const SizedBox(height: 10),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             _SocialButton(icon: Icons.apple, label: 'Apple'),
                             SizedBox(width: 12),
                             _SocialButton(icon: Icons.facebook, label: 'Facebook'),

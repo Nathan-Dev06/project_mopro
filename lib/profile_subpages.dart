@@ -1109,10 +1109,10 @@ class MyVouchersPage extends StatelessWidget {
           final claimedVouchers = vouchers.where((v) => v.isClaimed).toList();
 
           if (claimedVouchers.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.confirmation_num_outlined,
                       size: 56, color: _K.grey300),
                   SizedBox(height: 16),
@@ -1244,10 +1244,10 @@ class WishlistPage extends StatelessWidget {
         valueListenable: WishlistManager.instance.wishlistNotifier,
         builder: (context, wishlist, _) {
           if (wishlist.isEmpty) {
-            return Center(
+            return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Icon(Icons.favorite_border_rounded,
                       size: 56, color: _K.grey300),
                   SizedBox(height: 16),
@@ -1928,7 +1928,7 @@ class RentalTermsPage extends StatelessWidget {
                 "You are responsible for safely returning the costume using a trackable shipping method or returning it directly to our physical store. Please ensure the costume is packed securely to prevent any damage during transit."),
             const SizedBox(height: 40),
 
-            Center(
+            const Center(
               child: Text(
                 "Last updated: June 2026",
                 style: TextStyle(

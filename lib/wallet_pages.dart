@@ -71,7 +71,7 @@ class DepositBalancePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.account_balance_wallet_outlined, color: Colors.white70, size: 20),
                       SizedBox(width: 8),
@@ -117,12 +117,12 @@ class DepositBalancePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             // History
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Recent Transactions",
                     style: TextStyle(color: _K.black, fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w700),
                   ),
@@ -271,7 +271,7 @@ class CosmoPointsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       Icon(Icons.star_rounded, color: Colors.amber, size: 22),
                       SizedBox(width: 8),
@@ -317,12 +317,12 @@ class CosmoPointsPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             // History
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Points History",
                     style: TextStyle(color: _K.black, fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w700),
                   ),

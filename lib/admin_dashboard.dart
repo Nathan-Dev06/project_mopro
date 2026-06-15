@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'services/report_service.dart';
 import 'user_profile.dart';
+import 'manage_orders_page.dart';
+import 'manage_costumes_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({Key? key}) : super(key: key);
@@ -20,6 +22,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     final today = DateTime.now();
     final todayIncome = ReportService.incomeForDay(today);
+<<<<<<< HEAD
     final monthIncome = ReportService.incomeForMonth(today.year, today.month);
     final top = ReportService.topCostumes(limit: 5);
 
@@ -137,12 +140,126 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
+=======
+    final monthIncome =
+        ReportService.incomeForMonth(today.year, today.month);
+
+    final top = ReportService.topCostumes(limit: 10);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin Dashboard'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0.5,
+      ),
+      backgroundColor: Colors.white,
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                _SummaryCard(
+                  title: 'Today Income',
+                  value: ReportService.formatCurrency(todayIncome),
+                ),
+                const SizedBox(width: 12),
+                _SummaryCard(
+                  title: 'This Month',
+                  value: ReportService.formatCurrency(monthIncome),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'Admin Menu',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ==========================
+            // MANAGE ORDERS
+            // ==========================
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.receipt_long),
+                title: const Text('Manage Orders'),
+                subtitle: const Text('Manage customer rentals'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ManageOrdersPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ==========================
+            // MANAGE COSTUMES
+            // ==========================
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.checkroom),
+                title: const Text('Manage Costumes'),
+                subtitle: const Text('Manage rental costumes'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ManageCostumesPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'Top Rented Costumes',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            Expanded(
+              child: ListView.builder(
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
                 itemCount: top.keys.length,
                 separatorBuilder: (context, index) => Divider(color: _grey200, height: 1),
                 itemBuilder: (context, index) {
                   final key = top.keys.elementAt(index);
                   final count = top[key]!;
+
                   return ListTile(
+<<<<<<< HEAD
                     contentPadding: EdgeInsets.zero,
                     leading: Container(
                       width: 48,
@@ -180,6 +297,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ),
                     ),
                     trailing: const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
+=======
+                    leading: CircleAvatar(
+                      child: Text('${index + 1}'),
+                    ),
+                    title: Text(key),
+                    subtitle: Text('$count sewa'),
+                    trailing: Text('$count times'),
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
                   );
                 },
               ),
@@ -200,7 +325,10 @@ class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
     required this.title,
     required this.value,
+<<<<<<< HEAD
     required this.icon,
+=======
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
   });
 
   @override
@@ -211,11 +339,24 @@ class _SummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
+<<<<<<< HEAD
           border: Border.all(color: const Color(0xFFE8E8E8)),
+=======
+          border: Border.all(
+            color: const Color(0xFFE8E8E8),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+            ),
+          ],
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+<<<<<<< HEAD
             Icon(icon, color: const Color(0xFFB0B0B0), size: 22),
             const SizedBox(height: 12),
             Text(
@@ -234,6 +375,21 @@ class _SummaryCard extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'Inter',
+=======
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
               ),
             ),
           ],
