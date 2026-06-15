@@ -62,7 +62,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
 Widget build(BuildContext context) {
-  final primary = const Color(0xFF111111);
+  const primary = Color(0xFF111111);
 
   return Scaffold(
     body: Container(
