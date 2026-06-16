@@ -71,7 +71,7 @@ class DepositBalancePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.account_balance_wallet_outlined, color: Colors.white70, size: 20),
                       SizedBox(width: 8),
@@ -117,8 +117,8 @@ class DepositBalancePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             // History
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -271,7 +271,7 @@ class CosmoPointsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(Icons.star_rounded, color: Colors.amber, size: 22),
                       SizedBox(width: 8),
@@ -317,8 +317,8 @@ class CosmoPointsPage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             // History
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

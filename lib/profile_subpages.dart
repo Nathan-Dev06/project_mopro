@@ -1109,7 +1109,7 @@ class MyVouchersPage extends StatelessWidget {
           final claimedVouchers = vouchers.where((v) => v.isClaimed).toList();
 
           if (claimedVouchers.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1244,7 +1244,7 @@ class WishlistPage extends StatelessWidget {
         valueListenable: WishlistManager.instance.wishlistNotifier,
         builder: (context, wishlist, _) {
           if (wishlist.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -1538,15 +1538,15 @@ class _SettingsPageState extends State<SettingsPage> {
   void _showDeleteAccountDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: _K.bg,
         title: const Text("Delete Account", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
         content: const Text("Are you sure you want to permanently delete your account? This action cannot be undone.", style: TextStyle(fontFamily: 'Inter')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: _K.black))),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Cancel", style: TextStyle(color: _K.black))),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(dialogContext); // Close dialog
               try {
                 final user = FirebaseAuth.instance.currentUser;
                 if (user != null) {

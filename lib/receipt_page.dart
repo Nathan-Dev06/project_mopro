@@ -744,7 +744,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : const Row(
+                  : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.file_download_outlined, size: 18),

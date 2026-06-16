@@ -112,100 +112,185 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFF111111);
+    // Colors for minimalist design
+    const bgLight = Color(0xFFFAFAFA);
+    const inkPrimary = Color(0xFF111111);
+    const inkSecondary = Color(0xFF6B7280);
+    const fieldBg = Color(0xFFF3F4F6);
+
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFF7F3FF), Color(0xFFE6F7F1)],
-          ),
+      backgroundColor: bgLight,
+      appBar: AppBar(
+        backgroundColor: bgLight,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: inkPrimary, size: 20),
+          onPressed: () => Navigator.pop(context),
         ),
+      ),
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  width: 84,
-                  height: 84,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 14, offset: const Offset(0, 6))],
+                // Minimalist Header
+                const Text(
+                  'Create an account',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                    color: inkPrimary,
+                    fontFamily: 'Inter',
                   ),
-                  child: const Center(child: Icon(Icons.checkroom_rounded, size: 38, color: Color(0xFF111111))),
                 ),
-                const SizedBox(height: 12),
-                const Text('Buat Akun', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 18),
+                const SizedBox(height: 8),
+                const Text(
+                  'Join the premium cosplay community',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: inkSecondary,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 40),
 
-                Card(
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      children: [
-                        Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: _nameCtrl,
-                                decoration: InputDecoration(prefixIcon: const Icon(Icons.person_outline), labelText: 'Nama', border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-                                validator: (v) => (v==null||v.isEmpty)?'Masukkan nama':null,
-                              ),
-                              const SizedBox(height: 12),
-                              TextFormField(
-                                controller: _emailCtrl,
-                                decoration: InputDecoration(prefixIcon: const Icon(Icons.email_outlined), labelText: 'Email', border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-                                validator: (v) => (v==null||v.isEmpty)?'Masukkan email':null,
-                              ),
-                              const SizedBox(height: 12),
-                              TextFormField(
-                                controller: _passwordCtrl,
-                                obscureText: _obscure,
-                                decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), labelText: 'Password', border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)), suffixIcon: IconButton(icon: Icon(_obscure?Icons.visibility_off:Icons.visibility), onPressed: () => setState(()=>_obscure=!_obscure))),
-                                validator: (v) => (v==null||v.isEmpty)?'Masukkan password':null,
-                              ),
-                              const SizedBox(height: 12),
-                              TextFormField(
-                                controller: _confirmCtrl,
-                                obscureText: _obscure,
-                                decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), labelText: 'Konfirmasi Password', border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-                                validator: (v) => (v==null||v.isEmpty)?'Konfirmasi password':null,
-                              ),
-                              const SizedBox(height: 12),
-                              if (_error != null) Padding(padding: const EdgeInsets.only(bottom:8.0), child: Text(_error!, style: const TextStyle(color: Colors.red))),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: primary, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                                  onPressed: _loading ? null : _doRegister,
-                                  child: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Daftar', style: TextStyle(fontWeight: FontWeight.w700)),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text('Sudah punya akun? '),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('Masuk'),
-                                  ),
-                                ],
-                              ),
-                            ],
+                // Form
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Name Field
+                      TextFormField(
+                        controller: _nameCtrl,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: inkPrimary),
+                        decoration: InputDecoration(
+                          hintText: 'Full Name',
+                          hintStyle: const TextStyle(color: inkSecondary, fontSize: 15),
+                          filled: true,
+                          fillColor: fieldBg,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(Icons.person_outline_rounded, color: inkSecondary, size: 22),
+                        ),
+                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan nama' : null,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Email Field
+                      TextFormField(
+                        controller: _emailCtrl,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: inkPrimary),
+                        decoration: InputDecoration(
+                          hintText: 'Email address',
+                          hintStyle: const TextStyle(color: inkSecondary, fontSize: 15),
+                          filled: true,
+                          fillColor: fieldBg,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(Icons.email_outlined, color: inkSecondary, size: 22),
+                        ),
+                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan email' : null,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Password Field
+                      TextFormField(
+                        controller: _passwordCtrl,
+                        obscureText: _obscure,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: inkPrimary),
+                        decoration: InputDecoration(
+                          hintText: 'Password',
+                          hintStyle: const TextStyle(color: inkSecondary, fontSize: 15),
+                          filled: true,
+                          fillColor: fieldBg,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(Icons.lock_outline_rounded, color: inkSecondary, size: 22),
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: inkSecondary, size: 20),
+                            onPressed: () => setState(() => _obscure = !_obscure),
                           ),
                         ),
-                      ],
-                    ),
+                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan password' : null,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Confirm Password Field
+                      TextFormField(
+                        controller: _confirmCtrl,
+                        obscureText: _obscure,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: inkPrimary),
+                        decoration: InputDecoration(
+                          hintText: 'Confirm password',
+                          hintStyle: const TextStyle(color: inkSecondary, fontSize: 15),
+                          filled: true,
+                          fillColor: fieldBg,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(Icons.lock_outline_rounded, color: inkSecondary, size: 22),
+                        ),
+                        validator: (v) => (v == null || v.isEmpty) ? 'Konfirmasi password' : null,
+                      ),
+                      const SizedBox(height: 12),
+
+                      if (_error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.w500), textAlign: TextAlign.center),
+                        ),
+
+                      // Register Button
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: inkPrimary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        onPressed: _loading ? null : _doRegister,
+                        child: _loading
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                            : const Text('Sign up', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Login Redirect
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Already have an account? ', style: TextStyle(color: inkSecondary, fontSize: 14)),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: inkPrimary,
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Log in', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],

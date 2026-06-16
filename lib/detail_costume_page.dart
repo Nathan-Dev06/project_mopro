@@ -34,12 +34,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   late String _selectedSize;
   late AnimationController _favController;
   late Animation<double> _favScale;
-<<<<<<< Updated upstream
-=======
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
 
->>>>>>> Stashed changes
   // Shortcut accessor
   Map<String, dynamic> get data => widget.costumeData;
   bool get isReady => data['isReady'] == true;
@@ -261,32 +258,6 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ),
             ),
 
-            // ── Image counter badge ──
-<<<<<<< Updated upstream
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.photo_library_outlined,
-                        size: 14, color: Colors.white),
-                    SizedBox(width: 4),
-                    Text(
-                      '1 / 1',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.3,
-=======
             if (images.isNotEmpty)
               Positioned(
                 bottom: 16,
@@ -312,7 +283,6 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.3,
                         ),
->>>>>>> Stashed changes
                       ),
                     ],
                   ),
@@ -762,9 +732,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
+              const Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
                 'Kelengkapan Paket Sewa',
@@ -867,10 +837,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ),
             ),
             const SizedBox(width: 14),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     'Higienis & Siap Pakai',
                     style: TextStyle(
@@ -1119,9 +1089,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
+              const Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
                 'Ketentuan Sewa',

@@ -61,187 +61,130 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   }
 
   @override
-Widget build(BuildContext context) {
-  const primary = Color.fromARGB(255, 224, 216, 216);
+  Widget build(BuildContext context) {
+    // Colors for minimalist design
+    const bgLight = Color(0xFFFAFAFA);
+    const inkPrimary = Color(0xFF111111);
+    const inkSecondary = Color(0xFF6B7280);
+    const fieldBg = Color(0xFFF3F4F6);
 
-  return Scaffold(
-    body: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFF7F3FF),
-            Color(0xFFE6F7F1),
-          ],
+    return Scaffold(
+      backgroundColor: bgLight,
+      appBar: AppBar(
+        backgroundColor: bgLight,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: inkPrimary, size: 20),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 40,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 92,
-                height: 92,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Minimalist Header
+                const Text(
+                  'Reset password',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                    color: inkPrimary,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Enter the email associated with your account',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: inkSecondary,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                // Email Field
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: inkPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'Email address',
+                    hintStyle: const TextStyle(color: inkSecondary, fontSize: 15),
+                    filled: true,
+                    fillColor: fieldBg,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
                     ),
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.lock_reset_rounded,
-                    size: 44,
-                    color: Color(0xFF111111),
+                    prefixIcon: const Icon(Icons.email_outlined, color: inkSecondary, size: 22),
                   ),
                 ),
-              ),
+                const SizedBox(height: 16),
 
-              const SizedBox(height: 14),
-
-              const Text(
-                'RESET PASSWORD',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-
-              const SizedBox(height: 6),
-
-              const Text(
-                'Masukkan email yang terdaftar',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black54,
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              Card(
-                elevation: 6,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          prefixIcon:
-                              const Icon(Icons.email_outlined),
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(10),
-                            ),
-                          ),
-                          onPressed:
-                              _loading ? null : _resetPassword,
-                          child: _loading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child:
-                                      CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Text(
-                                  'Kirim Link Reset',
-                                  style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w700,
-                                  ),
-                                ),
-                        ),
-                      ),
-
-                      if (_message != null) ...[
-                        const SizedBox(height: 12),
-
-                        Container(
-                          width: double.infinity,
-                          padding:
-                              const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: _message!
-                                    .toLowerCase()
-                                    .contains('dikirim')
-                                ? Colors.green.shade50
-                                : Colors.red.shade50,
-                            borderRadius:
-                                BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _message!,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: _message!
-                                      .toLowerCase()
-                                      .contains('dikirim')
-                                  ? Colors.green.shade700
-                                  : Colors.red.shade700,
-                            ),
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 10),
-
-                      TextButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          size: 18,
-                        ),
-                        label:
-                            const Text('Kembali ke Login'),
-                      ),
-                    ],
+                // Reset Button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: inkPrimary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
+                  onPressed: _loading ? null : _resetPassword,
+                  child: _loading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      : const Text('Send Reset Link', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
                 ),
-              ),
-            ],
+                
+                if (_message != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: _message!.toLowerCase().contains('dikirim') || _message!.toLowerCase().contains('sent')
+                          ? Colors.green.shade50
+                          : Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _message!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: _message!.toLowerCase().contains('dikirim') || _message!.toLowerCase().contains('sent')
+                            ? Colors.green.shade700
+                            : Colors.red.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+
+                // Back to Login Redirect
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: inkPrimary,
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Back to Log in', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

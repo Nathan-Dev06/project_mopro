@@ -439,8 +439,8 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 14),
 
               // ── Contact Row ──
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
                     _ContactChip(

@@ -476,8 +476,8 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget _buildSearchResults(List<CostumeData> results) {
     if (results.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 60),
+      return Padding(
+        padding: const EdgeInsets.only(top: 60),
         child: Center(
           child: Column(
             children: [
