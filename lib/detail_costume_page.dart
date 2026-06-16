@@ -34,9 +34,24 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   late String _selectedSize;
   late AnimationController _favController;
   late Animation<double> _favScale;
+<<<<<<< Updated upstream
+=======
+  final PageController _pageController = PageController();
+  int _currentImageIndex = 0;
+
+>>>>>>> Stashed changes
   // Shortcut accessor
   Map<String, dynamic> get data => widget.costumeData;
   bool get isReady => data['isReady'] == true;
+  
+  List<String> get images {
+    if (data['images'] != null && data['images'] is List) {
+      return List<String>.from(data['images']);
+    } else if (data['image'] != null) {
+      return [data['image']];
+    }
+    return [];
+  }
 
   @override
   void initState() {
@@ -54,6 +69,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
 
   @override
   void dispose() {
+    _pageController.dispose();
     _favController.dispose();
     super.dispose();
   }
@@ -83,14 +99,20 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               SliverToBoxAdapter(child: _buildDivider()),
               SliverToBoxAdapter(child: _buildPriceSection()),
               SliverToBoxAdapter(child: _buildDivider()),
+              SliverToBoxAdapter(child: _buildSpecifications()),
+              SliverToBoxAdapter(child: _buildDivider()),
+              SliverToBoxAdapter(child: _buildConditionMinus()),
+              SliverToBoxAdapter(child: _buildDivider()),
               SliverToBoxAdapter(child: _buildSizeGuide()),
+              SliverToBoxAdapter(child: _buildDivider()),
+              SliverToBoxAdapter(child: _buildShippingInfo()),
               SliverToBoxAdapter(child: _buildDivider()),
               SliverToBoxAdapter(child: _buildIncludeList()),
               SliverToBoxAdapter(child: _buildTrustBanner()),
               SliverToBoxAdapter(child: _buildRentalPolicy()),
               SliverToBoxAdapter(child: _buildDivider()),
               SliverToBoxAdapter(child: _buildCustomerReviews()),
-              // Bottom padding so content doesn't hide behind sticky bar
+              // Bottom padding so content doesnt hide behind sticky bar
               const SliverToBoxAdapter(
                 child: SizedBox(height: 120),
               ),
@@ -167,18 +189,29 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // ── Hero Image ──
-            data['image'] != null
-                ? Image.asset(
-                    data['image'],
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: _bgColor,
-                      child: const Center(
-                        child: Icon(Icons.broken_image_outlined,
-                            size: 48, color: _textTertiary),
-                      ),
-                    ),
+            // ── Hero Image Carousel ──
+            images.isNotEmpty
+                ? PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemCount: images.length,
+                    itemBuilder: (context, index) {
+                      return Image.asset(
+                        images[index],
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: _bgColor,
+                          child: const Center(
+                            child: Icon(Icons.broken_image_outlined,
+                                size: 48, color: _textTertiary),
+                          ),
+                        ),
+                      );
+                    },
                   )
                 : Container(
                     color: _bgColor,
@@ -229,6 +262,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             ),
 
             // ── Image counter badge ──
+<<<<<<< Updated upstream
             Positioned(
               bottom: 16,
               right: 16,
@@ -252,12 +286,38 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.3,
+=======
+            if (images.isNotEmpty)
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.55),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.photo_library_outlined,
+                          size: 14, color: Colors.white),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${_currentImageIndex + 1} / ${images.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+>>>>>>> Stashed changes
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -440,19 +500,34 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ],
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: _textPrimary,
+                color: _surfaceColor,
                 borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: _hairline),
               ),
-              child: const Text(
-                'BEST DEAL',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                  color: Colors.white,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    'WAJIB DEPOSIT',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                      color: _textTertiary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Rp ${data['deposit'] ?? '50.000'}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _textPrimary,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -567,6 +642,32 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 value: sizeInfo['TB']!,
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          // Fit Notes
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.straighten_rounded, size: 16, color: _textSecondary),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    data['fit_notes'] ?? 'Fit Notes: Kostum ini true to size, namun bagian lingkar dada sedikit sempit. Bahan tidak stretch.',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: _textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -798,6 +899,218 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   }
 
   // ═══════════════════════════════════════════════════════════════════
+  //  NEW HELPER SECTIONS: Specs, Condition, Shipping
+  // ═══════════════════════════════════════════════════════════════════
+  Widget _buildSpecifications() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.style_outlined, size: 18, color: _textPrimary),
+              SizedBox(width: 8),
+              Text(
+                'Spesifikasi Kostum',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _specItem(
+                  label: 'Brand / Maker',
+                  value: data['maker'] ?? 'Uwowo Cosplay / Setara',
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _specItem(
+                  label: 'Bahan Utama',
+                  value: data['material'] ?? 'Premium Jacquard & Katun',
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _specItem(
+                  label: 'Berat Kostum',
+                  value: data['weight'] ?? '1.2 kg',
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _specItem(
+                  label: 'Detail Ekstra',
+                  value: data['extra_details'] ?? 'Wig pre-styled (Manmei)',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _specItem({required String label, required String value}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: _textSecondary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: _textPrimary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConditionMinus() {
+    final String minus = data['minus'] ?? 'Secara keseluruhan mulus (90%). Terdapat sedikit noda pudar di bagian kerah dalam (tidak terlihat saat dipakai), dan 1 aksesoris kecil diganti baru.';
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.info_outline_rounded, size: 18, color: _accentRed),
+              SizedBox(width: 8),
+              Text(
+                'Kondisi & Defect (Minus)',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: _accentRedBg.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFFECACA)),
+            ),
+            child: Text(
+              minus,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF991B1B), // Dark red
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShippingInfo() {
+    final String location = data['location'] ?? 'Jakarta Selatan, DKI Jakarta';
+    final bool canInstant = data['can_instant'] ?? true;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.local_shipping_outlined, size: 18, color: _textPrimary),
+              SizedBox(width: 8),
+              Text(
+                'Pengiriman & Lokasi',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: _textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: _surfaceColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: _hairline),
+                ),
+                child: const Icon(Icons.location_on_outlined, size: 20, color: _textSecondary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Dikirim dari',
+                      style: TextStyle(fontSize: 11, color: _textTertiary),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      location,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                    if (canInstant) ...[
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.bolt_rounded, size: 12, color: _gold),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Mendukung Kurir Instan (GoSend/Grab)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: _gold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   //  6. RENTAL & DEPOSIT POLICY
   // ═══════════════════════════════════════════════════════════════════
   Widget _buildRentalPolicy() {
@@ -835,9 +1148,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   icon: Icons.shield_outlined,
                   iconBg: const Color(0xFFFEF3C7),
                   iconColor: const Color(0xFFD97706),
-                  title: 'Wajib Deposit Rp 50.000',
+                  title: 'Wajib Deposit Rp ${data['deposit'] ?? '50.000'}',
                   subtitle:
-                      'Uang jaminan — dikembalikan penuh saat kostum dikembalikan dalam kondisi baik.',
+                      'Uang jaminan dikembalikan penuh 1x24 jam setelah kostum kami terima kembali dalam kondisi baik.',
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
@@ -849,7 +1162,19 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   iconColor: const Color(0xFF4F46E5),
                   title: 'Tidak Perlu Dicuci',
                   subtitle:
-                      'Kembalikan saja apa adanya. Kami yang akan mencuci ulang secara profesional.',
+                      'Jangan mencuci kostum/wig sendiri untuk menghindari kerusakan. Kami yang akan mencucinya.',
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(color: _hairline, height: 1),
+                ),
+                _policyItem(
+                  icon: Icons.warning_amber_rounded,
+                  iconBg: const Color(0xFFFEE2E2),
+                  iconColor: const Color(0xFFDC2626),
+                  title: 'Denda Keterlambatan & Kerusakan',
+                  subtitle:
+                      'Keterlambatan didenda Rp 25.000/hari. Kerusakan cacat permanen akan memotong uang deposit.',
                 ),
               ],
             ),
@@ -1161,7 +1486,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   ),
                 ),
                 child: Text(
-                  isReady ? 'Sewa Sekarang' : 'Sedang Disewa',
+                  isReady ? 'Pilih Tanggal Sewa' : 'Tidak Tersedia',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
