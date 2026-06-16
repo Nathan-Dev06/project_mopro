@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'login_page.dart';
-import 'user_profile.dart';
+import 'admin_store_settings.dart'; 
+import 'admin_manage_users_page.dart';
+import 'admin_payout_page.dart'; 
+import 'admin_identity_verification_page.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -11,24 +12,10 @@ class AdminProfilePage extends StatefulWidget {
 }
 
 class _AdminProfilePageState extends State<AdminProfilePage> {
-
   static const Color _bg = Color(0xFFFFFFFF);
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
-  static const Color _grey400 = Color(0xFFB0B0B0);
   static const Color _grey200 = Color(0xFFE8E8E8);
-  static const Color _redBadge = Color(0xFFE53935); // Warna lencana merah notifikasi
-
-  Future<void> _logout() async {
-    await FirebaseAuth.instance.signOut();
-    UserProfile.isAdmin = false;
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-      (route) => false,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,11 +23,12 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
       backgroundColor: _bg,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
+              
+              // ── JUDUL HALAMAN ──
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
@@ -55,186 +43,204 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // ── 1. PROFIL HEADER ADMIN ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFFF5F5F5),
-                        border: Border.all(color: _grey200, width: 1.5),
-                      ),
-                      child: const Icon(
-                        Icons.admin_panel_settings_outlined,
-                        color: Color(0xFFB0B0B0),
-                        size: 28,
-                      ),
+                    const CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Color(0xFFF3F4F6),
+                      child: Icon(Icons.account_box_rounded, color: _grey500, size: 36),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            UserProfile.name.isEmpty ? 'Super Admin' : UserProfile.name,
-                            style: const TextStyle(
-                              color: _black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Inter',
-                            ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Admin",
+                          style: TextStyle(
+                            color: _black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Inter',
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            UserProfile.email.isEmpty ? 'admin@cosvoria.com' : UserProfile.email,
-                            style: const TextStyle(
-                              color: _grey500,
-                              fontSize: 12,
-                              fontFamily: 'Inter',
-                            ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Admin@gmail.com",
+                          style: TextStyle(
+                            color: _grey500,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              const Divider(color: _grey200, height: 1, thickness: 1),
+              const SizedBox(height: 30),
+              const Divider(color: _grey200, height: 1),
+
+              // ── 2. DAFTAR MENU OPSI ──
               
-              // ── Deretan Menu yang Sudah Ditambahkan Fitur Lencana Notifikasi ──
-              _MenuTile(icon: Icons.storefront_outlined, title: "Store Settings", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
-              
-              _MenuTile(icon: Icons.people_outline, title: "Manage Users", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
-              
-              _MenuTile(icon: Icons.account_balance_outlined, title: "Payout & Financials", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              // Menu 1: Store Settings
+              _buildMenuRow(
+                icon: Icons.store_outlined,
+                title: "Store Settings",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StoreSettingsPage()),
+                  );
+                },
+              ),
 
-              // MENU BARU 1: Identity Verification dengan angka penanda 4 merah
-              _MenuTile(icon: Icons.gpp_good_outlined, title: "Identity Verification", badgeCount: "4", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              // Menu 2: Manage Users 
+              _buildMenuRow(
+                icon: Icons.people_outline,
+                title: "Manage Users",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminManageUsersPage()),
+                  );
+                },
+              ),
 
-              // MENU BARU 2: Voucher & Point
-              _MenuTile(icon: Icons.confirmation_number_outlined, title: "Voucher & Point", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1, indent: 20, endIndent: 20),
+              // Menu 3: Payout & Financials
+              _buildMenuRow(
+                icon: Icons.account_balance_outlined,
+                title: "Payout & Financials",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminPayoutPage()),
+                  );
+                },
+              ),
 
-              // MENU BARU 3: Notification Settings
-              _MenuTile(icon: Icons.notifications_none_outlined, title: "Notification Settings", onTap: () {}),
-              const Divider(color: _grey200, height: 1, thickness: 1),
+              // Menu 4: Identity Verification (Ada badge angka 4)
+              _buildMenuRow(
+                icon: Icons.gpp_good_outlined,
+                title: "Identity Verification",
+                badgeCount: 4,
+                onTap: () {
+                  // JALUR NAVIGASI KE HALAMAN VALIDASI 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminIdentityVerificationPage()),
+                  );
+                },
+              ),
 
-              const SizedBox(height: 32),
+              // Menu 5: Voucher & Point
+              _buildMenuRow(
+                icon: Icons.confirmation_number_outlined,
+                title: "Voucher & Point",
+                onTap: () {},
+              ),
+
+              // Menu 6: Notification Settings
+              _buildMenuRow(
+                icon: Icons.notifications_none_outlined,
+                title: "Notification Settings",
+                onTap: () {},
+              ),
+
+              const SizedBox(height: 30),
+
+              // ── 3. TOMBOL LOG OUT ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: OutlinedButton(
-                    onPressed: _logout,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFFEF4444),
-                      side: const BorderSide(color: Color(0xFFEF4444), width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      "Log Out",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        letterSpacing: 0.2,
+                      child: const Text(
+                        'Log Out',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  "Cosvoria Admin v1.0.0",
-                  style: TextStyle(
-                    color: _grey400,
-                    fontSize: 11,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
     );
   }
-}
 
-// ── Widget Kustom Menu Tile yang Sudah Ditambahkan Fitur Lencana Bulat ──
-class _MenuTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? badgeCount; // Ditambahkan parameter opsional untuk penanda angka
-  final VoidCallback onTap;
-
-  const _MenuTile({
-    required this.icon,
-    required this.title,
-    this.badgeCount, // Default-nya null kalau tidak diisi
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        child: Row(
-          children: [
-            Icon(icon, color: const Color(0xFF111111), size: 22),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Color(0xFF111111),
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            // Jika badgeCount diisi, maka kotak merah notifikasi akan muncul di sini
-            if (badgeCount != null) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE53935).withOpacity(0.12), // Merah transparan lembut
-                  borderRadius: BorderRadius.circular(10),
-                ),
+  Widget _buildMenuRow({
+    required IconData icon,
+    required String title,
+    int? badgeCount,
+    required VoidCallback onTap,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click, 
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: _grey200, width: 1)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: _black, size: 24),
+              const SizedBox(width: 16),
+              Expanded(
                 child: Text(
-                  badgeCount!,
+                  title,
                   style: const TextStyle(
-                    color: Color(0xFFE53935),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                    color: _black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'Inter',
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              if (badgeCount != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFEE2E2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    badgeCount.toString(),
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              const Icon(Icons.chevron_right, color: _grey500, size: 20),
             ],
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFFB0B0B0),
-              size: 20,
-            ),
-          ],
+          ),
         ),
       ),
     );
