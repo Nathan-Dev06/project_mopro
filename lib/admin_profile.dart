@@ -3,6 +3,7 @@ import 'admin_store_settings.dart';
 import 'admin_manage_users_page.dart';
 import 'admin_payout_page.dart'; 
 import 'admin_identity_verification_page.dart';
+import 'admin_voucher_point_page.dart'; 
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -122,13 +123,12 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 },
               ),
 
-              // Menu 4: Identity Verification (Ada badge angka 4)
+              // Menu 4: Identity Verification
               _buildMenuRow(
                 icon: Icons.gpp_good_outlined,
                 title: "Identity Verification",
                 badgeCount: 4,
                 onTap: () {
-                  // JALUR NAVIGASI KE HALAMAN VALIDASI 
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const AdminIdentityVerificationPage()),
@@ -136,18 +136,27 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 },
               ),
 
-              // Menu 5: Voucher & Point
+              // Menu 5: Voucher
               _buildMenuRow(
                 icon: Icons.confirmation_number_outlined,
                 title: "Voucher & Point",
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AdminVoucherPointPage()),
+                  );
+                },
               ),
 
               // Menu 6: Notification Settings
               _buildMenuRow(
                 icon: Icons.notifications_none_outlined,
                 title: "Notification Settings",
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur Pengaturan Notifikasi segera hadir!')),
+                  );
+                },
               ),
 
               const SizedBox(height: 30),
@@ -161,7 +170,12 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Berhasil keluar dari akun Admin!')),
+                        );
+                      },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red, width: 1.5),
                         shape: RoundedRectangleBorder(
@@ -202,6 +216,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           decoration: const BoxDecoration(
+            color: Colors.transparent, 
             border: Border(bottom: BorderSide(color: _grey200, width: 1)),
           ),
           child: Row(
@@ -221,15 +236,15 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               ),
               if (badgeCount != null) ...[
                 Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFEE2E2),
-                    shape: BoxShape.circle,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEE2E2), 
+                    borderRadius: BorderRadius.circular(12), 
                   ),
                   child: Text(
                     badgeCount.toString(),
                     style: const TextStyle(
-                      color: Colors.red,
+                      color: Colors.red, 
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Inter',

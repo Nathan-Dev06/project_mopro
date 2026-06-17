@@ -20,7 +20,6 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedTab = 'Semua';
 
-  // Data Dummy untuk testing tampilan list user
   final List<Map<String, String>> _users = [
     {'name': 'Admin Utama', 'email': 'admin@gmail.com', 'role': 'Admin'},
     {'name': 'Susi', 'email': 'susi@gmail.com', 'role': 'Customer'},
@@ -29,7 +28,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter data berdasarkan tab yang dipilih
+
     List<Map<String, String>> filteredUsers = _users.where((user) {
       if (_selectedTab == 'Semua') return true;
       return user['role'] == _selectedTab;
@@ -83,7 +82,6 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
             ),
             const SizedBox(height: 20),
 
-            // ── FILTER TABS (Semua, Admin, Customer) ──
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -114,7 +112,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
               ),
             ),
 
-            // ── TOMBOL TAMBAH ADMIN BARU ──
+         
             Padding(
               padding: const EdgeInsets.all(20),
               child: SizedBox(
@@ -156,7 +154,6 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
     );
   }
 
-  // Fungsi untuk memunculkan Form Tambah Admin dari bawah layar
   void _showAddAdminBottomSheet(BuildContext context) {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
@@ -185,7 +182,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Garis penanda handle di atas modal sheet
+        
                     Center(
                       child: Container(
                         width: 40,
@@ -208,19 +205,15 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Input Nama Lengkap
                     _buildFormTextField(label: 'Nama Lengkap', controller: nameController, hint: 'Masukkan nama admin baru'),
                     const SizedBox(height: 12),
 
-                    // Input Email
                     _buildFormTextField(label: 'Email', controller: emailController, hint: 'contohadmin@gmail.com', keyboardType: TextInputType.emailAddress),
                     const SizedBox(height: 12),
 
-                    // Input Password Sementara
                     _buildFormTextField(label: 'Password Sementara', controller: passwordController, hint: 'Minimal 6 karakter', isPassword: true),
                     const SizedBox(height: 16),
 
-                    // Pilihan Level Akses / Role (Dropdown)
                     const Text(
                       'Level Akses (Role)',
                       style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter', color: _black),
@@ -263,7 +256,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         onPressed: () {
-                          // Validasi jika field ada yang kosong
+      
                           if (nameController.text.isEmpty || emailController.text.isEmpty || passwordController.text.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Semua data wajib diisi ya, Sweety!')),
@@ -271,7 +264,6 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                             return;
                           }
 
-                          // Menambahkan data baru langsung ke dalam list lokal agar real-time berubah di layar
                           setState(() {
                             _users.add({
                               'name': nameController.text,
@@ -280,7 +272,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                             });
                           });
 
-                          Navigator.pop(context); // Menutup bottom sheet form
+                          Navigator.pop(context); 
                           
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('${nameController.text} berhasil diundang sebagai $selectedRole!')),
@@ -302,7 +294,6 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
     );
   }
 
-  // Widget Pembantu untuk Text Field di Form
   Widget _buildFormTextField({
     required String label,
     required TextEditingController controller,

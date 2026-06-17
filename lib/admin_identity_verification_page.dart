@@ -8,14 +8,13 @@ class AdminIdentityVerificationPage extends StatefulWidget {
 }
 
 class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificationPage> {
-  // Tema Warna disesuaikan dengan Putih Bersih (Light Mode) sesuai request
+
   static const Color _bg = Color(0xFFFFFFFF);
   static const Color _cardBg = Color(0xFFF9FAFB);
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
 
-  // Data Dummy Pengajuan KTP (Ada 4 item sesuai badge angka 4 di profil kamu)
   final List<Map<String, String>> _verificationRequests = [
     {
       'id': '1',
@@ -96,7 +95,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Deskripsi Halaman (diambil dari acuan teks gambar hitam kamu)
+ 
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Text(
@@ -143,11 +142,11 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Info Pelanggan & KTP
+                    
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Kotak Ikon ID Card Kiri
+                              
                                   Container(
                                     width: 48,
                                     height: 48,
@@ -162,7 +161,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                     ),
                                   ),
                                   const SizedBox(width: 14),
-                                  // Detail Teks Utama
+                      
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,7 +210,6 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                               ),
                               const SizedBox(height: 16),
                               
-                              // Tombol Aksi: Tolak & Setujui
                               Row(
                                 children: [
                                   // Tombol Tolak
@@ -238,7 +236,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  // Tombol Setujui
+                           
                                   Expanded(
                                     child: SizedBox(
                                       height: 44,

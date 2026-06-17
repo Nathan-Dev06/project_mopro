@@ -104,7 +104,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
 
               const SizedBox(height: 30),
 
-              // Tombol Simpan Pengaturan
+      
               MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: SizedBox(
@@ -142,7 +142,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
     );
   }
 
-  // Widget Pembantu untuk Membuat Text Field Ringkas (Tema Terang)
+
   Widget _buildInputField(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18.0),
@@ -185,7 +185,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
     );
   }
 
-  // Widget Pembantu untuk Membuat Switch Bar/Toggle row (Tema Terang)
+  
   Widget _buildSwitchTile({
     required String title,
     required String subtitle,

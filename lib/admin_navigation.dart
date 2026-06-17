@@ -22,15 +22,13 @@ class AdminNavigationWrapper extends StatefulWidget {
 class _AdminNavigationWrapperState extends State<AdminNavigationWrapper> {
   late int _selectedIndex;
 
-  // ── Pages displayed for each tab ──
-  // Kata kunci 'const' di sini sudah dihapus supaya tidak bikin eror merah lagi!
   late final List<Widget> _pages = [
     AdminDashboard(
       onSeeAllPressed: () {
-        // Ketika "Lihat semua" diklik, pindah otomatis ke index 2 (Catalog)
+       
         _onTabTapped(2);
       },
-    ), // Index 0: Dashboard
+    ), 
     const AdminOrdersPage(),  // Index 1: Orders
     const AdminCatalogPage(), // Index 2: Catalog
     const AdminProfilePage(), // Index 3: Profile
