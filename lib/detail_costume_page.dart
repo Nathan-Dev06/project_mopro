@@ -197,17 +197,34 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                     },
                     itemCount: images.length,
                     itemBuilder: (context, index) {
-                      return Image.asset(
-                        images[index],
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: _bgColor,
-                          child: const Center(
-                            child: Icon(Icons.broken_image_outlined,
-                                size: 48, color: _textTertiary),
+                      final imageUrl = images[index];
+                      final isNetwork = imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
+                      
+                      if (isNetwork) {
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: _bgColor,
+                            child: const Center(
+                              child: Icon(Icons.broken_image_outlined,
+                                  size: 48, color: _textTertiary),
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        return Image.asset(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: _bgColor,
+                            child: const Center(
+                              child: Icon(Icons.broken_image_outlined,
+                                  size: 48, color: _textTertiary),
+                            ),
+                          ),
+                        );
+                      }
                     },
                   )
                 : Container(
@@ -263,8 +280,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 bottom: 16,
                 right: 16,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.55),
                     borderRadius: BorderRadius.circular(20),
@@ -272,8 +288,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.photo_library_outlined,
-                          size: 14, color: Colors.white),
+                      const Icon(Icons.photo_library_outlined, size: 14, color: Colors.white),
                       const SizedBox(width: 4),
                       Text(
                         '${_currentImageIndex + 1} / ${images.length}',
@@ -505,7 +520,6 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       ),
     );
   }
-
   // ═══════════════════════════════════════════════════════════════════
   //  3. SIZE GUIDE — Interactive Size Selector
   // ═══════════════════════════════════════════════════════════════════
@@ -642,9 +656,8 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         ],
       ),
     );
-  }
-
-  Widget _sizeDetailCard({
+    }
+    Widget _sizeDetailCard({
     required IconData icon,
     required String label,
     required String value,
@@ -733,8 +746,8 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
-              const Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
+            children: const [
+              Icon(Icons.inventory_2_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
                 'Kelengkapan Paket Sewa',
@@ -1056,9 +1069,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                     if (canInstant) ...[
                       const SizedBox(height: 4),
                       Row(
-                        children: [
-                          const Icon(Icons.bolt_rounded, size: 12, color: _gold),
-                          const SizedBox(width: 4),
+                        children: const [
+                          Icon(Icons.bolt_rounded, size: 12, color: _gold),
+                          SizedBox(width: 4),
                           Text(
                             'Mendukung Kurir Instan (GoSend/Grab)',
                             style: TextStyle(
@@ -1090,8 +1103,8 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: [
-              const Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
+            children: const [
+              Icon(Icons.assignment_outlined, size: 18, color: _textPrimary),
               SizedBox(width: 8),
               Text(
                 'Ketentuan Sewa',

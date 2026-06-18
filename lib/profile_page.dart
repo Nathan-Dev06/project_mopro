@@ -442,7 +442,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: [
+                  children: const [
                     _ContactChip(
                       icon: Icons.email_outlined,
                       label: "cs@cosvoria.com",

@@ -5,7 +5,6 @@ class _K {
   static const bg = Color(0xFFF9F9F9);
   static const black = Color(0xFF111111);
   static const grey500 = Color(0xFF888888);
-  static const grey400 = Color(0xFFB0B0B0);
   static const grey200 = Color(0xFFE8E8E8);
   static const grey100 = Color(0xFFF5F5F5);
   static const green = Color(0xFF28A745);
@@ -72,7 +71,7 @@ class DepositBalancePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: [
+                    children: const [
                       Icon(Icons.account_balance_wallet_outlined, color: Colors.white70, size: 20),
                       SizedBox(width: 8),
                       Text(
@@ -121,7 +120,7 @@ class DepositBalancePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: const [
                   Text(
                     "Recent Transactions",
                     style: TextStyle(color: _K.black, fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w700),
@@ -272,7 +271,7 @@ class CosmoPointsPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: [
+                    children: const [
                       Icon(Icons.star_rounded, color: Colors.amber, size: 22),
                       SizedBox(width: 8),
                       Text(
@@ -321,7 +320,7 @@ class CosmoPointsPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                children: const [
                   Text(
                     "Points History",
                     style: TextStyle(color: _K.black, fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w700),

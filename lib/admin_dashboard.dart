@@ -82,34 +82,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               
-              // ── Grafik Pendapatan Sederhana ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: const Color(0xFFF9F9F9), borderRadius: BorderRadius.circular(12), border: Border.all(color: _grey200)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Pendapatan 7 Hari Terakhir", style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildBar('Sen', 40), _buildBar('Sel', 60), _buildBar('Rab', 30), 
-                          _buildBar('Kam', 80), _buildBar('Jum', 50), _buildBar('Sab', 90), _buildBar('Min', 40),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-              
-              // ── Admin Menu ──
+              // ── Top Rented Section ──
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20), 
                 child: Text('Admin Menu', style: TextStyle(color: _black, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'))
@@ -169,7 +144,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 ),
               ),
               const SizedBox(height: 12),
-              
+
               ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 shrinkWrap: true,
@@ -179,6 +154,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 itemBuilder: (context, index) {
                   final key = top.keys.elementAt(index);
                   final count = top[key]!;
+
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(8)), child: Center(child: Text('#${index + 1}', style: const TextStyle(color: _black, fontWeight: FontWeight.w800, fontFamily: 'Inter')))),
@@ -188,6 +164,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   );
                 },
               ),
+
               const SizedBox(height: 30),
             ],
           ),
@@ -212,14 +189,38 @@ class _SummaryCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  const _SummaryCard({required this.title, required this.value, required this.icon});
+
+  const _SummaryCard({
+    required this.title,
+    required this.value,
+<<<<<<< HEAD
+    required this.icon,
+=======
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
+  });
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFFE8E8E8))),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+<<<<<<< HEAD
+          border: Border.all(color: const Color(0xFFE8E8E8)),
+=======
+          border: Border.all(
+            color: const Color(0xFFE8E8E8),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+            ),
+          ],
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -227,7 +228,30 @@ class _SummaryCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(title, style: const TextStyle(color: Color(0xFF888888), fontSize: 12, fontFamily: 'Inter')),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(color: Color(0xFF111111), fontSize: 18, fontFamily: 'Inter', fontWeight: FontWeight.w800)),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Color(0xFF111111),
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                fontFamily: 'Inter',
+=======
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+>>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
+              ),
+            ),
           ],
         ),
       ),

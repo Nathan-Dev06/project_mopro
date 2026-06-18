@@ -274,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Social Login Section
                 Row(
-                  children: [
+                  children: const [
                     Expanded(child: Divider(color: Color(0xFFE5E7EB))),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -285,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24),
                 Row(
-                  children: [
+                  children: const [
                     Expanded(child: _SocialButton(icon: Icons.apple)),
                     SizedBox(width: 12),
                     Expanded(child: _SocialButton(icon: Icons.g_mobiledata)),

@@ -480,7 +480,7 @@ class _SearchPageState extends State<SearchPage> {
         padding: const EdgeInsets.only(top: 60),
         child: Center(
           child: Column(
-            children: [
+            children: const [
               Icon(Icons.search_off_rounded, size: 64, color: _grey300),
               SizedBox(height: 16),
               Text(
