@@ -5,6 +5,7 @@ import 'admin_payout_page.dart';
 import 'admin_identity_verification_page.dart';
 import 'admin_voucher_point_page.dart'; 
 import 'login_page.dart';
+import 'admin_notification_settings.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -151,14 +152,15 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
 
               // Menu 6: Notification Settings
               _buildMenuRow(
-                icon: Icons.notifications_none_outlined,
-                title: "Notification Settings",
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur Pengaturan Notifikasi segera hadir!')),
-                  );
-                },
-              ),
+  icon: Icons.notifications_none_outlined,
+  title: "Notification Settings",
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AdminNotificationSettingsPage()),
+    );
+  },
+),
 
               const SizedBox(height: 30),
 
