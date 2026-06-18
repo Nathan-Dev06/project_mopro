@@ -5,21 +5,25 @@ import 'manage_orders_page.dart';
 import 'manage_costumes_page.dart';
 
 class AdminDashboard extends StatefulWidget {
-  // Ditambahkan parameter penampung fungsi supaya terhubung ke navigasi utama
   final VoidCallback? onSeeAllPressed;
+  final VoidCallback? onProfilePressed; 
 
-  const AdminDashboard({Key? key, this.onSeeAllPressed}) : super(key: key);
+  const AdminDashboard({
+    Key? key, 
+    this.onSeeAllPressed,
+    this.onProfilePressed, 
+  }) : super(key: key);
 
   @override
   State<AdminDashboard> createState() => _AdminDashboardState();
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  // ── Design Tokens ──
   static const Color _bg = Color(0xFFFFFFFF);
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
+
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
@@ -51,7 +55,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Text('Welcome back, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}', style: const TextStyle(color: _grey500, fontSize: 14, fontFamily: 'Inter')),
                       ],
                     ),
-                    Container(width: 44, height: 44, decoration: BoxDecoration(color: const Color(0xFFF5F5F5), shape: BoxShape.circle, border: Border.all(color: _grey200)), child: const Icon(Icons.person_outline, color: _black)),
+                    
+                    // ── LOGO ADMIN PROFIL INTERAKTIF ──
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (widget.onProfilePressed != null) {
+                            widget.onProfilePressed!();
+                          }
+                        },
+                        child: Container(
+                          width: 44, 
+                          height: 44, 
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5), 
+                            shape: BoxShape.circle, 
+                            border: Border.all(color: _grey200),
+                          ), 
+                          child: const Icon(Icons.person_outline, color: _black),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -126,7 +151,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   children: [
                     const Text('Top Rented Costumes', style: TextStyle(color: _black, fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Inter')),
                     
-                    // ── BAGIAN MOUSE REGION YANG SUDAH BUBUP TAMBAHKAN ──
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
@@ -170,7 +194,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
     );
   }
-
 }
 
 class _SummaryCard extends StatelessWidget {

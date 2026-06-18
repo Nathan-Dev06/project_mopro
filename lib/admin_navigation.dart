@@ -22,16 +22,18 @@ class AdminNavigationWrapper extends StatefulWidget {
 class _AdminNavigationWrapperState extends State<AdminNavigationWrapper> {
   late int _selectedIndex;
 
-  late final List<Widget> _pages = [
+  List<Widget> get _pages => [
     AdminDashboard(
       onSeeAllPressed: () {
-       
-        _onTabTapped(2);
+        _onTabTapped(2); // Index 2: Catalog
+      },
+      onProfilePressed: () {
+        _onTabTapped(3); // Index 3: Profile
       },
     ), 
-    const AdminOrdersPage(),  // Index 1: Orders
-    const AdminCatalogPage(), // Index 2: Catalog
-    const AdminProfilePage(), // Index 3: Profile
+    const AdminOrdersPage(),   // Index 1: Orders
+    const AdminCatalogPage(),  // Index 2: Catalog
+    const AdminProfilePage(),  // Index 3: Profile
   ];
 
   @override
