@@ -4,6 +4,7 @@ import 'admin_manage_users_page.dart';
 import 'admin_payout_page.dart'; 
 import 'admin_identity_verification_page.dart';
 import 'admin_voucher_point_page.dart'; 
+import 'login_page.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -171,7 +172,11 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     height: 50,
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                          (route) => false,
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Berhasil keluar dari akun Admin!')),
                         );
