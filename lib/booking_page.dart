@@ -144,6 +144,7 @@ class _BookingPageState extends State<BookingPage> {
           data['province']?.toString() ?? '';
     });
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Data profil berhasil dimuat'),

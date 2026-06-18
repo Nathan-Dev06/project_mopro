@@ -98,21 +98,16 @@ class CostumeData {
 class _C {
   static const Color bg = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFF5F5F5); // light grey product bg
-  static const Color surfaceAlt = Color(0xFFF9F9F9); // alternate surface
   static const Color black = Color(0xFF111111); // primary text & CTA
-  static const Color grey800 = Color(0xFF333333); // secondary text
   static const Color grey500 = Color(0xFF888888); // muted text
   static const Color grey400 = Color(0xFFB0B0B0); // tertiary text
   static const Color grey300 = Color(0xFFD5D5D5); // borders
-  static const Color grey200 = Color(0xFFE8E8E8); // hairline
   static const Color grey100 = Color(0xFFF2F2F2); // search bg
   static const Color white = Color(0xFFFFFFFF);
   static const Color readyGreen = Color(0xFF22C55E); // availability: Ready
   static const Color readyGreenBg = Color(0xFFDCFCE7);
   static const Color rentedRed = Color(0xFFEF4444); // availability: Rented
   static const Color rentedRedBg = Color(0xFFFEE2E2);
-  static const Color trustMint = Color(0xFFE8FBF3); // trust badge bg
-  static const Color trustMintText = Color(0xFF0D9F6E); // trust badge text
 }
 
 // ==================== STATIC COSTUME DATA ====================

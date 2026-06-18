@@ -48,8 +48,8 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             const SizedBox(height: 20),
             
             // ── JUDUL HALAMAN ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 "Orders",
                 style: TextStyle(

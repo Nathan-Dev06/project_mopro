@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
@@ -1112,7 +1111,7 @@ class MyVouchersPage extends StatelessWidget {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: const [
                   Icon(Icons.confirmation_num_outlined,
                       size: 56, color: _K.grey300),
                   SizedBox(height: 16),
@@ -1247,7 +1246,7 @@ class WishlistPage extends StatelessWidget {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: const [
                   Icon(Icons.favorite_border_rounded,
                       size: 56, color: _K.grey300),
                   SizedBox(height: 16),

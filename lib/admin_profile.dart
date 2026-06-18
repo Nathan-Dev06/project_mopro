@@ -58,8 +58,8 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
+                      children: const [
+                        Text(
                           "Admin",
                           style: TextStyle(
                             color: _black,
@@ -68,7 +68,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                             fontFamily: 'Inter',
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           "Admin@gmail.com",
                           style: TextStyle(

@@ -129,9 +129,9 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: const [
                       Icon(Icons.add, color: _black, size: 20),
                       SizedBox(width: 8),
                       Text(

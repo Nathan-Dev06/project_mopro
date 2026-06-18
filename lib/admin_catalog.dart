@@ -34,7 +34,7 @@ class _AdminCatalogPageState extends State<AdminCatalogPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Catalog",
                     style: TextStyle(
                       color: _black,

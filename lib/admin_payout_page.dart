@@ -151,18 +151,18 @@ class _AdminPayoutPageState extends State<AdminPayoutPage> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _grey200, width: 1),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: [
+                            children: const [
                               Icon(Icons.arrow_upward_rounded, color: Colors.green, size: 18),
                               SizedBox(width: 4),
                               Text("Total Pendapatan", style: TextStyle(color: _grey500, fontSize: 13, fontFamily: 'Inter')),
                             ],
                           ),
-                          SizedBox(height: 8),
-                          Text(
+                          const SizedBox(height: 8),
+                          const Text(
                             "Rp 12,8jt",
                             style: TextStyle(color: _black, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                           ),
@@ -180,18 +180,18 @@ class _AdminPayoutPageState extends State<AdminPayoutPage> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: _grey200, width: 1),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: [
+                            children: const [
                               Icon(Icons.arrow_downward_rounded, color: Colors.orange, size: 18),
                               SizedBox(width: 4),
                               Text("Sudah Ditarik", style: TextStyle(color: _grey500, fontSize: 13, fontFamily: 'Inter')),
                             ],
                           ),
-                          SizedBox(height: 8),
-                          Text(
+                          const SizedBox(height: 8),
+                          const Text(
                             "Rp 10,3jt",
                             style: TextStyle(color: _black, fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                           ),

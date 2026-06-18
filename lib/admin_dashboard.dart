@@ -20,8 +20,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
-  static const Color _accent = Color(0xFF111111);
-
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
@@ -74,9 +72,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: [
+                  children: const [
                     _SummaryCard(title: 'Active Rentals', value: '12', icon: Icons.local_mall_outlined),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     _SummaryCard(title: 'Pending Verify', value: '4', icon: Icons.verified_user_outlined),
                   ],
                 ),
@@ -173,16 +171,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 
-  // Widget Pembantu Grafik
-  Widget _buildBar(String day, double height) {
-    return Column(
-      children: [
-        Container(height: height * 0.5, width: 20, decoration: BoxDecoration(color: _accent, borderRadius: BorderRadius.circular(4))),
-        const SizedBox(height: 6),
-        Text(day, style: const TextStyle(fontSize: 10, color: _grey500)),
-      ],
-    );
-  }
 }
 
 class _SummaryCard extends StatelessWidget {
@@ -193,10 +181,7 @@ class _SummaryCard extends StatelessWidget {
   const _SummaryCard({
     required this.title,
     required this.value,
-<<<<<<< HEAD
     required this.icon,
-=======
->>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
   });
 
   @override
@@ -207,19 +192,13 @@ class _SummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-<<<<<<< HEAD
           border: Border.all(color: const Color(0xFFE8E8E8)),
-=======
-          border: Border.all(
-            color: const Color(0xFFE8E8E8),
-          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.02),
               blurRadius: 6,
             ),
           ],
->>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,21 +214,6 @@ class _SummaryCard extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'Inter',
-=======
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.black54,
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
->>>>>>> 92ab908a9b9199733eee0ec4d3861d9cb1c89b35
               ),
             ),
           ],

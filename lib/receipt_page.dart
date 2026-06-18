@@ -746,7 +746,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: const [
                         Icon(Icons.file_download_outlined, size: 18),
                         SizedBox(width: 8),
                         Text(
