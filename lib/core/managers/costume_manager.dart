@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'home_page.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
 
 class CostumeManager {
   CostumeManager._();

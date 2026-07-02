@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'firebase_options.dart';
-import 'splash_screen.dart';
-import 'home_page.dart';
-import 'profile_page.dart';
-import 'search_page.dart';
+import 'package:project_mopro/firebase_options.dart';
+import 'package:project_mopro/features/auth/pages/splash_screen.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/features/customer/pages/profile_page.dart';
+import 'package:project_mopro/features/customer/pages/search_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cosvoria — Premium Cosplay Rental',
+      title: 'Cosvoria â€” Premium Cosplay Rental',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Inter',
@@ -54,7 +54,7 @@ class MainNavigationWrapper extends StatefulWidget {
 class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
   late int _selectedIndex;
 
-  // ── Pages displayed for each tab ──
+  // â”€â”€ Pages displayed for each tab â”€â”€
   late final List<Widget> _pages = <Widget>[
     MainHomePage(onProfileTapped: () => _onTabTapped(2)), // Index 0: Home
     const SearchPage(), // Index 1: Search
@@ -111,7 +111,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
           ),
           onTap: _onTabTapped,
           items: const [
-            // ── Home: outline → filled on active ──
+            // â”€â”€ Home: outline â†’ filled on active â”€â”€
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 3),
@@ -123,7 +123,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
               ),
               label: "Home",
             ),
-            // ── Search: outline → filled on active ──
+            // â”€â”€ Search: outline â†’ filled on active â”€â”€
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 3),
@@ -135,7 +135,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
               ),
               label: "Search",
             ),
-            // ── Profile: outline → filled on active ──
+            // â”€â”€ Profile: outline â†’ filled on active â”€â”€
             BottomNavigationBarItem(
               icon: Padding(
                 padding: EdgeInsets.only(bottom: 3),

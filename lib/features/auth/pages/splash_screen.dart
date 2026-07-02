@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'main.dart';
-import 'user_profile.dart';
-import 'login_page.dart';
-import 'admin_navigation.dart';
+import 'package:project_mopro/main.dart';
+import 'package:project_mopro/core/models/user_profile.dart';
+import 'package:project_mopro/features/auth/pages/login_page.dart';
+import 'package:project_mopro/features/admin/admin_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

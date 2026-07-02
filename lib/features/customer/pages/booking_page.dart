@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'payment_page.dart';
-import 'voucher_manager.dart';
+import 'package:project_mopro/features/customer/pages/payment_page.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -281,7 +281,7 @@ class _BookingPageState extends State<BookingPage> {
               children: [
                 // STEP TITLE
                 Text(
-                  "STEP 1 OF 3 · SCHEDULING",
+                  "STEP 1 OF 3 Â· SCHEDULING",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 10,

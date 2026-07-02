@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'profile_subpages.dart';
-import 'admin_dashboard.dart';
+import 'package:project_mopro/features/customer/pages/profile_subpages.dart';
+import 'package:project_mopro/features/admin/pages/admin_dashboard.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login_page.dart';
-import 'wallet_pages.dart';
-import 'rental_manager.dart';
+import 'package:project_mopro/features/auth/pages/login_page.dart';
+import 'package:project_mopro/features/customer/pages/wallet_pages.dart';
+import 'package:project_mopro/core/managers/rental_manager.dart';
 
 // =============================================
-// PROFILE PAGE — Kick Avenue Clean Minimalist
+// PROFILE PAGE â€” Kick Avenue Clean Minimalist
 // White canvas, outline icons, grey dividers
 // =============================================
 
@@ -19,7 +19,7 @@ class ProfilePage extends StatefulWidget {
 
   const ProfilePage({Key? key, this.activeRentals = 1}) : super(key: key);
 
-  // ── Design Tokens (Kick Avenue Monochromatic) ──
+  // â”€â”€ Design Tokens (Kick Avenue Monochromatic) â”€â”€
   static const Color bg = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF111111);
   static const Color grey800 = Color(0xFF333333);
@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // ── Mutable user biodata ──
+  // â”€â”€ Mutable user biodata â”€â”€
   String _userName = "tes_nama";
   String _userEmail = "tes@gmail.com";
   String _userPhone = "";
@@ -153,9 +153,9 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               //  HEADER: Title + User Info
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -172,7 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 24),
 
-              // ── User Info Row (Tappable → EditProfilePage) ──
+              // â”€â”€ User Info Row (Tappable â†’ EditProfilePage) â”€â”€
               GestureDetector(
                 onTap: _userEmail.isEmpty
                     ? () async {
@@ -248,14 +248,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 24),
 
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               //  WALLET CARDS: Deposit + Cosmo Points
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    // ── Deposit Balance ──
+                    // â”€â”€ Deposit Balance â”€â”€
                     Expanded(
                       child: _WalletCard(
                         icon: Icons.account_balance_wallet_outlined,
@@ -267,7 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // ── Cosmo Points ──
+                    // â”€â”€ Cosmo Points â”€â”€
                     Expanded(
                       child: _WalletCard(
                         icon: Icons.star_outline_rounded,
@@ -284,9 +284,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 28),
 
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               //  MAIN MENU LIST
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               Divider(color: _grey200, height: 1, thickness: 1),
 
               // 1. My Rentals
@@ -421,9 +421,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
 
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               //  HELP CENTER
-              // ═══════════════════════════════════════
+              // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
@@ -438,7 +438,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 14),
 
-              // ── Contact Row ──
+              // â”€â”€ Contact Row â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -463,7 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 20),
 
-              // ── Rental Terms Button ──
+              // â”€â”€ Rental Terms Button â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
@@ -500,7 +500,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 12),
 
-              // ── Logout Button ──
+              // â”€â”€ Logout Button â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
@@ -530,7 +530,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               const SizedBox(height: 16),
 
-              // ── App Version ──
+              // â”€â”€ App Version â”€â”€
               Center(
                 child: Text(
                   "Cosvoria v1.0.0",
@@ -551,11 +551,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  REUSABLE WIDGETS
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-/// Wallet info card — deposit balance or cosmo points
+/// Wallet info card â€” deposit balance or cosmo points
 class _WalletCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -614,7 +614,7 @@ class _WalletCard extends StatelessWidget {
   }
 }
 
-/// Menu item tile — Kick Avenue style ListTile replacement
+/// Menu item tile â€” Kick Avenue style ListTile replacement
 class _MenuTile extends StatelessWidget {
   final IconData icon;
   final String title;

@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login_page.dart';
-import 'user_profile.dart';
-import 'home_page.dart';
-import 'detail_costume_page.dart';
-import 'wishlist_manager.dart';
-import 'voucher_manager.dart';
-import 'rental_manager.dart';
+import 'package:project_mopro/features/auth/pages/login_page.dart';
+import 'package:project_mopro/core/models/user_profile.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
+import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
+import 'package:project_mopro/core/managers/rental_manager.dart';
 import 'package:intl/intl.dart';
 
 // =============================================
-// PROFILE SUBPAGES — Kick Avenue Clean Minimalist
+// PROFILE SUBPAGES â€” Kick Avenue Clean Minimalist
 // All pages: white Scaffold, white AppBar, elevation 0
 // =============================================
 
-// ── Shared Design Tokens ──
+// â”€â”€ Shared Design Tokens â”€â”€
 class _K {
   static const Color bg = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF111111);
@@ -57,9 +57,9 @@ PreferredSizeWidget _minimalAppBar(BuildContext context, String title) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  1. MY RENTALS PAGE — Tabbed (Active / Completed / Canceled)
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  1. MY RENTALS PAGE â€” Tabbed (Active / Completed / Canceled)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class MyRentalsPage extends StatelessWidget {
   const MyRentalsPage({Key? key}) : super(key: key);
 
@@ -119,7 +119,7 @@ class MyRentalsPage extends StatelessWidget {
 
             return TabBarView(
               children: [
-                // ── TAB 1: ACTIVE ──
+                // â”€â”€ TAB 1: ACTIVE â”€â”€
                 activeRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.shopping_bag_outlined,
@@ -128,7 +128,7 @@ class MyRentalsPage extends StatelessWidget {
                       )
                     : _RentalsListTab(rentals: activeRentals),
 
-                // ── TAB 2: COMPLETED ──
+                // â”€â”€ TAB 2: COMPLETED â”€â”€
                 completedRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.check_circle_outline_rounded,
@@ -138,7 +138,7 @@ class MyRentalsPage extends StatelessWidget {
                       )
                     : _RentalsListTab(rentals: completedRentals),
 
-                // ── TAB 3: CANCELED ──
+                // â”€â”€ TAB 3: CANCELED â”€â”€
                 canceledRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.cancel_outlined,
@@ -183,7 +183,7 @@ class _RentalsListTab extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // ── Card Header: Order ID + Status Badge ──
+              // â”€â”€ Card Header: Order ID + Status Badge â”€â”€
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -237,7 +237,7 @@ class _RentalsListTab extends StatelessWidget {
                 ),
               ),
 
-              // ── Card Body: Costume Info ──
+              // â”€â”€ Card Body: Costume Info â”€â”€
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -276,7 +276,7 @@ class _RentalsListTab extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "${rental.costumeSeries} • Size ${rental.size}",
+                            "${rental.costumeSeries} â€¢ Size ${rental.size}",
                             style: const TextStyle(
                               color: _K.grey500,
                               fontSize: 12,
@@ -291,7 +291,7 @@ class _RentalsListTab extends StatelessWidget {
                                   size: 13, color: _K.grey400),
                               const SizedBox(width: 6),
                               Text(
-                                "${dateFormat.format(rental.startDate)} – ${dateFormat.format(rental.endDate)}",
+                                "${dateFormat.format(rental.startDate)} â€“ ${dateFormat.format(rental.endDate)}",
                                 style: const TextStyle(
                                   color: _K.grey500,
                                   fontSize: 12,
@@ -327,7 +327,7 @@ class _RentalsListTab extends StatelessWidget {
                 ),
               ),
 
-              // ── Card Footer: Action Buttons ──
+              // â”€â”€ Card Footer: Action Buttons â”€â”€
               if (!isFinished)
                 Padding(
                   padding:
@@ -646,7 +646,7 @@ class _RentalsListTab extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "${rental.costumeSeries} • Size ${rental.size}",
+                                  "${rental.costumeSeries} â€¢ Size ${rental.size}",
                                   style: const TextStyle(
                                     color: _K.grey500,
                                     fontSize: 13,
@@ -805,9 +805,9 @@ class _EmptyStateTab extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  2. IDENTITY VERIFICATION PAGE
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class IdentityVerificationPage extends StatelessWidget {
   const IdentityVerificationPage({Key? key}) : super(key: key);
 
@@ -890,9 +890,9 @@ class IdentityVerificationPage extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  3. SIZE PROFILE PAGE — Height & Weight input
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  3. SIZE PROFILE PAGE â€” Height & Weight input
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class SizeProfilePage extends StatefulWidget {
   const SizeProfilePage({Key? key}) : super(key: key);
 
@@ -1091,9 +1091,9 @@ Future<void> _saveSizeProfile() async {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  4. MY VOUCHERS PAGE — Empty state
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  4. MY VOUCHERS PAGE â€” Empty state
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class MyVouchersPage extends StatelessWidget {
   const MyVouchersPage({Key? key}) : super(key: key);
 
@@ -1228,9 +1228,9 @@ class MyVouchersPage extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  5. WISHLIST PAGE — Empty state
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  5. WISHLIST PAGE â€” Empty state
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class WishlistPage extends StatelessWidget {
   const WishlistPage({Key? key}) : super(key: key);
 
@@ -1261,7 +1261,7 @@ class WishlistPage extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Tap the ♡ icon on any costume\nto save it for later.",
+                    "Tap the â™¡ icon on any costume\nto save it for later.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _K.grey400,
@@ -1425,9 +1425,9 @@ class WishlistPage extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  6. SETTINGS PAGE — Empty state
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  6. SETTINGS PAGE â€” Empty state
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -1582,9 +1582,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  7. EDIT PROFILE PAGE
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class EditProfilePage extends StatefulWidget {
   final String name;
   final String email;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'receipt_page.dart';
-import 'voucher_manager.dart';
-import 'rental_manager.dart';
+import 'package:project_mopro/features/customer/pages/receipt_page.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
+import 'package:project_mopro/core/managers/rental_manager.dart';
 
 class PaymentPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -147,7 +147,7 @@ class _PaymentPageState extends State<PaymentPage> {
               children: [
                 // STEP TITLE
                 Text(
-                  "STEP 2 OF 3 · CHECKOUT",
+                  "STEP 2 OF 3 Â· CHECKOUT",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 11,
@@ -270,7 +270,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${widget.shippingAddress!['phone'] ?? '-'} · ${widget.shippingAddress!['postal'] ?? ''}',
+                          '${widget.shippingAddress!['phone'] ?? '-'} Â· ${widget.shippingAddress!['postal'] ?? ''}',
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 12,

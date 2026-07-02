@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'main.dart';
-import 'profile_subpages.dart';
+import 'package:project_mopro/main.dart';
+import 'package:project_mopro/features/customer/pages/profile_subpages.dart';
 
 class ReceiptPage extends StatelessWidget {
   final Map<String, dynamic> costumeData;
@@ -758,6 +758,7 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
                         ),
                       ],
                     ),
+
             ),
           ),
         ],

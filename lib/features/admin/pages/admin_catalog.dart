@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_edit_product_page.dart'; 
+import 'package:project_mopro/features/admin/pages/admin_edit_product_page.dart'; 
 
 class AdminCatalogPage extends StatefulWidget {
   const AdminCatalogPage({Key? key}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'services/report_service.dart';
-import 'user_profile.dart';
-import 'manage_orders_page.dart';
-import 'manage_costumes_page.dart';
+import 'package:project_mopro/core/services/report_service.dart';
+import 'package:project_mopro/core/models/user_profile.dart';
+import 'package:project_mopro/features/admin/pages/manage_orders_page.dart';
+import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final VoidCallback? onSeeAllPressed;
@@ -29,7 +29,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final today = DateTime.now();
     final todayIncome = ReportService.incomeForDay(today);
     final monthIncome = ReportService.incomeForMonth(today.year, today.month);
-    final top = ReportService.topCostumes(limit: 5);
+    final top = ReportService.topCostumes(limit: 10);
 
     return Scaffold(
       backgroundColor: _bg,
@@ -41,7 +41,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             children: [
               const SizedBox(height: 20),
               
-              // ── Header ──
+              // â”€â”€ Header â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -56,7 +56,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       ],
                     ),
                     
-                    // ── LOGO ADMIN PROFIL INTERAKTIF ──
+                    // â”€â”€ LOGO ADMIN PROFIL INTERAKTIF â”€â”€
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
@@ -82,7 +82,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
               const SizedBox(height: 28),
 
-              // ── Summary Cards ──
+              // â”€â”€ Summary Cards â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -106,8 +106,58 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
 
               const SizedBox(height: 32),
-              
-              // ── Top Rented Section ──
+
+              // â”€â”€ Admin Menu â”€â”€
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Admin Menu',
+                  style: TextStyle(
+                    color: _black,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    _MenuCard(
+                      title: 'Manage Orders',
+                      subtitle: 'Manage customer rentals',
+                      icon: Icons.receipt_long_outlined,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _MenuCard(
+                      title: 'Manage Costumes',
+                      subtitle: 'Manage rental costumes',
+                      icon: Icons.checkroom_outlined,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageCostumesPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // â”€â”€ Top Rented Section â”€â”€
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20), 
                 child: Text('Admin Menu', style: TextStyle(color: _black, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'))
@@ -143,7 +193,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
               const SizedBox(height: 32),
               
-              // ── Top Rented + Lihat Semua ──
+              // â”€â”€ Top Rented + Lihat Semua â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -196,16 +246,93 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 }
 
+class _MenuCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _MenuCard({
+    Key? key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFE8E8E8)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F5F5),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: const Color(0xFF111111)),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Color(0xFF111111),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: Color(0xFF888888),
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SummaryCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
 
   const _SummaryCard({
+    Key? key,
     required this.title,
     required this.value,
     required this.icon,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

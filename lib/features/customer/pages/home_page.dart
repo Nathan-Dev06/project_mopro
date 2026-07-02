@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'detail_costume_page.dart';
-import 'notification_page.dart';
-import 'profile_page.dart';
-import 'voucher_manager.dart';
-import 'wishlist_manager.dart';
+import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
+import 'package:project_mopro/features/customer/pages/notification_page.dart';
+import 'package:project_mopro/features/customer/pages/profile_page.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
+import 'package:project_mopro/core/managers/wishlist_manager.dart';
 
 // =============================================
-// DESIGN SYSTEM — Kick Avenue Aesthetic
+// DESIGN SYSTEM â€” Kick Avenue Aesthetic
 // Clean, Light, Premium Minimalist
 // Monochromatic: Black, White, Soft Greys
 // =============================================
@@ -39,7 +39,7 @@ class CostumeData {
     this.reviewCount = 12,
   });
 
-  /// Size list from string. "All Size" → ['All Size']
+  /// Size list from string. "All Size" â†’ ['All Size']
   List<String> get sizeList {
     if (size == 'All Size') return ['All Size'];
     if (size.contains('|')) {
@@ -56,7 +56,7 @@ class CostumeData {
 
   bool get hasMultipleSizes => sizeList.length > 1;
 
-  /// Compact size display: "S|M" → "S|M"
+  /// Compact size display: "S|M" â†’ "S|M"
   String get sizeDisplay {
     if (size == 'All Size') return 'All Size';
     return sizeList.join('|');
@@ -94,7 +94,7 @@ class CostumeData {
 }
 
 // ==================== DESIGN TOKENS ====================
-/// Strict monochromatic palette — Kick Avenue inspired
+/// Strict monochromatic palette â€” Kick Avenue inspired
 class _C {
   static const Color bg = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFF5F5F5); // light grey product bg
@@ -113,7 +113,7 @@ class _C {
 // ==================== STATIC COSTUME DATA ====================
 const List<CostumeData> kCostumes = [
   // ==========================================
-  // ── 1. KATEGORI ANIME (10 Item) ──
+  // â”€â”€ 1. KATEGORI ANIME (10 Item) â”€â”€
   // ==========================================
   CostumeData(
     title: "Monkey D. Luffy (Wano)",
@@ -247,7 +247,7 @@ const List<CostumeData> kCostumes = [
   ),
 
   // ==========================================
-  // ── 2. KATEGORI GAMES (10 Item) ──
+  // â”€â”€ 2. KATEGORI GAMES (10 Item) â”€â”€
   // ==========================================
   CostumeData(
     title: "Link (Breath of The Wild)",
@@ -381,15 +381,15 @@ const List<CostumeData> kCostumes = [
   ),
 
   // ==========================================
-  // ── 3. KATEGORI MOVIES (10 Item) ──
+  // â”€â”€ 3. KATEGORI MOVIES (10 Item) â”€â”€
   // ==========================================
   CostumeData(
-    title: "Dalí Mask & Jumpsuit",
+    title: "DalÃ­ Mask & Jumpsuit",
     series: "Money Heist",
     price: "100,000",
     condition: "90%",
     image: "assets/images/money_heist.jpg",
-    include: "Red Jumpsuit, Dalí Mask, Gloves, Weapon Prop",
+    include: "Red Jumpsuit, DalÃ­ Mask, Gloves, Weapon Prop",
     size: "All Size",
     isReady: true,
     category: "Movies",
@@ -515,7 +515,7 @@ const List<CostumeData> kCostumes = [
   ),
 
   // ==========================================
-  // ── 4. KATEGORI PROPS & WEAPONS (10 Item) ──
+  // â”€â”€ 4. KATEGORI PROPS & WEAPONS (10 Item) â”€â”€
   // ==========================================
   CostumeData(
     title: "Shusui Katana Prop (104cm)",
@@ -649,7 +649,7 @@ const List<CostumeData> kCostumes = [
   ),
 
   // ==========================================
-  // ── 5. KATEGORI ACCESSORIES (10 Item) ──
+  // â”€â”€ 5. KATEGORI ACCESSORIES (10 Item) â”€â”€
   // ==========================================
   CostumeData(
     title: "Gojo Satoru Blindfold",
@@ -794,7 +794,7 @@ class MainHomePage extends StatefulWidget {
 class _MainHomePageState extends State<MainHomePage> {
   final TextEditingController _searchController = TextEditingController();
 
-  // ── Kick Avenue-style category filter tab state ──
+  // â”€â”€ Kick Avenue-style category filter tab state â”€â”€
   String _selectedTab = 'All';
   static const List<String> _categoryTabs = [
     'All',
@@ -824,7 +824,7 @@ class _MainHomePageState extends State<MainHomePage> {
     return Scaffold(
       key: const Key('main_home_page_scaffold'),
       backgroundColor: _C.bg,
-      // ── Section A: Top App Bar ──
+      // â”€â”€ Section A: Top App Bar â”€â”€
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
         key: const Key('home_scroll_view'),
@@ -832,23 +832,23 @@ class _MainHomePageState extends State<MainHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Section B: Immediate Search & Filter ──
+            // â”€â”€ Section B: Immediate Search & Filter â”€â”€
             const SizedBox(height: 4),
             _buildSearchAndFilter(),
 
-            // ── Kick Avenue-style Category Filter Tabs ──
+            // â”€â”€ Kick Avenue-style Category Filter Tabs â”€â”€
             const SizedBox(height: 10),
             _buildCategoryTabs(),
 
-            // ── Section D: Compact Promo Banner ──
+            // â”€â”€ Section D: Compact Promo Banner â”€â”€
             const SizedBox(height: 14),
             _buildPromoBanner(),
 
-            // ── Section E: Trust Badges Bar ──
+            // â”€â”€ Section E: Trust Badges Bar â”€â”€
             const SizedBox(height: 14),
             _buildTrustBadges(),
 
-            // ── Section G: Main Catalog Grid ──
+            // â”€â”€ Section G: Main Catalog Grid â”€â”€
             const SizedBox(height: 14),
             _buildCatalogHeader(),
             const SizedBox(height: 10),
@@ -862,10 +862,10 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  A. TOP APP BAR
   //  Bold "COSVORIA" on left, Notification + Profile on right
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       key: const Key('cosvoria_app_bar'),
@@ -928,10 +928,10 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  B. IMMEDIATE SEARCH & FILTER
   //  Clean grey horizontal Row: SearchBar + solid black Filter btn
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildSearchAndFilter() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -974,11 +974,11 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  KICK AVENUE-STYLE CATEGORY FILTER TABS
-  //  Pure text, no icons — active tab has bold black text + underline
+  //  Pure text, no icons â€” active tab has bold black text + underline
   //  Uses SingleChildScrollView + BouncingScrollPhysics
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildCategoryTabs() {
     return SizedBox(
       height: 36,
@@ -1037,11 +1037,11 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  D. COMPACT PROMO BANNER
   //  Minimalist light grey promo container
-  //  Only ONE "Claim Voucher" CTA — no duplicate buttons
-  // ══════════════════════════════════════════════════════════════
+  //  Only ONE "Claim Voucher" CTA â€” no duplicate buttons
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildPromoBanner() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1159,19 +1159,19 @@ class _MainHomePageState extends State<MainHomePage> {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  E. TRUST BADGES BAR
-  //  Thin horizontal bar — soft mint green/teal background
+  //  Thin horizontal bar â€” soft mint green/teal background
   //  3 badges: "100% Premium", "Fresh & Clean", "Fast Delivery"
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildTrustBadges() {
     return const SizedBox.shrink();
   }
 
-  // ══════════════════════════════════════════════════════════════
-  //  G. MAIN CATALOG GRID — 2-Column Portrait
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  G. MAIN CATALOG GRID â€” 2-Column Portrait
   //  Section Title: "Costume Catalog" (font size 16, bold)
-  // ══════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildCatalogHeader() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -1233,11 +1233,11 @@ class _MainHomePageState extends State<MainHomePage> {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  CATALOG PRODUCT CARD (Stateless for performance)
 //  Each card: grey bg image, title, series, price, size, condition,
 //  availability badge. Taps navigate to DetailCostumePage.
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class _CatalogProductCard extends StatelessWidget {
   final CostumeData data;
   const _CatalogProductCard({required this.data});
@@ -1257,7 +1257,7 @@ class _CatalogProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Image Canvas: 1:1 Square ──
+          // â”€â”€ Image Canvas: 1:1 Square â”€â”€
           AspectRatio(
             aspectRatio: 1.0,
             child: Container(
@@ -1344,10 +1344,10 @@ class _CatalogProductCard extends StatelessWidget {
             ),
           ),
 
-          // ── Typography Section ──
+          // â”€â”€ Typography Section â”€â”€
           const SizedBox(height: 10),
 
-          // Series/Brand — Bold Black
+          // Series/Brand â€” Bold Black
           Text(
             data.series,
             maxLines: 1,
@@ -1361,7 +1361,7 @@ class _CatalogProductCard extends StatelessWidget {
 
           const SizedBox(height: 2),
 
-          // Costume Name — Dark Grey, 2 lines
+          // Costume Name â€” Dark Grey, 2 lines
           Text(
             data.title,
             maxLines: 2,
@@ -1387,7 +1387,7 @@ class _CatalogProductCard extends StatelessWidget {
 
           const SizedBox(height: 2),
 
-          // Price — Bold Black
+          // Price â€” Bold Black
           Text(
             "Rp ${data.price}",
             style: const TextStyle(

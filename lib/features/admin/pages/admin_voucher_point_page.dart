@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_create_voucher_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_create_voucher_page.dart';
 
 class AdminVoucherPointPage extends StatefulWidget {
   const AdminVoucherPointPage({Key? key}) : super(key: key);
@@ -136,7 +136,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                         });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Voucher ${result['code']} Berhasil Dibuat! 🎉'),
+                            content: Text('Voucher ${result['code']} Berhasil Dibuat! ðŸŽ‰'),
                             backgroundColor: Colors.green,
                           ),
                         );

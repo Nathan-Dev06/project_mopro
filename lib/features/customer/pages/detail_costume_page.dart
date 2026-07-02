@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'booking_page.dart';
-import 'wishlist_manager.dart';
+import 'package:project_mopro/features/customer/pages/booking_page.dart';
+import 'package:project_mopro/core/managers/wishlist_manager.dart';
 
 class DetailCostumePage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -15,9 +15,9 @@ class DetailCostumePage extends StatefulWidget {
 
 class _DetailCostumePageState extends State<DetailCostumePage>
     with SingleTickerProviderStateMixin {
-  // ═══════════════════════════════════════════════════════════════════
-  //  DESIGN SYSTEM — Clean, Light, Minimalist (Kick Avenue × Zara)
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  DESIGN SYSTEM â€” Clean, Light, Minimalist (Kick Avenue Ã— Zara)
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static const Color _bgColor = Color(0xFFFAFAFA);
   static const Color _surfaceColor = Color(0xFFFFFFFF);
   static const Color _textPrimary = Color(0xFF1A1A1A);
@@ -77,16 +77,16 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     HapticFeedback.lightImpact();
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  BUILD
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _bgColor,
       body: Stack(
         children: [
-          // ── Scrollable Content ──
+          // â”€â”€ Scrollable Content â”€â”€
           CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
@@ -116,7 +116,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             ],
           ),
 
-          // ── Sticky Bottom Action Bar ──
+          // â”€â”€ Sticky Bottom Action Bar â”€â”€
           Positioned(
             left: 0,
             right: 0,
@@ -128,9 +128,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  //  1. SLIVER APP BAR — Collapsible Header Image
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  1. SLIVER APP BAR â€” Collapsible Header Image
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
       expandedHeight: 460,
@@ -139,7 +139,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       backgroundColor: _surfaceColor,
       elevation: 0,
       automaticallyImplyLeading: false,
-      // ── Leading: Back Button ──
+      // â”€â”€ Leading: Back Button â”€â”€
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
         child: _circleButton(
@@ -147,7 +147,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
           onTap: () => Navigator.pop(context),
         ),
       ),
-      // ── Actions: Share & Favorite ──
+      // â”€â”€ Actions: Share & Favorite â”€â”€
       actions: [
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -186,7 +186,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         background: Stack(
           fit: StackFit.expand,
           children: [
-            // ── Hero Image Carousel ──
+            // â”€â”€ Hero Image Carousel â”€â”€
             images.isNotEmpty
                 ? PageView.builder(
                     controller: _pageController,
@@ -235,7 +235,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                     ),
                   ),
 
-            // ── Top gradient for status bar readability ──
+            // â”€â”€ Top gradient for status bar readability â”€â”€
             Positioned(
               top: 0,
               left: 0,
@@ -255,7 +255,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ),
             ),
 
-            // ── Bottom gradient for smooth transition ──
+            // â”€â”€ Bottom gradient for smooth transition â”€â”€
             Positioned(
               bottom: 0,
               left: 0,
@@ -275,6 +275,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               ),
             ),
 
+            // â”€â”€ Image counter badge â”€â”€
             if (images.isNotEmpty)
               Positioned(
                 bottom: 16,
@@ -309,9 +310,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  //  2. MAIN PRODUCT INFO — Badge, Title, Series
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  2. MAIN PRODUCT INFO â€” Badge, Title, Series
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildMainInfo() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
@@ -365,9 +366,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  //  RATING ROW — Stars + Condition
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  RATING ROW â€” Stars + Condition
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildRatingRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
@@ -429,9 +430,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  PRICE SECTION
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildPriceSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -520,13 +521,13 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       ),
     );
   }
-  // ═══════════════════════════════════════════════════════════════════
-  //  3. SIZE GUIDE — Interactive Size Selector
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  3. SIZE GUIDE â€” Interactive Size Selector
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   static const List<String> _availableSizes = ['S', 'M', 'L', 'XL'];
 
   /// Normalisasi nilai size dari data ke salah satu opsi valid.
-  /// Contoh: "S|M" → "S", "All Size" → "M", "l" → "L"
+  /// Contoh: "S|M" â†’ "S", "All Size" â†’ "M", "l" â†’ "L"
   String _normalizeSize(String raw) {
     final s = raw.toUpperCase().trim();
     if (s == 'XL') return 'XL';
@@ -545,7 +546,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header: Judul + Size Chips ──
+          // â”€â”€ Header: Judul + Size Chips â”€â”€
           Row(
             children: [
               const Icon(Icons.straighten_rounded,
@@ -560,7 +561,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 ),
               ),
               const Spacer(),
-              // ── Interactive Size Chips ──
+              // â”€â”€ Interactive Size Chips â”€â”€
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: _availableSizes.map((s) {
@@ -605,7 +606,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
           ),
           const SizedBox(height: 16),
 
-          // ── Size Detail Boxes — 3 horizontal cards ──
+          // â”€â”€ Size Detail Boxes â€” 3 horizontal cards â”€â”€
           Row(
             children: [
               _sizeDetailCard(
@@ -731,9 +732,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  //  4. KELENGKAPAN PAKET SEWA — Bullet Points
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  4. KELENGKAPAN PAKET SEWA â€” Bullet Points
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildIncludeList() {
     final String rawInclude =
         data['include'] ?? 'Tidak ada deskripsi kelengkapan';
@@ -811,9 +812,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  5. TRUST & HYGIENE BANNER
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildTrustBanner() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -881,9 +882,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  NEW HELPER SECTIONS: Specs, Condition, Shipping
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildSpecifications() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1093,9 +1094,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  6. RENTAL & DEPOSIT POLICY
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildRentalPolicy() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
@@ -1216,9 +1217,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  7. CUSTOMER REVIEWS
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildCustomerReviews() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1260,7 +1261,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             date: '2 minggu lalu',
             rating: 5,
             comment:
-                'Kostumnya bagus banget, jahitannya rapi dan bahannya nyaman dipakai seharian. Wig-nya juga udah di-styling, jadi tinggal pakai. Pasti sewa lagi! 🔥',
+                'Kostumnya bagus banget, jahitannya rapi dan bahannya nyaman dipakai seharian. Wig-nya juga udah di-styling, jadi tinggal pakai. Pasti sewa lagi! ðŸ”¥',
             avatar: 'A',
             avatarColor: const Color(0xFFC4B5FD),
           ),
@@ -1272,7 +1273,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             date: '1 bulan lalu',
             rating: 5,
             comment:
-                'Detail kostumnya sangat akurat, pokoknya worth it buat event cosplay. Pelayanannya juga ramah dan fast response. Recommended! ⭐',
+                'Detail kostumnya sangat akurat, pokoknya worth it buat event cosplay. Pelayanannya juga ramah dan fast response. Recommended! â­',
             avatar: 'R',
             avatarColor: const Color(0xFFFBCFE8),
           ),
@@ -1370,9 +1371,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  8. STICKY BOTTOM ACTION BAR
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildStickyBottomBar(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1484,9 +1485,9 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   //  HELPER WIDGETS
-  // ═══════════════════════════════════════════════════════════════════
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _circleButton({
     required IconData icon,
     required VoidCallback onTap,

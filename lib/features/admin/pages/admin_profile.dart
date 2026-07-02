@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'admin_store_settings.dart'; 
-import 'admin_manage_users_page.dart';
-import 'admin_payout_page.dart'; 
-import 'admin_identity_verification_page.dart';
-import 'admin_voucher_point_page.dart'; 
-import 'login_page.dart';
-import 'admin_notification_settings.dart';
+import 'package:project_mopro/features/admin/pages/admin_store_settings.dart'; 
+import 'package:project_mopro/features/admin/pages/admin_manage_users_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_payout_page.dart'; 
+import 'package:project_mopro/features/admin/pages/admin_identity_verification_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_voucher_point_page.dart'; 
+import 'package:project_mopro/features/auth/pages/login_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_notification_settings.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
             children: [
               const SizedBox(height: 20),
               
-              // ── JUDUL HALAMAN ──
+              // â”€â”€ JUDUL HALAMAN â”€â”€
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
@@ -47,7 +47,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               ),
               const SizedBox(height: 24),
 
-              // ── 1. PROFIL HEADER ADMIN ──
+              // â”€â”€ 1. PROFIL HEADER ADMIN â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -87,7 +87,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               const SizedBox(height: 30),
               const Divider(color: _grey200, height: 1),
 
-              // ── 2. DAFTAR MENU OPSI ──
+              // â”€â”€ 2. DAFTAR MENU OPSI â”€â”€
               
               // Menu 1: Store Settings
               _buildMenuRow(
@@ -164,7 +164,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
 
               const SizedBox(height: 30),
 
-              // ── 3. TOMBOL LOG OUT ──
+              // â”€â”€ 3. TOMBOL LOG OUT â”€â”€
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: MouseRegion(

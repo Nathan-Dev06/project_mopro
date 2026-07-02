@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import '../data/mock_rentals.dart';
+import 'package:project_mopro/data/mock_rentals.dart';
 
 class ReportService {
   /// Total income for given date (day)

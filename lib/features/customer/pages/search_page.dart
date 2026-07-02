@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'detail_costume_page.dart';
-import 'category_page.dart';
-import 'wishlist_manager.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
+import 'package:project_mopro/features/customer/pages/category_page.dart';
+import 'package:project_mopro/core/managers/wishlist_manager.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -12,7 +12,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  // ── Design Tokens ──
+  // â”€â”€ Design Tokens â”€â”€
   static const Color _bg = Color(0xFFFFFFFF);
   static const Color _black = Color(0xFF111111);
   static const Color _grey800 = Color(0xFF333333);

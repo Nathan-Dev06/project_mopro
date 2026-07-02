@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'package:project_mopro/features/auth/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -58,26 +58,30 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     await FirebaseAuth.instance.currentUser?.updateDisplayName(
-    _nameCtrl.text.trim(),
-    );
+  _nameCtrl.text.trim(),
+);
 
-    await FirebaseAuth.instance.currentUser?.reload();
+await FirebaseAuth.instance.currentUser?.reload();
 
-    if (!mounted) return;
+// Logout setelah register agar user wajib login
+await FirebaseAuth.instance.signOut();
 
-    setState(() {
-      _loading = false;
-    });
+if (!mounted) return;
 
-    Navigator.of(context).pushAndRemoveUntil(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const MainNavigationWrapper(),
-        transitionsBuilder: (_, animation, __, child) =>
-            FadeTransition(opacity: animation, child: child),
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
-      (route) => false,
-    );
+setState(() {
+  _loading = false;
+});
+
+// Kembali ke halaman login
+Navigator.of(context).pushAndRemoveUntil(
+  PageRouteBuilder(
+    pageBuilder: (_, __, ___) => const LoginPage(),
+    transitionsBuilder: (_, animation, __, child) =>
+        FadeTransition(opacity: animation, child: child),
+    transitionDuration: const Duration(milliseconds: 400),
+  ),
+  (route) => false,
+);
   } on FirebaseAuthException catch (e) {
     String message;
 

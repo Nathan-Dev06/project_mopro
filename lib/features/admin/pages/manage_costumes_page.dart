@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'costume_manager.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 class ManageCostumesPage extends StatefulWidget {
   const ManageCostumesPage({super.key});

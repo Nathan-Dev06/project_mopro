@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'admin_dashboard.dart';
-import 'admin_orders.dart';
-import 'admin_catalog.dart';
-import 'admin_profile.dart';
+import 'package:project_mopro/features/admin/pages/admin_dashboard.dart';
+import 'package:project_mopro/features/admin/pages/admin_orders.dart';
+import 'package:project_mopro/features/admin/pages/admin_catalog.dart';
+import 'package:project_mopro/features/admin/pages/admin_profile.dart';
 
 // =============================================
 // Admin Navigation Wrapper

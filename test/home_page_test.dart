@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:project_mopro/home_page.dart';
-import 'package:project_mopro/detail_costume_page.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'test_helper.dart';
 
 void main() {

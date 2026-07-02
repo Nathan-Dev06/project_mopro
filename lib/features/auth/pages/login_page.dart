@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'register_page.dart';
-import 'main.dart';
+import 'package:project_mopro/features/auth/pages/register_page.dart';
+import 'package:project_mopro/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'forgot_password_page.dart';
-import 'admin_navigation.dart';
-import 'user_profile.dart';
+import 'package:project_mopro/features/auth/pages/forgot_password_page.dart';
+import 'package:project_mopro/features/admin/admin_navigation.dart';
+import 'package:project_mopro/core/models/user_profile.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
