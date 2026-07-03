@@ -52,8 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
     'address': '',
     'role': 'Customer',
     'isAdmin': false,
-    'verificationStatus': 'pending',
-    'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
+    'verificationStatus': 'unverified',
 
     // Wallet
     'deposit_balance': 0,
@@ -74,6 +73,16 @@ if (!mounted) return;
 setState(() {
   _loading = false;
 });
+
+ScaffoldMessenger.of(context).showSnackBar(
+  const SnackBar(
+    content: Text(
+      'Registration successful! Please login with your new account.',
+      style: TextStyle(fontFamily: 'Inter'),
+    ),
+    backgroundColor: Colors.green,
+  ),
+);
 
 // Kembali ke halaman login
 Navigator.of(context).pushAndRemoveUntil(

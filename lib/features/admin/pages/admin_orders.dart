@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_mopro/core/managers/rental_manager.dart';
 
 class AdminOrdersPage extends StatefulWidget {
   const AdminOrdersPage({Key? key}) : super(key: key);
@@ -13,223 +14,392 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
 
-  // Menyimpan status filter yang sedang dipilih aktif
-  String selectedFilter = 'Semua';
-
-  final List<Map<String, String>> dummyOrders = [
-    {'id': 'ORD-1002', 'customer': 'Budi Santoso', 'costume': 'Genshin Impact Zhongli', 'status': 'Pending Approval', 'date': 'Today'},
-    {'id': 'ORD-1001', 'customer': 'Ayu Lestari', 'costume': 'Spy x Family Anya', 'status': 'Active Rental', 'date': 'Yesterday'},
-    {'id': 'ORD-1000', 'customer': 'Dimas', 'costume': 'Naruto Akatsuki Cloak', 'status': 'Completed', 'date': '10 Jun 2026'},
-  ];
+  String selectedFilter = 'All';
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
-    // ── LOGIKA FILTER DATA ──
-    // Di sini kita menyaring dummyOrders berdasarkan tombol status yang sedang aktif
-    final filteredOrders = dummyOrders.where((order) {
-      if (selectedFilter == 'Semua') {
-        return true; // Tampilkan semua data jika pilih 'Semua'
-      } else if (selectedFilter == 'Pending') {
-        return order['status'] == 'Pending Approval';
-      } else if (selectedFilter == 'Active') {
-        return order['status'] == 'Active Rental';
-      } else if (selectedFilter == 'Completed') {
-        return order['status'] == 'Completed';
-      }
-      return true;
-    }).toList();
-
     return Scaffold(
       backgroundColor: _bg,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            
-            // ── JUDUL HALAMAN ──
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Orders",
-                style: TextStyle(
-                  color: _black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                  letterSpacing: -0.3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+        child: ValueListenableBuilder<List<Rental>>(
+          valueListenable: RentalManager.instance.rentalsNotifier,
+          builder: (context, allRentals, child) {
+            // Apply search filter
+            final searchedRentals = allRentals.where((r) {
+              if (searchQuery.isEmpty) return true;
+              final q = searchQuery.toLowerCase();
+              return r.transactionId.toLowerCase().contains(q) ||
+                  r.customerName.toLowerCase().contains(q) ||
+                  r.costumeName.toLowerCase().contains(q);
+            }).toList();
 
-            // ── 1. KOTAK PENCARIAN (SEARCH BAR) ──
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                onChanged: (value) {
-                  // TODO: Tempat menaruh logika pencarian nama/ID nanti setelah ini beres
-                },
-                style: const TextStyle(color: _black, fontFamily: 'Inter', fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Cari order ID atau nama...',
-                  hintStyle: const TextStyle(color: _grey500, fontFamily: 'Inter'),
-                  prefixIcon: const Icon(Icons.search, color: _grey500, size: 20),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            // Apply status filter
+            final filteredOrders = searchedRentals.where((r) {
+              if (selectedFilter == 'All') return true;
+              if (selectedFilter == 'Cancellation') return r.status == 'Cancellation Request';
+              return r.status == selectedFilter;
+            }).toList();
 
-            // ── 2. TOMBOL FILTER STATUS (DENGAN KURSOR TANGAN) ──
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
-              child: Row(
-                children: [
-                  _buildFilterChip('Semua'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Pending'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Active'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Completed'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
 
-            // ── DAFTAR ORDERAN YANG SUDAH DI-FILTER ──
-            Expanded(
-              child: filteredOrders.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'Tidak ada orderan dengan status ini',
-                        style: TextStyle(color: _grey500, fontFamily: 'Inter'),
-                      ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      itemCount: filteredOrders.length, // Menggunakan hasil filter
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final order = filteredOrders[index]; // Menggunakan hasil filter
-                        final isPending = order['status'] == 'Pending Approval';
-                        final isActive = order['status'] == 'Active Rental';
-                        
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _grey200),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    order['id']!,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                      fontFamily: 'Inter',
-                                      color: _grey500,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: isPending ? const Color(0xFFFEF08A) : (isActive ? const Color(0xFFDCFCE7) : _grey200),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      order['status']!,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Inter',
-                                        color: isPending ? const Color(0xFF854D0E) : (isActive ? const Color(0xFF166534) : _grey500),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                order['costume']!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16,
-                                  fontFamily: 'Inter',
-                                  color: _black,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Rented by: ${order['customer']} • ${order['date']}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: 'Inter',
-                                  color: _grey500,
-                                ),
-                              ),
-                              if (isPending) ...[
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () {},
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: Colors.red,
-                                          side: const BorderSide(color: Colors.red),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        ),
-                                        child: const Text('Reject', style: TextStyle(fontWeight: FontWeight.w700)),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: _black,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        ),
-                                        child: const Text('Approve', style: TextStyle(fontWeight: FontWeight.w700)),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ]
-                            ],
-                          ),
-                        );
-                      },
+                // ── JUDUL HALAMAN ──
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Orders",
+                    style: TextStyle(
+                      color: _black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                      letterSpacing: -0.3,
                     ),
-            ),
-          ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ── 1. KOTAK PENCARIAN (SEARCH BAR) ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    style: const TextStyle(color: _black, fontFamily: 'Inter', fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Search order ID, customer, or costume...',
+                      hintStyle: const TextStyle(color: _grey500, fontFamily: 'Inter'),
+                      prefixIcon: const Icon(Icons.search, color: _grey500, size: 20),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // ── 2. TOMBOL FILTER STATUS ──
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  child: Row(
+                    children: [
+                      _buildFilterChip('All'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Pending'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Packaging'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Shipped'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Active'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Completed'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Cancellation'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Canceled'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // ── DAFTAR ORDERAN YANG SUDAH DI-FILTER ──
+                Expanded(
+                  child: filteredOrders.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No orders found',
+                            style: TextStyle(color: _grey500, fontFamily: 'Inter'),
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          itemCount: filteredOrders.length,
+                          separatorBuilder: (context, index) => const SizedBox(height: 12),
+                          itemBuilder: (context, index) {
+                            final rental = filteredOrders[index];
+                            return _buildOrderCard(rental);
+                          },
+                        ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
-  // Widget pembantu filter yang sudah ditambah interaksi klik tangan (MouseRegion)
+  Widget _buildOrderCard(Rental rental) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _grey200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: ID + Status Badge
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                rental.transactionId,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  color: _grey500,
+                ),
+              ),
+              _buildStatusBadge(rental.status),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Costume Name
+          Text(
+            rental.costumeName,
+            style: const TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              fontFamily: 'Inter',
+              color: _black,
+            ),
+          ),
+          const SizedBox(height: 4),
+
+          // Customer + Series
+          Text(
+            'Customer: ${rental.customerName} • ${rental.costumeSeries}',
+            style: const TextStyle(
+              fontSize: 12,
+              fontFamily: 'Inter',
+              color: _grey500,
+            ),
+          ),
+
+          // Show review info for completed orders
+          if (rental.status == 'Completed' && rental.rating != null) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.rate_review_outlined, size: 14, color: Color(0xFF16A34A)),
+                      const SizedBox(width: 6),
+                      const Text(
+                        "Customer Review",
+                        style: TextStyle(fontFamily: 'Inter', fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF16A34A)),
+                      ),
+                      const Spacer(),
+                      ...List.generate(
+                        rental.rating!.toInt(),
+                        (_) => const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 14),
+                      ),
+                      ...List.generate(
+                        5 - rental.rating!.toInt(),
+                        (_) => const Icon(Icons.star_outline_rounded, color: Color(0xFFD1D5DB), size: 14),
+                      ),
+                    ],
+                  ),
+                  if (rental.reviewText != null && rental.reviewText!.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      rental.reviewText!,
+                      style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFF555555), height: 1.4),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                  if (rental.reviewMediaPath != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          rental.reviewMediaType == 'image' ? Icons.image_rounded : Icons.video_file_rounded,
+                          size: 14,
+                          color: const Color(0xFF16A34A),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          rental.reviewMediaPath!,
+                          style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: Color(0xFF16A34A), fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+
+          // Show cancellation reason + Approve/Reject for Cancellation Request
+          if (rental.status == 'Cancellation Request') ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFE11D48)),
+                      SizedBox(width: 6),
+                      Text(
+                        "Cancellation Reason:",
+                        style: TextStyle(fontFamily: 'Inter', fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFE11D48)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    rental.cancellationReason ?? 'No reason provided',
+                    style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: Color(0xFF881337), height: 1.4),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      RentalManager.instance.updateRentalStatus(rental.transactionId, 'Packaging');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Cancellation rejected. Order returned to Packaging.', style: TextStyle(fontFamily: 'Inter')),
+                          backgroundColor: Color(0xFF3B82F6),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Reject Cancel', style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      RentalManager.instance.updateRentalStatus(rental.transactionId, 'Canceled');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Cancellation approved. Order has been canceled.', style: TextStyle(fontFamily: 'Inter')),
+                          backgroundColor: Color(0xFFDC2626),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _black,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Approve Cancel', style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Status Badge
+  Widget _buildStatusBadge(String status) {
+    Color bgColor;
+    Color textColor;
+    switch (status) {
+      case 'Pending':
+        bgColor = const Color(0xFFFEF08A);
+        textColor = const Color(0xFF854D0E);
+        break;
+      case 'Packaging':
+        bgColor = const Color(0xFFE0E7FF);
+        textColor = const Color(0xFF3730A3);
+        break;
+      case 'Shipped':
+        bgColor = const Color(0xFFDDD6FE);
+        textColor = const Color(0xFF5B21B6);
+        break;
+      case 'Active':
+      case 'Renting':
+        bgColor = const Color(0xFFDCFCE7);
+        textColor = const Color(0xFF166534);
+        break;
+      case 'Cancellation Request':
+        bgColor = const Color(0xFFFFE4E6);
+        textColor = const Color(0xFFE11D48);
+        break;
+      case 'Completed':
+        bgColor = const Color(0xFFDBEAFE);
+        textColor = const Color(0xFF1D4ED8);
+        break;
+      case 'Canceled':
+        bgColor = const Color(0xFFFFE4E6);
+        textColor = const Color(0xFFE11D48);
+        break;
+      default:
+        bgColor = _grey200;
+        textColor = _grey500;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'Inter',
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  // Filter Chip
   Widget _buildFilterChip(String label) {
     final bool isActive = selectedFilter == label;
 
     return MouseRegion(
-      cursor: SystemMouseCursors.click, // <── Bikin kursor jadi bentuk tangan saat diarahkan ke sini
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
           setState(() {

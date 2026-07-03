@@ -77,8 +77,6 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                   discountPercent: int.tryParse(discountController.text.trim()) ?? voucher.discountPercent,
                   discountType: 'Persentase',
                   expiresAt: null,
-                  isClaimed: voucher.isClaimed,
-                  isUsed: voucher.isUsed,
                 );
 
                 if (!mounted) return;

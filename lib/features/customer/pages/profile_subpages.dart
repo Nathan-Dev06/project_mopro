@@ -208,31 +208,7 @@ class _RentalsListTab extends StatelessWidget {
                       ),
                     ),
                     // Status Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: rental.status == "Completed"
-                            ? _K.greenBg
-                            : (rental.status == "Canceled"
-                                ? const Color(0xFFFFE4E6)
-                                : _K.greenBg),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        rental.status,
-                        style: TextStyle(
-                          color: rental.status == "Completed"
-                              ? _K.green
-                              : (rental.status == "Canceled"
-                                  ? const Color(0xFFE11D48)
-                                  : _K.green),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                    ),
+                    _buildStatusBadge(rental),
                   ],
                 ),
               ),
@@ -326,61 +302,8 @@ class _RentalsListTab extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // â”€â”€ Card Footer: Action Buttons â”€â”€
-              if (!isFinished)
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                  child: Row(
-                    children: [
-                      // Return Button (Outlined)
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => _showReturnInfo(context, rental),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: _K.black,
-                            side: const BorderSide(color: _K.grey200),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            "Return Info",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      // Detail Button (Filled)
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _showRentalDetails(context, rental),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _K.black,
-                            foregroundColor: _K.bg,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          child: const Text(
-                            "View Details",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              // ── Card Footer: Action Buttons ──
+              _buildCardFooter(context, rental),
             ],
           ),
         );
@@ -757,6 +680,691 @@ class _RentalsListTab extends StatelessWidget {
       ),
     );
   }
+
+  // ── Status Badge Helper ──
+  Widget _buildStatusBadge(Rental rental) {
+    Color bgColor;
+    Color textColor;
+    switch (rental.status) {
+      case "Pending":
+        bgColor = const Color(0xFFFEF08A);
+        textColor = const Color(0xFF854D0E);
+        break;
+      case "Packaging":
+        bgColor = const Color(0xFFE0E7FF);
+        textColor = const Color(0xFF3730A3);
+        break;
+      case "Shipped":
+        bgColor = const Color(0xFFDDD6FE);
+        textColor = const Color(0xFF5B21B6);
+        break;
+      case "Active":
+      case "Renting":
+        bgColor = _K.greenBg;
+        textColor = _K.green;
+        break;
+      case "Cancellation Request":
+        bgColor = const Color(0xFFFFE4E6);
+        textColor = const Color(0xFFE11D48);
+        break;
+      case "Completed":
+        bgColor = const Color(0xFFDBEAFE);
+        textColor = const Color(0xFF1D4ED8);
+        break;
+      case "Canceled":
+        bgColor = const Color(0xFFFFE4E6);
+        textColor = const Color(0xFFE11D48);
+        break;
+      default:
+        bgColor = _K.grey200;
+        textColor = _K.grey500;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        rental.status,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'Inter',
+        ),
+      ),
+    );
+  }
+
+  // ── Card Footer Builder ──
+  Widget _buildCardFooter(BuildContext context, Rental rental) {
+    // Packaging / Pending → Request Cancellation
+    if (rental.status == "Packaging" || rental.status == "Pending") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _showReturnInfo(context, rental),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _K.black,
+                  side: const BorderSide(color: _K.grey200),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "View Details",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _showCancellationDialog(context, rental),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFDC2626),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.cancel_outlined, size: 16),
+                label: const Text(
+                  "Cancel Order",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Shipped → Confirm Arrival
+    if (rental.status == "Shipped") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      title: const Text("Not Arrived Yet?", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                      content: const Text(
+                        "If your order hasn't arrived, please wait a bit longer or contact our support via WhatsApp for tracking assistance.",
+                        style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text("OK", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _K.black,
+                  side: const BorderSide(color: _K.grey200),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text(
+                  "Not Arrived",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  RentalManager.instance.updateRentalStatus(rental.transactionId, "Completed");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Order marked as received! You can now write a review.", style: TextStyle(fontFamily: 'Inter')),
+                      backgroundColor: Color(0xFF16A34A),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _K.black,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
+                label: const Text(
+                  "Received",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Active → Return Info + View Details
+    if (rental.status == "Active" || rental.status == "Renting") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _showReturnInfo(context, rental),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: _K.black,
+                  side: const BorderSide(color: _K.grey200),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text(
+                  "Return Info",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => _showRentalDetails(context, rental),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _K.black,
+                  foregroundColor: _K.bg,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text(
+                  "View Details",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Completed → Write Review
+    if (rental.status == "Completed") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Show existing review if present
+            if (rental.rating != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _K.grey100,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        ...List.generate(
+                          rental.rating!.toInt(),
+                          (_) => const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 16),
+                        ),
+                        ...List.generate(
+                          5 - rental.rating!.toInt(),
+                          (_) => const Icon(Icons.star_outline_rounded, color: _K.grey300, size: 16),
+                        ),
+                      ],
+                    ),
+                    if (rental.reviewText != null && rental.reviewText!.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        rental.reviewText!,
+                        style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: _K.grey500, height: 1.4),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            SizedBox(
+              width: double.infinity,
+              child: rental.rating != null
+                  ? OutlinedButton.icon(
+                      onPressed: () => _showRentalDetails(context, rental),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _K.black,
+                        side: const BorderSide(color: _K.grey200),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.visibility_outlined, size: 16),
+                      label: const Text(
+                        "View Details",
+                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    )
+                  : ElevatedButton.icon(
+                      onPressed: () => _showReviewSheet(context, rental),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _K.black,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      icon: const Icon(Icons.rate_review_outlined, size: 16),
+                      label: const Text(
+                        "Write Review / Complaint",
+                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Cancellation Request → Waiting status
+    if (rental.status == "Cancellation Request") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF7ED),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFFDE68A)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.hourglass_top_rounded, color: Color(0xFFF59E0B), size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Cancellation request is being reviewed by admin.",
+                  style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: Colors.amber.shade900, height: 1.4),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Canceled → no actions
+    return const SizedBox.shrink();
+  }
+
+  // ── Cancellation Dialog (checks working hours 07:00 - 17:00) ──
+  void _showCancellationDialog(BuildContext context, Rental rental) {
+    final now = DateTime.now();
+    final hour = now.hour;
+
+    // Check working hours
+    if (hour < 7 || hour >= 17) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.schedule_rounded, color: Colors.amber.shade700, size: 22),
+              const SizedBox(width: 8),
+              const Text("Outside Working Hours", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+            ],
+          ),
+          content: const Text(
+            "Cancellation requests can only be submitted during working hours:\n\n🕖 07:00 AM — 05:00 PM\n\nPlease try again during these hours.",
+            style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.6),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("Understood", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final reasonController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 24, right: 24, top: 28, bottom: MediaQuery.of(ctx).viewInsets.bottom + 28,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Request Cancellation",
+                    style: TextStyle(fontFamily: 'Inter', fontSize: 18, fontWeight: FontWeight.w800, color: _K.black),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close_rounded, color: _K.black),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Order: ${rental.transactionId} — ${rental.costumeName}",
+                style: const TextStyle(fontFamily: 'Inter', fontSize: 13, color: _K.grey500),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Reason for cancellation *",
+                style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: reasonController,
+                maxLines: 4,
+                style: const TextStyle(fontFamily: 'Inter', fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: "Tell us why you want to cancel this order...",
+                  hintStyle: const TextStyle(fontFamily: 'Inter', color: _K.grey400, fontSize: 13),
+                  filled: true,
+                  fillColor: _K.grey100,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    final reason = reasonController.text.trim();
+                    if (reason.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please provide a reason for cancellation.", style: TextStyle(fontFamily: 'Inter')),
+                          backgroundColor: Color(0xFFDC2626),
+                        ),
+                      );
+                      return;
+                    }
+                    RentalManager.instance.updateRentalStatus(
+                      rental.transactionId,
+                      "Cancellation Request",
+                      cancellationReason: reason,
+                    );
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Cancellation request submitted. Awaiting admin approval.", style: TextStyle(fontFamily: 'Inter')),
+                        backgroundColor: Color(0xFFF59E0B),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFDC2626),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    "Submit Cancellation Request",
+                    style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Review / Complaint Bottom Sheet ──
+  void _showReviewSheet(BuildContext context, Rental rental) {
+    int selectedRating = 5;
+    final reviewController = TextEditingController();
+    String? selectedMediaType;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24, right: 24, top: 28, bottom: MediaQuery.of(ctx).viewInsets.bottom + 28,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Write Review",
+                          style: TextStyle(fontFamily: 'Inter', fontSize: 18, fontWeight: FontWeight.w800, color: _K.black),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(Icons.close_rounded, color: _K.black),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${rental.costumeName} — ${rental.costumeSeries}",
+                      style: const TextStyle(fontFamily: 'Inter', fontSize: 13, color: _K.grey500),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Star Rating
+                    const Text(
+                      "Rating *",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: List.generate(5, (index) {
+                        return GestureDetector(
+                          onTap: () => setSheetState(() => selectedRating = index + 1),
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: Icon(
+                              index < selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
+                              color: index < selectedRating ? const Color(0xFFF59E0B) : _K.grey300,
+                              size: 36,
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Review Text
+                    const Text(
+                      "Your Review / Complaint",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: reviewController,
+                      maxLines: 4,
+                      style: const TextStyle(fontFamily: 'Inter', fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: "Tell us about your experience, any issues, or compliments...",
+                        hintStyle: const TextStyle(fontFamily: 'Inter', color: _K.grey400, fontSize: 13),
+                        filled: true,
+                        fillColor: _K.grey100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Media Attachment
+                    const Text(
+                      "Attach Photo / Video (optional)",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _buildMediaOption(
+                          icon: Icons.photo_camera_outlined,
+                          label: "Photo",
+                          isSelected: selectedMediaType == 'image',
+                          onTap: () => setSheetState(() {
+                            selectedMediaType = selectedMediaType == 'image' ? null : 'image';
+                          }),
+                        ),
+                        const SizedBox(width: 12),
+                        _buildMediaOption(
+                          icon: Icons.videocam_outlined,
+                          label: "Video",
+                          isSelected: selectedMediaType == 'video',
+                          onTap: () => setSheetState(() {
+                            selectedMediaType = selectedMediaType == 'video' ? null : 'video';
+                          }),
+                        ),
+                      ],
+                    ),
+                    if (selectedMediaType != null) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _K.greenBg,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              selectedMediaType == 'image' ? Icons.image_rounded : Icons.video_file_rounded,
+                              color: _K.green, size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              selectedMediaType == 'image' ? "photo_review.jpg attached" : "video_review.mp4 attached",
+                              style: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: _K.green, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+
+                    // Submit
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          RentalManager.instance.updateRentalStatus(
+                            rental.transactionId,
+                            "Completed",
+                            rating: selectedRating.toDouble(),
+                            reviewText: reviewController.text.trim(),
+                            reviewMediaPath: selectedMediaType != null
+                                ? (selectedMediaType == 'image' ? 'photo_review.jpg' : 'video_review.mp4')
+                                : null,
+                            reviewMediaType: selectedMediaType,
+                          );
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Thank you for your review!", style: TextStyle(fontFamily: 'Inter')),
+                              backgroundColor: Color(0xFF16A34A),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _K.black,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text(
+                          "Submit Review",
+                          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildMediaOption({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? _K.black : _K.grey100,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isSelected ? _K.black : _K.grey200),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: isSelected ? Colors.white : _K.grey500),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? Colors.white : _K.grey500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// Empty state widget used in Completed and Canceled tabs
@@ -839,10 +1447,12 @@ class IdentityVerificationPage extends StatelessWidget {
     );
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>?> _loadVerificationDoc() async {
+  Stream<DocumentSnapshot<Map<String, dynamic>>> _verificationStream() {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return null;
-    return FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    if (user == null) {
+      return const Stream.empty();
+    }
+    return FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots();
   }
 
   Map<String, Object> _statusInfo(String status) {
@@ -861,12 +1471,19 @@ class IdentityVerificationPage extends StatelessWidget {
           'title': 'Verification Rejected',
           'subtitle': 'Please upload a clearer ID or contact support for review.',
         };
-      default:
+      case 'pending':
         return {
           'bg': const Color(0xFFFFF7ED),
           'icon': const Color(0xFFF59E0B),
           'title': 'Verification Pending',
-          'subtitle': 'Your ID is waiting for admin review.\nUpload a valid KTP to speed up approval.',
+          'subtitle': 'Your ID is waiting for admin review.\nWe will notify you once approved.',
+        };
+      default: // 'unverified'
+        return {
+          'bg': _K.grey100,
+          'icon': _K.grey500,
+          'title': 'Identity Unverified',
+          'subtitle': 'Please upload your KTP / Student ID to verify your identity and start renting costumes.',
         };
     }
   }
@@ -876,15 +1493,19 @@ class IdentityVerificationPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: _K.bg,
       appBar: _minimalAppBar(context, "Identity Verification"),
-      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
-        future: _loadVerificationDoc(),
+      body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        stream: _verificationStream(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final data = snapshot.data?.data();
-          final status = (data?['verificationStatus'] ?? 'pending').toString();
+          String status = (data?['verificationStatus'] ?? 'unverified').toString();
+          final ktp = data?['ktpNumber']?.toString() ?? '';
+          if (ktp.trim().isEmpty) {
+            status = 'unverified';
+          }
           final info = _statusInfo(status);
 
           return Center(
@@ -901,7 +1522,13 @@ class IdentityVerificationPage extends StatelessWidget {
                       color: info['bg'] as Color,
                     ),
                     child: Icon(
-                      status == 'rejected' ? Icons.error_outline_rounded : Icons.verified_rounded,
+                      status == 'approved'
+                          ? Icons.verified_rounded
+                          : (status == 'rejected'
+                              ? Icons.error_outline_rounded
+                              : (status == 'pending'
+                                  ? Icons.hourglass_empty_rounded
+                                  : Icons.info_outline_rounded)),
                       size: 40,
                       color: info['icon'] as Color,
                     ),

@@ -156,7 +156,9 @@ class _BookingPageState extends State<BookingPage> {
 }
 
   void _showVoucherSelector() {
-    final availableVouchers = VoucherManager.instance.availableVouchers;
+    final availableVouchers = VoucherManager.instance.claimedVouchers
+        .where((v) => !v.isUsed)
+        .toList();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -195,6 +197,21 @@ class _BookingPageState extends State<BookingPage> {
                     leading: const Icon(Icons.local_offer, color: Colors.green),
                     title: Text(v.code, style: const TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: Text(v.description),
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '-${v.discountPercent}%',
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
                     onTap: () {
                       setState(() {
                         _selectedVoucher = v;
@@ -311,20 +328,36 @@ class _BookingPageState extends State<BookingPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          widget.costumeData['image'],
-                          height: 60,
-                          width: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            height: 60,
-                            width: 50,
-                            color: bgColor,
-                            child:
-                                Icon(Icons.broken_image, color: textSecondary),
-                          ),
-                        ),
+                        child: widget.costumeData['image']?.startsWith('http://') == true ||
+                                widget.costumeData['image']?.startsWith('https://') == true
+                            ? Image.network(
+                                widget.costumeData['image'],
+                                height: 60,
+                                width: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  height: 60,
+                                  width: 50,
+                                  color: bgColor,
+                                  child: Icon(Icons.broken_image,
+                                      color: textSecondary),
+                                ),
+                              )
+                            : Image.asset(
+                                widget.costumeData['image'],
+                                height: 60,
+                                width: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  height: 60,
+                                  width: 50,
+                                  color: bgColor,
+                                  child: Icon(Icons.broken_image,
+                                      color: textSecondary),
+                                ),
+                              ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(

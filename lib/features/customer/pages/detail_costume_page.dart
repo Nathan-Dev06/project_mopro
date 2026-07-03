@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/customer/pages/booking_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
 
@@ -75,6 +77,139 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     WishlistManager.instance.toggleWishlist(data['title']);
     _favController.forward().then((_) => _favController.reverse());
     HapticFeedback.lightImpact();
+  }
+
+  Future<void> _checkIdentityAndProceed(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _showVerificationDialog(
+        context,
+        title: 'Login Required',
+        message: 'Please login first before renting a costume.',
+        icon: Icons.login_rounded,
+      );
+      return;
+    }
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (!mounted) return;
+
+      final data = doc.data();
+      final status = data?['verificationStatus']?.toString() ?? 'unverified';
+
+      if (status == 'approved') {
+        // Verified — proceed to booking
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BookingPage(costumeData: this.data),
+          ),
+        );
+      } else if (status == 'pending') {
+        _showVerificationDialog(
+          context,
+          title: 'Verification Pending',
+          message:
+              'Your identity verification is still being reviewed. Please wait for admin approval before renting costumes.',
+          icon: Icons.hourglass_top_rounded,
+        );
+      } else {
+        _showVerificationDialog(
+          context,
+          title: 'Identity Verification Required',
+          message:
+              'You must verify your identity (KTP) before renting costumes. Go to Profile → Verify Identity to submit your KTP number.',
+          icon: Icons.verified_user_outlined,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to check verification status. Please try again.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showVerificationDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required IconData icon,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Colors.white,
+        contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFEF3C7),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 40, color: const Color(0xFFF59E0B)),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A1A),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: Color(0xFF78716C),
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1A1A1A),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text(
+                'Understood',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1448,15 +1583,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               height: 50,
               child: ElevatedButton(
                 onPressed: isReady
-                    ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                BookingPage(costumeData: data),
-                          ),
-                        );
-                      }
+                    ? () => _checkIdentityAndProceed(context)
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:

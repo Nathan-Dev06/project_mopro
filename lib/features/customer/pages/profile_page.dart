@@ -48,6 +48,12 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
 
+      // Pre-populate from firebase auth user as fallback
+      setState(() {
+        _userName = user.displayName ?? 'User';
+        _userEmail = user.email ?? '';
+      });
+
       final doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -57,8 +63,8 @@ class _ProfilePageState extends State<ProfilePage> {
         final data = doc.data()!;
 
         setState(() {
-          _userName = data['name'] ?? '';
-          _userEmail = data['email'] ?? '';
+          _userName = data['name'] ?? user.displayName ?? 'User';
+          _userEmail = data['email'] ?? user.email ?? '';
           _userPhone = data['phone'] ?? '';
           _userAddress = data['address'] ?? '';
           _userCity = data['city'] ?? '';
@@ -67,7 +73,26 @@ class _ProfilePageState extends State<ProfilePage> {
           _isAdmin = data['isAdmin'] ?? false;
           _depositBalance = (data['deposit_balance'] ?? 0).toInt();
           _cosmoPoints = (data['cosmo_points'] ?? 0).toInt();
-          _verificationStatus = (data['verificationStatus'] ?? 'pending').toString();
+          final statusVal = (data['verificationStatus'] ?? 'unverified').toString();
+          final ktpVal = data['ktpNumber']?.toString() ?? '';
+          if (ktpVal.trim().isEmpty) {
+            _verificationStatus = 'unverified';
+          } else {
+            _verificationStatus = statusVal;
+          }
+        });
+      } else {
+        // If user logged in, but Firestore document doesn't exist, create it!
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': user.displayName ?? 'User',
+          'email': user.email ?? '',
+          'phone': '',
+          'address': '',
+          'role': 'Customer',
+          'isAdmin': false,
+          'verificationStatus': 'unverified',
+          'deposit_balance': 0,
+          'cosmo_points': 0,
         });
       }
     } catch (e) {
@@ -75,9 +100,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // â”€â”€ Mutable user biodata â”€â”€
-  String _userName = "tes_nama";
-  String _userEmail = "tes@gmail.com";
+  // — Mutable user biodata —
+  String _userName = "";
+  String _userEmail = "";
   String _userPhone = "";
   String _userAddress = "";
   String _userCity = "";
@@ -86,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isAdmin = false;
   int _depositBalance = 0;
   int _cosmoPoints = 0;
-  String _verificationStatus = 'pending';
+  String _verificationStatus = 'unverified';
 
   @override
   void initState() {
@@ -121,8 +146,10 @@ class _ProfilePageState extends State<ProfilePage> {
         return 'Verified';
       case 'rejected':
         return 'Rejected';
-      default:
+      case 'pending':
         return 'Pending';
+      default:
+        return 'Unverified';
     }
   }
 
@@ -132,8 +159,10 @@ class _ProfilePageState extends State<ProfilePage> {
         return _verifiedGreen;
       case 'rejected':
         return Colors.red;
-      default:
+      case 'pending':
         return Colors.orange;
+      default:
+        return _grey500;
     }
   }
 
@@ -198,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               // â”€â”€ User Info Row (Tappable â†’ EditProfilePage) â”€â”€
               GestureDetector(
-                onTap: _userEmail.isEmpty
+                onTap: FirebaseAuth.instance.currentUser == null
                     ? () async {
                         // Open login when not logged in
                         final res = await Navigator.push<bool?>(
