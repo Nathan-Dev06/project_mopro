@@ -377,17 +377,13 @@ class ReceiptPage extends StatelessWidget {
                         elevation: 0,
                       ),
                       onPressed: () {
+                        // Navigate to MainNavigationWrapper with Profile tab (index 2) active
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const MainNavigationWrapper(initialIndex: 0)),
+                                  const MainNavigationWrapper(initialIndex: 2)),
                           (route) => false,
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const MyRentalsPage()),
                         );
                       },
                       child: const Text(
@@ -472,16 +468,21 @@ class ReceiptPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label,
               style: TextStyle(
                   fontFamily: 'Inter', fontSize: 13, color: inkTextSecondary)),
-          Text(value,
-              style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
-                  color: textColor ?? inkTextPrimary)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(value,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: textColor ?? inkTextPrimary)),
+          ),
         ],
       ),
     );

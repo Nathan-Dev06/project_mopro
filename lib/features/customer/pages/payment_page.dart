@@ -147,7 +147,7 @@ class _PaymentPageState extends State<PaymentPage> {
               children: [
                 // STEP TITLE
                 Text(
-                  "STEP 2 OF 3 Â· CHECKOUT",
+                  "STEP 2 OF 3 • CHECKOUT",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 11,
@@ -270,7 +270,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${widget.shippingAddress!['phone'] ?? '-'} Â· ${widget.shippingAddress!['postal'] ?? ''}',
+                          '${widget.shippingAddress!['phone'] ?? '-'} • ${widget.shippingAddress!['postal'] ?? ''}',
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 12,
@@ -575,15 +575,19 @@ class _PaymentPageState extends State<PaymentPage> {
   Widget _buildBillingRow(String label, String value, {Color? textColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            color: textColor ?? inkTextSecondary,
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 14,
+              color: textColor ?? inkTextSecondary,
+            ),
           ),
         ),
+        const SizedBox(width: 16),
         Text(
           value,
           style: TextStyle(

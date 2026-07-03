@@ -281,7 +281,7 @@ class _BookingPageState extends State<BookingPage> {
               children: [
                 // STEP TITLE
                 Text(
-                  "STEP 1 OF 3 Â· SCHEDULING",
+                  "STEP 1 OF 3 • SCHEDULING",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 10,

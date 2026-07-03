@@ -1462,6 +1462,9 @@ class _SettingsPageState extends State<SettingsPage> {
             }),
             const SizedBox(height: 20),
             _buildSectionHeader("Legal & About"),
+            _buildListTile("Store Info & Location", Icons.storefront_outlined, onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreInfoPage()));
+            }),
             _buildListTile("Privacy Policy", Icons.privacy_tip_outlined, onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()));
             }),
@@ -2247,4 +2250,297 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ],
     );
   }
+}
+
+// =============================================
+// STORE INFO & LOCATION PAGE
+// =============================================
+class StoreInfoPage extends StatelessWidget {
+  const StoreInfoPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: _K.bg,
+      appBar: _minimalAppBar(context, "Store Info & Location"),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Store Hero/Image
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E1E1E), Color(0xFF3A3A3A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  // Decorative Background Circles
+                  Positioned(
+                    right: -30,
+                    top: -30,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.04),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 60,
+                    bottom: -40,
+                    child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.04),
+                      ),
+                    ),
+                  ),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 40),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "COSVORIA STUDIO",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Premium Cosplay Rental",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            
+            Text(
+              "Full Address",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _K.grey200),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _K.grey100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.location_on_rounded, color: _K.black, size: 20),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Cosvoria HQ",
+                          style: TextStyle(
+                            color: _K.black,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Jl. Kemang Raya No. 10, RT.1/RW.7\nBangka, Kec. Mampang Prpt.\nJakarta Selatan, DKI Jakarta 12730",
+                          style: TextStyle(
+                            color: _K.grey500,
+                            height: 1.5,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 32),
+            Text(
+              "Location Map",
+              style: TextStyle(
+                color: _K.black,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 12),
+            
+            // Map Preview
+            Container(
+              width: double.infinity,
+              height: 160,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFE5E3DF), // Standard map bg color
+                border: Border.all(color: _K.grey200),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  // A subtle grid to look like a map placeholder
+                  CustomPaint(
+                    painter: _MapGridPainter(),
+                    size: Size.infinite,
+                  ),
+                  // Fake pin
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))
+                            ],
+                          ),
+                          child: const Text(
+                            "Cosvoria Studio",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Icon(Icons.location_on, color: Colors.red, size: 36),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(content: Text("Opening Google Maps..."))
+                   );
+                },
+                icon: const Icon(Icons.map_rounded, size: 18),
+                label: const Text(
+                  "Open in Google Maps",
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _K.black,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MapGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.5)
+      ..strokeWidth = 1.0;
+
+    const double step = 20.0;
+    
+    // Draw vertical lines
+    for (double i = 0; i < size.width; i += step) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    // Draw horizontal lines
+    for (double i = 0; i < size.height; i += step) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
+    
+    // Draw some fake roads
+    final roadPaint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 4.0
+      ..strokeCap = StrokeCap.round;
+      
+    canvas.drawLine(Offset(size.width * 0.2, -10), Offset(size.width * 0.3, size.height + 10), roadPaint);
+    canvas.drawLine(Offset(-10, size.height * 0.4), Offset(size.width + 10, size.height * 0.5), roadPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1048,109 +1048,213 @@ class _MainHomePageState extends State<MainHomePage> {
       child: Container(
         key: const Key('promo_banner'),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         decoration: BoxDecoration(
-          color: _C.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1E1E1E), Color(0xFF3A3A3A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        child: Row(
+        child: Stack(
           children: [
-            // Promo text content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Promo badge
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: _C.black,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      "LIMITED OFFER",
-                      style: TextStyle(
-                        color: _C.white,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Main promo copy
-                  const Text(
-                    "EUPHORIA DEALS II",
-                    style: TextStyle(
-                      color: _C.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    "Get 20% OFF for your first rental!",
-                    style: TextStyle(
-                      color: _C.grey500,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Single prominent CTA: "Claim Voucher"
-                  ValueListenableBuilder<List<Voucher>>(
-                    valueListenable: VoucherManager.instance.vouchersNotifier,
-                    builder: (context, vouchers, _) {
-                      final voucher = VoucherManager.instance.getVoucher('EUPHORIA20');
-                      final isClaimed = voucher?.isClaimed ?? false;
-                      
-                      return GestureDetector(
-                        key: const Key('claim_voucher_button'),
-                        onTap: isClaimed ? null : () {
-                          VoucherManager.instance.claimVoucher('EUPHORIA20');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Voucher claimed successfully!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isClaimed ? _C.grey300 : _C.black,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            isClaimed ? "Claimed" : "Claim Voucher",
-                            style: TextStyle(
-                              color: isClaimed ? _C.grey500 : _C.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+            // Decorative Background Circles
+            Positioned(
+              right: -30,
+              top: -30,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.04),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
-            // Large decorative percentage text
-            Text(
-              "20%",
-              style: TextStyle(
-                color: _C.grey300.withOpacity(0.6),
-                fontSize: 48,
-                fontWeight: FontWeight.w900,
-                height: 1,
+            Positioned(
+              right: 60,
+              bottom: -40,
+              child: Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.04),
+                ),
+              ),
+            ),
+            
+            // Main Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Promo badge with glass effect
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(
+                                Icons.flash_on_rounded,
+                                color: Color(0xFFFFD700),
+                                size: 12,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                "LIMITED OFFER",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Main promo copy
+                        const Text(
+                          "EUPHORIA DEALS II",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Get 20% OFF for your first rental!",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        
+                        // Call to Action
+                        ValueListenableBuilder<List<Voucher>>(
+                          valueListenable: VoucherManager.instance.vouchersNotifier,
+                          builder: (context, vouchers, _) {
+                            final voucher = VoucherManager.instance.getVoucher('EUPHORIA20');
+                            final isClaimed = voucher?.isClaimed ?? false;
+                            
+                            return GestureDetector(
+                              key: const Key('claim_voucher_button'),
+                              onTap: isClaimed ? null : () {
+                                VoucherManager.instance.claimVoucher('EUPHORIA20');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Row(
+                                      children: const [
+                                        Icon(Icons.check_circle_outline, color: Colors.white),
+                                        SizedBox(width: 12),
+                                        Text('Voucher claimed successfully!'),
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.green.shade700,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    margin: const EdgeInsets.all(16),
+                                  ),
+                                );
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: isClaimed
+                                      ? Colors.white.withOpacity(0.1)
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: isClaimed ? [] : [
+                                    BoxShadow(
+                                      color: Colors.white.withOpacity(0.2),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    )
+                                  ],
+                                ),
+                                child: Text(
+                                  isClaimed ? "Claimed" : "Claim Voucher",
+                                  style: TextStyle(
+                                    color: isClaimed ? Colors.white54 : Colors.black,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Divider
+                  Container(
+                    width: 1,
+                    height: 90,
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    color: Colors.white.withOpacity(0.15),
+                  ),
+                  
+                  // Percentage Text
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "20%",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 38,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "OFF",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
