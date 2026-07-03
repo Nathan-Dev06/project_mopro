@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import 'package:project_mopro/core/services/firebase_sync_service.dart';
 
 class AdminIdentityVerificationPage extends StatefulWidget {
   const AdminIdentityVerificationPage({Key? key}) : super(key: key);
@@ -15,41 +18,14 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
 
-  final List<Map<String, String>> _verificationRequests = [
-    {
-      'id': '1',
-      'name': 'Nadia Pratiwi',
-      'email': 'nadia.p@email.com',
-      'ktp': '3175 0145 0298 0003',
-      'date': '13 Jun 2026',
-    },
-    {
-      'id': '2',
-      'name': 'Farhan Maulana',
-      'email': 'farhan.m@email.com',
-      'ktp': '3173 0102 9501 0012',
-      'date': '12 Jun 2026',
-    },
-    {
-      'id': '3',
-      'name': 'Ahmad Hidayat',
-      'email': 'ahmad.h@email.com',
-      'ktp': '3214 0918 0497 0001',
-      'date': '11 Jun 2026',
-    },
-    {
-      'id': '4',
-      'name': 'Siti Rahmawati',
-      'email': 'siti.r@email.com',
-      'ktp': '3578 1244 0399 0005',
-      'date': '10 Jun 2026',
-    },
-  ];
+  Future<void> _handleApprove(String id, String name) async {
+    await FirebaseSyncService.updateUserVerification(
+      userId: id,
+      verificationStatus: 'approved',
+    );
 
-  void _handleApprove(String id, String name) {
-    setState(() {
-      _verificationRequests.removeWhere((item) => item['id'] == id);
-    });
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Identitas $name berhasil disetujui!'),
@@ -58,10 +34,14 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
     );
   }
 
-  void _handleReject(String id, String name) {
-    setState(() {
-      _verificationRequests.removeWhere((item) => item['id'] == id);
-    });
+  Future<void> _handleReject(String id, String name) async {
+    await FirebaseSyncService.updateUserVerification(
+      userId: id,
+      verificationStatus: 'rejected',
+    );
+
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Identitas $name telah ditolak.'),
@@ -110,10 +90,29 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
             ),
             const SizedBox(height: 12),
             
-            // Konten Utama List Kartu Verifikasi
             Expanded(
-              child: _verificationRequests.isEmpty
-                  ? Center(
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseSyncService.usersCollection()
+                    .where('verificationStatus', isEqualTo: 'pending')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text(
+                        'Gagal memuat data verifikasi.',
+                        style: TextStyle(color: _grey500, fontFamily: 'Inter'),
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final requests = snapshot.data!.docs;
+
+                  if (requests.isEmpty) {
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
@@ -125,148 +124,152 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                           ),
                         ],
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _verificationRequests.length,
-                      itemBuilder: (context, index) {
-                        final item = _verificationRequests[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: _cardBg,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: _grey200, width: 1),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                    
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                              
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEEF2F6),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Icon(
-                                      Icons.badge_outlined,
-                                      color: _black,
-                                      size: 24,
-                                    ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: requests.length,
+                    itemBuilder: (context, index) {
+                      final item = requests[index].data();
+                      final userId = requests[index].id;
+                      final name = (item['name'] ?? 'Unknown').toString();
+                      final email = (item['email'] ?? '').toString();
+                      final ktp = (item['ktpNumber'] ?? item['ktp'] ?? '-').toString();
+                      final date = (item['verificationRequestedAtLabel'] ?? 'Menunggu review').toString();
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: _cardBg,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: _grey200, width: 1),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEEF2F6),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  const SizedBox(width: 14),
-                      
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          item['name']!,
-                                          style: const TextStyle(
-                                            color: _black,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Inter',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          item['email']!,
-                                          style: const TextStyle(
-                                            color: _grey500,
-                                            fontSize: 13,
-                                            fontFamily: 'Inter',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "No. KTP: ${item['ktp']}",
-                                          style: const TextStyle(
-                                            color: _black,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Inter',
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "• ${item['date']}",
-                                          style: const TextStyle(
-                                            color: _grey500,
-                                            fontSize: 12,
-                                            fontFamily: 'Inter',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  child: const Icon(
+                                    Icons.badge_outlined,
+                                    color: _black,
+                                    size: 24,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              
-                              Row(
-                                children: [
-                                  // Tombol Tolak
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 44,
-                                      child: OutlinedButton(
-                                        onPressed: () => _handleReject(item['id']!, item['name']!),
-                                        style: OutlinedButton.styleFrom(
-                                          side: const BorderSide(color: Colors.red, width: 1),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        name,
+                                        style: const TextStyle(
+                                          color: _black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Inter',
                                         ),
-                                        child: const Text(
-                                          "Tolak",
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Inter',
-                                          ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        email,
+                                        style: const TextStyle(
+                                          color: _grey500,
+                                          fontSize: 13,
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "No. KTP: $ktp",
+                                        style: const TextStyle(
+                                          color: _black,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "• $date",
+                                        style: const TextStyle(
+                                          color: _grey500,
+                                          fontSize: 12,
+                                          fontFamily: 'Inter',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 44,
+                                    child: OutlinedButton(
+                                      onPressed: () => _handleReject(userId, name),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.red, width: 1),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        "Tolak",
+                                        style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Inter',
                                         ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                           
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 44,
-                                      child: ElevatedButton(
-                                        onPressed: () => _handleApprove(item['id']!, item['name']!),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: _black,
-                                          foregroundColor: Colors.white,
-                                          elevation: 0,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 44,
+                                    child: ElevatedButton(
+                                      onPressed: () => _handleApprove(userId, name),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: _black,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
-                                        child: const Text(
-                                          "Setujui",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Inter',
-                                          ),
+                                      ),
+                                      child: const Text(
+                                        "Setujui",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Inter',
                                         ),
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

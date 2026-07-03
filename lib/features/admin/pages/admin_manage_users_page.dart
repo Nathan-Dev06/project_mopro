@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import 'package:project_mopro/core/services/firebase_sync_service.dart';
 
 class AdminManageUsersPage extends StatefulWidget {
   const AdminManageUsersPage({Key? key}) : super(key: key);
@@ -20,20 +23,32 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedTab = 'Semua';
 
-  final List<Map<String, String>> _users = [
-    {'name': 'Admin Utama', 'email': 'admin@gmail.com', 'role': 'Admin'},
-    {'name': 'Susi', 'email': 'susi@gmail.com', 'role': 'Customer'},
-    {'name': 'Doni', 'email': 'doni@gmail.com', 'role': 'Customer'},
-  ];
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  String _resolveRole(Map<String, dynamic> data) {
+    final role = data['role']?.toString();
+    if (role != null && role.isNotEmpty) return role;
+    return data['isAdmin'] == true ? 'Admin' : 'Customer';
+  }
+
+  List<Map<String, String>> _mapUsers(QuerySnapshot<Map<String, dynamic>> snapshot) {
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return {
+        'id': doc.id,
+        'name': (data['name'] ?? 'Unknown').toString(),
+        'email': (data['email'] ?? '').toString(),
+        'role': _resolveRole(data),
+      };
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-    List<Map<String, String>> filteredUsers = _users.where((user) {
-      if (_selectedTab == 'Semua') return true;
-      return user['role'] == _selectedTab;
-    }).toList();
-
     return Scaffold(
       backgroundColor: _bg,
       appBar: AppBar(
@@ -71,6 +86,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                 child: TextField(
                   controller: _searchController,
                   style: const TextStyle(color: _black),
+                  onChanged: (_) => setState(() {}),
                   decoration: const InputDecoration(
                     icon: Icon(Icons.search, color: _grey500),
                     hintText: "Cari user...",
@@ -98,15 +114,52 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
 
             // ── DAFTAR USER ──
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: filteredUsers.length,
-                itemBuilder: (context, index) {
-                  final user = filteredUsers[index];
-                  return _buildUserItem(
-                    name: user['name']!,
-                    email: user['email']!,
-                    role: user['role']!,
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseSyncService.usersCollection().snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Center(
+                      child: Text(
+                        'Gagal memuat data user.',
+                        style: TextStyle(color: _grey500, fontFamily: 'Inter'),
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  final search = _searchController.text.trim().toLowerCase();
+                  final users = _mapUsers(snapshot.data!);
+                  final filteredUsers = users.where((user) {
+                    final matchesRole = _selectedTab == 'Semua' || user['role'] == _selectedTab;
+                    final matchesSearch = search.isEmpty ||
+                        user['name']!.toLowerCase().contains(search) ||
+                        user['email']!.toLowerCase().contains(search);
+                    return matchesRole && matchesSearch;
+                  }).toList();
+
+                  if (filteredUsers.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Tidak ada user yang cocok.',
+                        style: TextStyle(color: _grey500, fontFamily: 'Inter'),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: filteredUsers.length,
+                    itemBuilder: (context, index) {
+                      final user = filteredUsers[index];
+                      return _buildUserItem(
+                        name: user['name']!,
+                        email: user['email']!,
+                        role: user['role']!,
+                      );
+                    },
                   );
                 },
               ),
@@ -255,26 +308,36 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                           backgroundColor: _black, 
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          final navigator = Navigator.of(context);
       
                           if (nameController.text.isEmpty || emailController.text.isEmpty || passwordController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
+                            messenger.showSnackBar(
                               const SnackBar(content: Text('Semua data wajib diisi ya, Sweety!')),
                             );
                             return;
                           }
 
-                          setState(() {
-                            _users.add({
-                              'name': nameController.text,
-                              'email': emailController.text,
-                              'role': selectedRole,
-                            });
-                          });
+                          final email = emailController.text.trim().toLowerCase();
 
-                          Navigator.pop(context); 
+                          await FirebaseSyncService.upsertUserRecord(
+                            userId: 'manual_$email',
+                            data: {
+                              'name': nameController.text.trim(),
+                              'email': email,
+                              'role': selectedRole,
+                              'isAdmin': selectedRole == 'Admin',
+                              'accountSource': 'admin-panel',
+                              'verificationStatus': 'approved',
+                            },
+                          );
+
+                          if (!mounted) return;
+
+                          navigator.pop(); 
                           
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          messenger.showSnackBar(
                             SnackBar(content: Text('${nameController.text} berhasil diundang sebagai $selectedRole!')),
                           );
                         },

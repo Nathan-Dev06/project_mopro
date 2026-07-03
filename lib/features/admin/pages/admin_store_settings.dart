@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:project_mopro/core/services/firebase_sync_service.dart';
+
 class StoreSettingsPage extends StatefulWidget {
   const StoreSettingsPage({Key? key}) : super(key: key);
 
@@ -26,6 +28,37 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
   bool isModeTokoAktif = true;
   bool isWajibKtp = true;
   bool isAutoApprove = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    try {
+      final snapshot = await FirebaseSyncService.storeSettingsDoc().get();
+      final data = snapshot.data() ?? FirebaseSyncService.defaultStoreSettings();
+
+      _namaTokoController.text = data['storeName']?.toString() ?? _namaTokoController.text;
+      _provinsiController.text = data['province']?.toString() ?? _provinsiController.text;
+      _kotaController.text = data['city']?.toString() ?? _kotaController.text;
+      _whatsappController.text = data['whatsapp']?.toString() ?? _whatsappController.text;
+      _depositController.text = data['deposit']?.toString() ?? _depositController.text;
+      _ongkirController.text = data['shipping']?.toString() ?? _ongkirController.text;
+      isModeTokoAktif = data['isStoreActive'] ?? true;
+      isWajibKtp = data['requiresKtpVerification'] ?? true;
+      isAutoApprove = data['autoApproveOrder'] ?? false;
+    } catch (e) {
+      debugPrint('Failed to load store settings: $e');
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -65,79 +98,92 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
         titleSpacing: 0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Input Fields
-              _buildInputField('Nama Toko', _namaTokoController),
-              _buildInputField('Provinsi Utama', _provinsiController),
-              _buildInputField('Kota Utama', _kotaController),
-              _buildInputField('Nomor WhatsApp CS', _whatsappController),
-              _buildInputField('Biaya Deposit Default', _depositController),
-              _buildInputField('Ongkir Default', _ongkirController),
-              
-              const SizedBox(height: 10),
-              const Divider(color: _grey200, height: 1),
-              const SizedBox(height: 15),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInputField('Nama Toko', _namaTokoController),
+                    _buildInputField('Provinsi Utama', _provinsiController),
+                    _buildInputField('Kota Utama', _kotaController),
+                    _buildInputField('Nomor WhatsApp CS', _whatsappController),
+                    _buildInputField('Biaya Deposit Default', _depositController),
+                    _buildInputField('Ongkir Default', _ongkirController),
+                    
+                    const SizedBox(height: 10),
+                    const Divider(color: _grey200, height: 1),
+                    const SizedBox(height: 15),
 
-              // Switch Toggles
-              _buildSwitchTile(
-                title: 'Mode Toko Aktif',
-                subtitle: 'Matikan untuk menutup sementara semua sewa',
-                value: isModeTokoAktif,
-                onChanged: (val) => setState(() => isModeTokoAktif = val),
-              ),
-              _buildSwitchTile(
-                title: 'Wajib Verifikasi KTP',
-                subtitle: 'Pelanggan harus verifikasi sebelum sewa',
-                value: isWajibKtp,
-                onChanged: (val) => setState(() => isWajibKtp = val),
-              ),
-              _buildSwitchTile(
-                title: 'Auto-approve Order',
-                subtitle: 'Lewati approval manual jika KTP valid',
-                value: isAutoApprove,
-                onChanged: (val) => setState(() => isAutoApprove = val),
-              ),
+                    _buildSwitchTile(
+                      title: 'Mode Toko Aktif',
+                      subtitle: 'Matikan untuk menutup sementara semua sewa',
+                      value: isModeTokoAktif,
+                      onChanged: (val) => setState(() => isModeTokoAktif = val),
+                    ),
+                    _buildSwitchTile(
+                      title: 'Wajib Verifikasi KTP',
+                      subtitle: 'Pelanggan harus verifikasi sebelum sewa',
+                      value: isWajibKtp,
+                      onChanged: (val) => setState(() => isWajibKtp = val),
+                    ),
+                    _buildSwitchTile(
+                      title: 'Auto-approve Order',
+                      subtitle: 'Lewati approval manual jika KTP valid',
+                      value: isAutoApprove,
+                      onChanged: (val) => setState(() => isAutoApprove = val),
+                    ),
 
-              const SizedBox(height: 30),
+                    const SizedBox(height: 30),
 
-      
-              MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pengaturan berhasil disimpan!')),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: _black, width: 1.5),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            await FirebaseSyncService.saveStoreSettings({
+                              'storeName': _namaTokoController.text.trim(),
+                              'province': _provinsiController.text.trim(),
+                              'city': _kotaController.text.trim(),
+                              'whatsapp': _whatsappController.text.trim(),
+                              'deposit': _depositController.text.trim(),
+                              'shipping': _ongkirController.text.trim(),
+                              'isStoreActive': isModeTokoAktif,
+                              'requiresKtpVerification': isWajibKtp,
+                              'autoApproveOrder': isAutoApprove,
+                            });
+
+                            if (!mounted) return;
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Pengaturan berhasil disimpan!')),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: _black, width: 1.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Simpan Pengaturan',
+                            style: TextStyle(
+                              color: _black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'Simpan Pengaturan',
-                      style: TextStyle(
-                        color: _black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
       ),
     );
   }

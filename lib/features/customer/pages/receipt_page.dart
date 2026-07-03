@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_mopro/main.dart';
-import 'package:project_mopro/features/customer/pages/profile_subpages.dart';
 
 class ReceiptPage extends StatelessWidget {
   final Map<String, dynamic> costumeData;
@@ -226,13 +225,11 @@ class ReceiptPage extends StatelessWidget {
                                 ],
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: semanticSuccess.withOpacity(0.12),
                                   borderRadius: BorderRadius.circular(99),
-                                  border: Border.all(
-                                      color: semanticSuccess.withOpacity(0.3)),
+                                  border: Border.all(color: semanticSuccess.withOpacity(0.3)),
                                 ),
                                 child: Text(
                                   "PAID",
@@ -253,12 +250,9 @@ class ReceiptPage extends StatelessWidget {
                             30,
                             (index) => Expanded(
                               child: Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 2),
+                                margin: const EdgeInsets.symmetric(horizontal: 2),
                                 height: 1.5,
-                                color: index % 2 == 0
-                                    ? hairlineDashed
-                                    : Colors.transparent,
+                                color: index % 2 == 0 ? hairlineDashed : Colors.transparent,
                               ),
                             ),
                           ),
@@ -298,41 +292,33 @@ class ReceiptPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              _buildTicketDetailRow("Rental Period",
-                                  "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"),
-                              _buildTicketDetailRow(
-                                  "Duration", "$totalDays Days"),
-                              _buildTicketDetailRow(
-                                  "Payment Method", paymentMethod),
+                              _buildTicketDetailRow("Rental Period", "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"),
+                              _buildTicketDetailRow("Duration", "$totalDays Days"),
+                              _buildTicketDetailRow("Payment Method", paymentMethod),
                               if (discountAmount > 0)
                                 _buildTicketDetailRow(
                                   "Discount ($voucherCode)",
                                   "-Rp ${NumberFormat('#,###', 'id').format(discountAmount)}",
                                   textColor: semanticSuccess,
                                 ),
-                                if (shippingAddress != null) ...[
+                              if (shippingAddress != null) ...[
                                 Padding(
-                                  padding:
-                                    const EdgeInsets.symmetric(vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(vertical: 12.0),
                                   child: Divider(color: hairlineStrong, height: 1),
                                 ),
-                                _buildTicketDetailRow("Recipient",
-                                  shippingAddress!['recipient'] ?? '-'),
-                                _buildTicketDetailRow(
-                                  "Phone", shippingAddress!['phone'] ?? '-'),
+                                _buildTicketDetailRow("Recipient", shippingAddress!['recipient'] ?? '-'),
+                                _buildTicketDetailRow("Phone", shippingAddress!['phone'] ?? '-'),
                                 _buildTicketDetailRow(
                                   "Address",
-                                  "${shippingAddress!['street'] ?? '-'}, ${shippingAddress!['city'] ?? '-'}, ${shippingAddress!['province'] ?? '-'} ${shippingAddress!['postal'] ?? ''}"),
-                                ],
+                                  "${shippingAddress!['street'] ?? '-'}, ${shippingAddress!['city'] ?? '-'}, ${shippingAddress!['province'] ?? '-'} ${shippingAddress!['postal'] ?? ''}",
+                                ),
+                              ],
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
-                                child:
-                                    Divider(color: hairlineStrong, height: 1),
+                                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                                child: Divider(color: hairlineStrong, height: 1),
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "TOTAL PAID",
@@ -470,18 +456,28 @@ class ReceiptPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: TextStyle(
-                  fontFamily: 'Inter', fontSize: 13, color: inkTextSecondary)),
-          const SizedBox(width: 16),
           Expanded(
-            child: Text(value,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: textColor ?? inkTextPrimary)),
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontFamily: 'Inter', fontSize: 13, color: inkTextSecondary),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                  color: textColor ?? inkTextPrimary),
+            ),
           ),
         ],
       ),
@@ -562,231 +558,245 @@ class _ReceiptThermalSlipState extends State<_ReceiptThermalSlip> {
         NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0);
     final dateFormat = DateFormat('dd MMM yyyy');
 
-    return Container(
-      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 32, top: 20),
-      decoration: BoxDecoration(
-          color: widget
-              .canvasLight, // Penyesuaian agar background modal bawah ikut berwarna terang
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            )
-          ]),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: widget.hairlineStrong,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Print Receipt Preview",
-            style: TextStyle(
-                color: widget.inkTextPrimary,
-                fontFamily: 'Inter',
-                fontSize: 15,
-                fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-
-          // BLOK UTAMA: Kertas Struk Thermal Putih Bersih tetap dipertahankan
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5))
-              ],
-              border: Border.all(color: widget.hairlineStrong),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  "OFFICIAL TRANSACTION RECEIPT",
-                  style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
-                      letterSpacing: 0.5),
-                ),
-                Text(
-                  "ID: ${widget.transactionId}",
-                  style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 10,
-                      color: Colors.grey[700],
-                      fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: List.generate(
-                      25,
-                      (index) => Expanded(
-                            child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 1.5),
-                              height: 1,
-                              color: index % 2 == 0
-                                  ? Colors.grey[300]
-                                  : Colors.transparent,
-                            ),
-                          )),
-                ),
-                const SizedBox(height: 12),
-                _buildRowThermal(
-                    "Rental Item", widget.costumeData['title'] ?? '-'),
-                _buildRowThermal(
-                    "Series / Character", widget.costumeData['series'] ?? '-'),
-                _buildRowThermal("Rental Duration", "${widget.totalDays} Days"),
-                _buildRowThermal("Start", dateFormat.format(widget.startDate)),
-                _buildRowThermal("End", dateFormat.format(widget.endDate)),
-                _buildRowThermal("Payment", widget.paymentMethod),
-                if (widget.discountAmount > 0)
-                  _buildRowThermal("Discount (${widget.voucherCode})",
-                      "-Rp ${NumberFormat('#,###', 'id').format(widget.discountAmount)}"),
-                if (widget.shippingAddress != null) ...[
-                  const SizedBox(height: 6),
-                  _buildRowThermal(
-                    "Recipient", widget.shippingAddress!['recipient'] ?? '-'),
-                  _buildRowThermal(
-                    "Phone", widget.shippingAddress!['phone'] ?? '-'),
-                  _buildRowThermal(
-                    "Address",
-                    "${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'} ${widget.shippingAddress!['postal'] ?? ''}"),
-                ],
-                const SizedBox(height: 12),
-                Row(
-                  children: List.generate(
-                      25,
-                      (index) => Expanded(
-                            child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 1.5),
-                              height: 1,
-                              color: index % 2 == 0
-                                  ? Colors.grey[300]
-                                  : Colors.transparent,
-                            ),
-                          )),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "TOTAL PAID",
-                      style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
-                    Text(
-                      currencyFormat.format(widget.grandTotal),
-                      style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.black),
-                    ),
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: Container(
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 32, top: 20),
+                decoration: BoxDecoration(
+                  color: widget.canvasLight,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    )
                   ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  "Thank you for your rental!",
-                  style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 9,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey[600]),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 28),
-
-          // TOMBOL DOWNLOAD SEKARANG MENYESUAIKAN DENGAN SKEMA LIGHT MODE ELEGAN
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: widget.inkTextPrimary,
-                foregroundColor: Colors.white,
-                shape: const StadiumBorder(),
-                elevation: 0,
-              ),
-              onPressed: _isDownloading ? null : _simulateDownload,
-              child: _isDownloading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.file_download_outlined, size: 18),
-                        SizedBox(width: 8),
-                        Text(
-                          "Download Receipt",
-                          style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: widget.hairlineStrong,
+                          borderRadius: BorderRadius.circular(2),
                         ),
-                      ],
-                    ),
-
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Print Receipt Preview",
+                        style: TextStyle(
+                          color: widget.inkTextPrimary,
+                          fontFamily: 'Inter',
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 15,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                          border: Border.all(color: widget.hairlineStrong),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "OFFICIAL TRANSACTION RECEIPT",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            Text(
+                              "ID: ${widget.transactionId}",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 10,
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: List.generate(
+                                25,
+                                (index) => Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                                    height: 1,
+                                    color: index % 2 == 0 ? Colors.grey[300] : Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildRowThermal("Rental Item", widget.costumeData['title'] ?? '-'),
+                            _buildRowThermal("Series / Character", widget.costumeData['series'] ?? '-'),
+                            _buildRowThermal("Rental Duration", "${widget.totalDays} Days"),
+                            _buildRowThermal("Start", dateFormat.format(widget.startDate)),
+                            _buildRowThermal("End", dateFormat.format(widget.endDate)),
+                            _buildRowThermal("Payment", widget.paymentMethod),
+                            if (widget.discountAmount > 0)
+                              _buildRowThermal(
+                                "Discount (${widget.voucherCode})",
+                                "-Rp ${NumberFormat('#,###', 'id').format(widget.discountAmount)}",
+                              ),
+                            if (widget.shippingAddress != null) ...[
+                              const SizedBox(height: 6),
+                              _buildRowThermal("Recipient", widget.shippingAddress!['recipient'] ?? '-'),
+                              _buildRowThermal("Phone", widget.shippingAddress!['phone'] ?? '-'),
+                              _buildRowThermal(
+                                "Address",
+                                "${widget.shippingAddress!['street'] ?? '-'}, ${widget.shippingAddress!['city'] ?? '-'}, ${widget.shippingAddress!['province'] ?? '-'} ${widget.shippingAddress!['postal'] ?? ''}",
+                              ),
+                            ],
+                            const SizedBox(height: 12),
+                            Row(
+                              children: List.generate(
+                                25,
+                                (index) => Expanded(
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                                    height: 1,
+                                    color: index % 2 == 0 ? Colors.grey[300] : Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "TOTAL PAID",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Text(
+                                  currencyFormat.format(widget.grandTotal),
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Thank you for your rental!",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 9,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 46,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: widget.inkTextPrimary,
+                            foregroundColor: Colors.white,
+                            shape: const StadiumBorder(),
+                            elevation: 0,
+                          ),
+                          onPressed: _isDownloading ? null : _simulateDownload,
+                          child: _isDownloading
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.file_download_outlined, size: 18),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "Download Receipt",
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
-    ));
+    );
   }
 
   Widget _buildRowThermal(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3.5),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 11,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 11,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500),
+            ),
           ),
           const SizedBox(width: 16),
-          Expanded(
+          Flexible(
             child: Text(
               value,
               textAlign: TextAlign.right,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 11,

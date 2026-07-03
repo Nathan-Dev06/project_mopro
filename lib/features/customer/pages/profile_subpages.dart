@@ -811,80 +811,187 @@ class _EmptyStateTab extends StatelessWidget {
 class IdentityVerificationPage extends StatelessWidget {
   const IdentityVerificationPage({Key? key}) : super(key: key);
 
+  Future<void> _submitKtp(BuildContext context, String ktpNumber) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    if (user == null) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Silakan login terlebih dahulu.')),
+      );
+      return;
+    }
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+      {
+        'ktpNumber': ktpNumber.trim(),
+        'verificationStatus': 'pending',
+        'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
+        'verificationSubmittedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
+
+    if (!navigator.mounted) return;
+
+    messenger.showSnackBar(
+      const SnackBar(content: Text('KTP berhasil dikirim ke admin untuk verifikasi.')),
+    );
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>?> _loadVerificationDoc() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return null;
+    return FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+  }
+
+  Map<String, Object> _statusInfo(String status) {
+    switch (status) {
+      case 'approved':
+        return {
+          'bg': _K.greenBg,
+          'icon': _K.green,
+          'title': 'Identity Verified',
+          'subtitle': 'Your identity has been verified.\nYou can rent costumes without restrictions.',
+        };
+      case 'rejected':
+        return {
+          'bg': const Color(0xFFFEE2E2),
+          'icon': Colors.red,
+          'title': 'Verification Rejected',
+          'subtitle': 'Please upload a clearer ID or contact support for review.',
+        };
+      default:
+        return {
+          'bg': const Color(0xFFFFF7ED),
+          'icon': const Color(0xFFF59E0B),
+          'title': 'Verification Pending',
+          'subtitle': 'Your ID is waiting for admin review.\nUpload a valid KTP to speed up approval.',
+        };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _K.bg,
       appBar: _minimalAppBar(context, "Identity Verification"),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Verified badge
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _K.greenBg,
-                ),
-                child: const Icon(
-                  Icons.verified_rounded,
-                  size: 40,
-                  color: _K.green,
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Identity Verified",
-                style: TextStyle(
-                  color: _K.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Inter',
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Your identity has been verified.\nYou can rent costumes without restrictions.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: _K.grey500,
-                  fontSize: 13,
-                  fontFamily: 'Inter',
-                  height: 1.6,
-                ),
-              ),
-              const SizedBox(height: 28),
-              // Upload button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.upload_file_outlined, size: 20),
-                  label: const Text(
-                    "Upload KTP / Kartu Pelajar",
-                    style: TextStyle(
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+        future: _loadVerificationDoc(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final data = snapshot.data?.data();
+          final status = (data?['verificationStatus'] ?? 'pending').toString();
+          final info = _statusInfo(status);
+
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: info['bg'] as Color,
+                    ),
+                    child: Icon(
+                      status == 'rejected' ? Icons.error_outline_rounded : Icons.verified_rounded,
+                      size: 40,
+                      color: info['icon'] as Color,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    info['title'] as String,
+                    style: const TextStyle(
+                      color: _K.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
                       fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    info['subtitle'] as String,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: _K.grey500,
                       fontSize: 13,
+                      fontFamily: 'Inter',
+                      height: 1.6,
                     ),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: _K.black,
-                    side: const BorderSide(color: _K.black, width: 1.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        final ktpController = TextEditingController(text: data?['ktpNumber']?.toString() ?? '');
+
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) {
+                            final dialogNavigator = Navigator.of(dialogContext);
+
+                            return AlertDialog(
+                              title: const Text('Upload KTP / Kartu Pelajar'),
+                              content: TextField(
+                                controller: ktpController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Nomor KTP / Kartu Pelajar',
+                                  hintText: '3175xxxxxxxxxxxx',
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: const Text('Batal'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    await _submitKtp(context, ktpController.text);
+                                    if (dialogNavigator.mounted) {
+                                      dialogNavigator.pop();
+                                    }
+                                  },
+                                  child: const Text('Kirim'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.upload_file_outlined, size: 20),
+                      label: const Text(
+                        "Upload KTP / Kartu Pelajar",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _K.black,
+                        side: const BorderSide(color: _K.black, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -1097,6 +1204,24 @@ Future<void> _saveSizeProfile() async {
 class MyVouchersPage extends StatelessWidget {
   const MyVouchersPage({Key? key}) : super(key: key);
 
+  String _statusLabel(Voucher voucher) {
+    if (voucher.isUsed) return 'USED';
+    if (voucher.isClaimed) return 'CLAIMED';
+    return 'AVAILABLE';
+  }
+
+  Color _statusColor(Voucher voucher) {
+    if (voucher.isUsed) return _K.grey200;
+    if (voucher.isClaimed) return _K.greenBg;
+    return const Color(0xFFFFF7ED);
+  }
+
+  Color _statusTextColor(Voucher voucher) {
+    if (voucher.isUsed) return _K.grey500;
+    if (voucher.isClaimed) return _K.green;
+    return const Color(0xFFF59E0B);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1105,9 +1230,7 @@ class MyVouchersPage extends StatelessWidget {
       body: ValueListenableBuilder<List<Voucher>>(
         valueListenable: VoucherManager.instance.vouchersNotifier,
         builder: (context, vouchers, child) {
-          final claimedVouchers = vouchers.where((v) => v.isClaimed).toList();
-
-          if (claimedVouchers.isEmpty) {
+          if (vouchers.isEmpty) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -1116,7 +1239,7 @@ class MyVouchersPage extends StatelessWidget {
                       size: 56, color: _K.grey300),
                   SizedBox(height: 16),
                   Text(
-                    "No active vouchers",
+                    "No vouchers available",
                     style: TextStyle(
                       color: _K.grey800,
                       fontSize: 15,
@@ -1126,7 +1249,7 @@ class MyVouchersPage extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Vouchers you receive from promos\nor events will appear here.",
+                    "Vouchers created by admin will appear here automatically.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: _K.grey400,
@@ -1142,9 +1265,9 @@ class MyVouchersPage extends StatelessWidget {
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: claimedVouchers.length,
+            itemCount: vouchers.length,
             itemBuilder: (context, index) {
-              final voucher = claimedVouchers[index];
+              final voucher = vouchers[index];
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
@@ -1197,13 +1320,69 @@ class MyVouchersPage extends StatelessWidget {
                               fontFamily: 'Inter',
                             ),
                           ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: _statusColor(voucher),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  _statusLabel(voucher),
+                                  style: TextStyle(
+                                    color: _statusTextColor(voucher),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                '${voucher.discountPercent}% OFF',
+                                style: const TextStyle(
+                                  color: _K.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    if (voucher.isUsed)
+                    const SizedBox(width: 12),
+                    if (!voucher.isClaimed && !voucher.isUsed)
+                      SizedBox(
+                        height: 36,
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            final messenger = ScaffoldMessenger.of(context);
+                            await VoucherManager.instance.claimVoucher(voucher.code);
+                            messenger.showSnackBar(
+                              SnackBar(content: Text('Voucher ${voucher.code} berhasil diklaim.')),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: _K.black, width: 1.2),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: const Text(
+                            'Claim',
+                            style: TextStyle(
+                              color: _K.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      )
+                    else if (voucher.isUsed)
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: _K.grey200,
                           borderRadius: BorderRadius.circular(4),
@@ -1217,6 +1396,22 @@ class MyVouchersPage extends StatelessWidget {
                           ),
                         ),
                       )
+                    else
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _K.greenBg,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          "CLAIMED",
+                          style: TextStyle(
+                            color: _K.green,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               );

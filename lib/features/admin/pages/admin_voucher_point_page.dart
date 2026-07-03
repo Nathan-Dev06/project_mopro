@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_mopro/features/admin/pages/admin_create_voucher_page.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
 
 class AdminVoucherPointPage extends StatefulWidget {
   const AdminVoucherPointPage({Key? key}) : super(key: key);
@@ -14,21 +15,6 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
-
-  final List<Map<String, String>> _vouchers = [
-    {
-      'code': 'NEWUSER20',
-      'desc': 'Diskon 20% untuk pengguna baru, maks Rp 20.000',
-      'used': '142x',
-      'exp': '31 Jul 2026'
-    },
-    {
-      'code': 'WEEKENDSTAY',
-      'desc': 'Potongan harga Rp 50.000 khusus booking di hari Sabtu-Minggu',
-      'used': '98x',
-      'exp': '15 Aug 2026'
-    }
-  ];
 
   Widget _buildStatCard({required IconData icon, required String title, required String value}) {
     return Container(
@@ -51,6 +37,93 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showEditVoucherDialog(Voucher voucher) async {
+    final descriptionController = TextEditingController(text: voucher.description);
+    final discountController = TextEditingController(text: voucher.discountPercent.toString());
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Edit Voucher'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Deskripsi'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: discountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Diskon (%)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await VoucherManager.instance.updateVoucher(
+                  code: voucher.code,
+                  description: descriptionController.text.trim(),
+                  discountPercent: int.tryParse(discountController.text.trim()) ?? voucher.discountPercent,
+                  discountType: 'Persentase',
+                  expiresAt: null,
+                  isClaimed: voucher.isClaimed,
+                  isUsed: voucher.isUsed,
+                );
+
+                if (!mounted) return;
+                Navigator.pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Voucher ${voucher.code} berhasil diperbarui.')),
+                );
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteVoucher(Voucher voucher) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Hapus Voucher'),
+          content: Text('Hapus voucher ${voucher.code}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true) return;
+
+    await VoucherManager.instance.deleteVoucher(voucher.code);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Voucher ${voucher.code} dihapus.')),
     );
   }
 
@@ -83,24 +156,31 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
             children: [
               const SizedBox(height: 10),
               
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      icon: Icons.confirmation_number_outlined,
-                      title: "Voucher Aktif",
-                      value: _vouchers.length.toString(),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: _buildStatCard(
-                      icon: Icons.percent_outlined,
-                      title: "Total Terpakai",
-                      value: "312x",
-                    ),
-                  ),
-                ],
+              ValueListenableBuilder<List<Voucher>>(
+                valueListenable: VoucherManager.instance.vouchersNotifier,
+                builder: (context, vouchers, _) {
+                  final usedCount = vouchers.where((voucher) => voucher.isUsed).length;
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.confirmation_number_outlined,
+                          title: "Voucher Aktif",
+                          value: vouchers.length.toString(),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: _buildStatCard(
+                          icon: Icons.percent_outlined,
+                          title: "Total Terpakai",
+                          value: '${usedCount}x',
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 28),
 
@@ -126,14 +206,6 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                       if (!mounted) return;
 
                       if (result != null && result is Map<String, String>) {
-                        setState(() {
-                          _vouchers.insert(0, {
-                            'code': result['code']!,
-                            'desc': result['desc']!,
-                            'used': '0x',
-                            'exp': result['exp']!,
-                          });
-                        });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Voucher ${result['code']} Berhasil Dibuat! ðŸŽ‰'),
@@ -158,59 +230,106 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
               const SizedBox(height: 16),
 
               Expanded(
-                child: ListView.builder(
-                  itemCount: _vouchers.length,
-                  itemBuilder: (context, index) {
-                    final item = _vouchers[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 14),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: _cardBg,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: _grey200, width: 1.2),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['code']!,
-                            style: const TextStyle(
-                              color: _black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800, 
-                              fontFamily: 'Inter',
-                              letterSpacing: 0.5,
-                            ),
+                child: ValueListenableBuilder<List<Voucher>>(
+                  valueListenable: VoucherManager.instance.vouchersNotifier,
+                  builder: (context, vouchers, _) {
+                    if (vouchers.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'Belum ada voucher.',
+                          style: TextStyle(color: _grey500, fontFamily: 'Inter'),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: vouchers.length,
+                      itemBuilder: (context, index) {
+                        final item = vouchers[index];
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 14),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: _cardBg,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _grey200, width: 1.2),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            item['desc']!,
-                            style: const TextStyle(
-                              color: _grey500,
-                              fontSize: 13,
-                              fontFamily: 'Inter',
-                              height: 1.4,
-                    ),
-                          ),
-                          const SizedBox(height: 14),
-                          Container(height: 1, color: _grey200),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Terpakai: ${item['used']}",
-                                style: const TextStyle(color: _black, fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'Inter'),
+                                item.code,
+                                style: const TextStyle(
+                                  color: _black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'Inter',
+                                  letterSpacing: 0.5,
+                                ),
                               ),
+                              const SizedBox(height: 6),
                               Text(
-                                "Exp: ${item['exp']}",
-                                style: const TextStyle(color: _grey500, fontSize: 12, fontFamily: 'Inter'),
+                                item.description,
+                                style: const TextStyle(
+                                  color: _grey500,
+                                  fontSize: 13,
+                                  fontFamily: 'Inter',
+                                  height: 1.4,
+                                ),
                               ),
+                              const SizedBox(height: 14),
+                              Container(height: 1, color: _grey200),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Terpakai: ${item.isUsed ? '1x' : '0x'}",
+                                    style: const TextStyle(color: _black, fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'Inter'),
+                                  ),
+                                  Text(
+                                    item.isClaimed ? 'Claimed' : 'Belum diklaim',
+                                    style: const TextStyle(color: _grey500, fontSize: 12, fontFamily: 'Inter'),
+                                  ),
+                                ],
+                              )
+                              ,
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () => _showEditVoucherDialog(item),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: _black, width: 1.2),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      child: const Text(
+                                        'Edit',
+                                        style: TextStyle(color: _black, fontFamily: 'Inter', fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () => _deleteVoucher(item),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.red, width: 1.2),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      child: const Text(
+                                        'Hapus',
+                                        style: TextStyle(color: Colors.red, fontFamily: 'Inter', fontWeight: FontWeight.w700),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
                             ],
-                          )
-                        ],
-                      ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

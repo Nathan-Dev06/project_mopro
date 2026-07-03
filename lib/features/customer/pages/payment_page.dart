@@ -177,19 +177,36 @@ class _PaymentPageState extends State<PaymentPage> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          widget.costumeData['image'],
-                          height: 70,
-                          width: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            height: 70,
-                            width: 60,
-                            color: hairlineStrong,
-                            child: Icon(Icons.broken_image, color: textMuted),
-                          ),
-                        ),
+                        child: widget.costumeData['image']?.startsWith('http://') == true ||
+                                widget.costumeData['image']?.startsWith('https://') == true
+                            ? Image.network(
+                                widget.costumeData['image'],
+                                height: 70,
+                                width: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  height: 70,
+                                  width: 60,
+                                  color: hairlineStrong,
+                                  child: Icon(Icons.broken_image,
+                                      color: textMuted),
+                                ),
+                              )
+                            : Image.asset(
+                                widget.costumeData['image'],
+                                height: 70,
+                                width: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Container(
+                                  height: 70,
+                                  width: 60,
+                                  color: hairlineStrong,
+                                  child: Icon(Icons.broken_image,
+                                      color: textMuted),
+                                ),
+                              ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -216,6 +233,8 @@ class _PaymentPageState extends State<PaymentPage> {
                                 fontSize: 13,
                                 color: inkTextSecondary,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 6),
                             Text(
@@ -226,6 +245,8 @@ class _PaymentPageState extends State<PaymentPage> {
                                 color: inkTextPrimary.withOpacity(0.8),
                                 fontWeight: FontWeight.w600,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -574,12 +595,12 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _buildBillingRow(String label, String value, {Color? textColor}) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Text(
             label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -587,14 +608,19 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
           ),
         ),
-        const SizedBox(width: 16),
-        Text(
-          value,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: textColor ?? inkTextPrimary,
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: textColor ?? inkTextPrimary,
+            ),
           ),
         ),
       ],

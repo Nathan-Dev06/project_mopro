@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/admin/pages/admin_store_settings.dart'; 
 import 'package:project_mopro/features/admin/pages/admin_manage_users_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_payout_page.dart'; 
@@ -6,6 +7,7 @@ import 'package:project_mopro/features/admin/pages/admin_identity_verification_p
 import 'package:project_mopro/features/admin/pages/admin_voucher_point_page.dart'; 
 import 'package:project_mopro/features/auth/pages/login_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_notification_settings.dart';
+import 'package:project_mopro/core/services/firebase_sync_service.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -126,14 +128,21 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               ),
 
               // Menu 4: Identity Verification
-              _buildMenuRow(
-                icon: Icons.gpp_good_outlined,
-                title: "Identity Verification",
-                badgeCount: 4,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AdminIdentityVerificationPage()),
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseSyncService.usersCollection()
+                    .where('verificationStatus', isEqualTo: 'pending')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  return _buildMenuRow(
+                    icon: Icons.gpp_good_outlined,
+                    title: "Identity Verification",
+                    badgeCount: snapshot.data?.docs.length ?? 0,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AdminIdentityVerificationPage()),
+                      );
+                    },
                   );
                 },
               ),

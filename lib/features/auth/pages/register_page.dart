@@ -50,7 +50,10 @@ class _RegisterPageState extends State<RegisterPage> {
     'email': _emailCtrl.text.trim(),
     'phone': '',
     'address': '',
+    'role': 'Customer',
     'isAdmin': false,
+    'verificationStatus': 'pending',
+    'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
 
     // Wallet
     'deposit_balance': 0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_mopro/core/managers/voucher_manager.dart';
 
 class AdminCreateVoucherPage extends StatefulWidget {
   const AdminCreateVoucherPage({Key? key}) : super(key: key);
@@ -232,14 +233,28 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                
                     if (_codeController.text.trim().isNotEmpty) {
+                      final code = _codeController.text.toUpperCase().trim();
+                      final description = _descController.text.trim().isEmpty 
+                          ? 'Diskon spesial khusus untukmu.' 
+                          : _descController.text.trim();
+                      final discountValue = int.tryParse(_valueController.text.trim()) ?? 0;
+
+                      await VoucherManager.instance.saveVoucher(
+                        code: code,
+                        description: description,
+                        discountPercent: discountValue,
+                        discountType: _selectedDiscountType,
+                        expiresAt: _formatDateLong(_endDate),
+                      );
+
+                      if (!mounted) return;
+
                       Navigator.pop(context, {
                         'code': _codeController.text.toUpperCase().trim(),
-                        'desc': _descController.text.trim().isEmpty 
-                            ? 'Diskon spesial khusus untukmu.' 
-                            : _descController.text.trim(),
+                        'desc': description,
                         'exp': _formatDateLong(_endDate), 
                       });
                     } else {

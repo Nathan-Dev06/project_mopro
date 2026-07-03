@@ -67,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
           _isAdmin = data['isAdmin'] ?? false;
           _depositBalance = (data['deposit_balance'] ?? 0).toInt();
           _cosmoPoints = (data['cosmo_points'] ?? 0).toInt();
+          _verificationStatus = (data['verificationStatus'] ?? 'pending').toString();
         });
       }
     } catch (e) {
@@ -85,6 +86,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _isAdmin = false;
   int _depositBalance = 0;
   int _cosmoPoints = 0;
+  String _verificationStatus = 'pending';
 
   @override
   void initState() {
@@ -112,6 +114,28 @@ class _ProfilePageState extends State<ProfilePage> {
   Color get _grey200 => ProfilePage.grey200;
   Color get _grey100 => ProfilePage.grey100;
   Color get _verifiedGreen => ProfilePage.verifiedGreen;
+
+  String get _verificationLabel {
+    switch (_verificationStatus) {
+      case 'approved':
+        return 'Verified';
+      case 'rejected':
+        return 'Rejected';
+      default:
+        return 'Pending';
+    }
+  }
+
+  Color get _verificationColor {
+    switch (_verificationStatus) {
+      case 'approved':
+        return _verifiedGreen;
+      case 'rejected':
+        return Colors.red;
+      default:
+        return Colors.orange;
+    }
+  }
 
   /// Navigate to EditProfilePage and update state on return
   Future<void> _openEditProfile() async {
@@ -319,9 +343,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 icon: Icons.verified_user_outlined,
                 title: "Identity Verification",
                 trailing: Text(
-                  "Verified",
+                  _verificationLabel,
                   style: TextStyle(
-                    color: _verifiedGreen,
+                    color: _verificationColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'Inter',
