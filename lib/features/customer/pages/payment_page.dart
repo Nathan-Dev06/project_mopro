@@ -91,10 +91,9 @@ class _PaymentPageState extends State<PaymentPage> {
         title: Text(
           "Pembayaran",
           style: TextStyle(
-            fontFamily: 'EB Garamond',
-            fontSize: 22,
-            fontWeight: FontWeight.w300,
-            letterSpacing: -0.5,
+            fontFamily: 'Inter',
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
             color: inkTextPrimary,
           ),
         ),
@@ -260,17 +259,20 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 const SizedBox(height: 28),
 
-                // ALAMAT PENGIRIMAN (jika tersedia)
+                // ALAMAT PENGIRIMAN / PENGAMBILAN (jika tersedia)
                 if (widget.shippingAddress != null) ...[
-                  Text(
-                    "Alamat Pengiriman",
+                  Builder(builder: (context) {
+                    bool isAmbilSendiri = (widget.shippingAddress!['notes'] ?? '').contains('Ambil Sendiri');
+                    return Text(
+                      isAmbilSendiri ? "Lokasi Pengambilan" : "Alamat Pengiriman",
                     style: TextStyle(
-                      fontFamily: 'EB Garamond',
-                      fontWeight: FontWeight.w300,
-                      fontSize: 18,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
                       color: inkTextPrimary,
                     ),
-                  ),
+                    );
+                  }),
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
@@ -287,8 +289,8 @@ class _PaymentPageState extends State<PaymentPage> {
                           widget.shippingAddress!['recipient'] ?? '-',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
                             color: inkTextPrimary,
                           ),
                         ),
@@ -332,10 +334,9 @@ class _PaymentPageState extends State<PaymentPage> {
                 Text(
                   "Rincian Pembayaran",
                   style: TextStyle(
-                    fontFamily: 'EB Garamond',
-                    fontWeight: FontWeight.w300,
-                    fontSize: 20,
-                    letterSpacing: -0.2,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
                     color: inkTextPrimary,
                   ),
                 ),
@@ -348,8 +349,8 @@ class _PaymentPageState extends State<PaymentPage> {
                     border: Border.all(color: hairlineStrong),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
-                        blurRadius: 10,
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 15,
                         offset: const Offset(0, 4),
                       )
                     ],
@@ -410,10 +411,9 @@ class _PaymentPageState extends State<PaymentPage> {
                 Text(
                   "Metode Pembayaran",
                   style: TextStyle(
-                    fontFamily: 'EB Garamond',
-                    fontWeight: FontWeight.w300,
-                    fontSize: 20,
-                    letterSpacing: -0.2,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
                     color: inkTextPrimary,
                   ),
                 ),
@@ -441,8 +441,8 @@ class _PaymentPageState extends State<PaymentPage> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.01),
-                                blurRadius: 8,
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 12,
                                 offset: const Offset(0, 2),
                               )
                             ],

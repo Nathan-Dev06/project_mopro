@@ -30,6 +30,8 @@ class Rental {
   final int? discountAmount;
   final String? voucherCode;
   final int? grandTotal;
+  final int? depositDeduction;
+  final String? deductionReason;
 
   Rental({
     required this.transactionId,
@@ -59,6 +61,8 @@ class Rental {
     this.discountAmount,
     this.voucherCode,
     this.grandTotal,
+    this.depositDeduction,
+    this.deductionReason,
   });
 }
 
@@ -82,7 +86,9 @@ class RentalManager {
           r.status == "Packaging" ||
           r.status == "Shipped" ||
           r.status == "Cancellation Request" ||
-          r.status == "Renting")
+          r.status == "Renting" ||
+          r.status == "Returned" ||
+          r.status == "Checking")
       .toList();
   List<Rental> get completedRentals =>
       rentalsNotifier.value.where((r) => r.status == "Completed").toList();
@@ -129,6 +135,8 @@ class RentalManager {
           discountAmount: data['discountAmount'] as int?,
           voucherCode: data['voucherCode'],
           grandTotal: data['grandTotal'] as int?,
+          depositDeduction: data['depositDeduction'] as int?,
+          deductionReason: data['deductionReason'],
         );
       }).toList();
 
@@ -272,6 +280,8 @@ class RentalManager {
       'discountAmount': rental.discountAmount,
       'voucherCode': rental.voucherCode,
       'grandTotal': rental.grandTotal,
+      'depositDeduction': rental.depositDeduction,
+      'deductionReason': rental.deductionReason,
     }, SetOptions(merge: true));
   }
 
@@ -285,6 +295,8 @@ class RentalManager {
     String? reviewMediaPath,
     String? reviewMediaType,
     String? receiptNumber,
+    int? depositDeduction,
+    String? deductionReason,
   }) async {
     final updates = <String, dynamic>{
       'status': newStatus,
@@ -306,6 +318,12 @@ class RentalManager {
     }
     if (receiptNumber != null) {
       updates['receiptNumber'] = receiptNumber;
+    }
+    if (depositDeduction != null) {
+      updates['depositDeduction'] = depositDeduction;
+    }
+    if (deductionReason != null) {
+      updates['deductionReason'] = deductionReason;
     }
 
     await FirebaseFirestore.instance

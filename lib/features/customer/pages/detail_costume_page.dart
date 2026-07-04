@@ -1582,22 +1582,17 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             child: SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: isReady
-                    ? () => _checkIdentityAndProceed(context)
-                    : null,
+                onPressed: () => _checkIdentityAndProceed(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isReady ? _textPrimary : const Color(0xFFD6D3D1),
-                  disabledBackgroundColor: const Color(0xFFD6D3D1),
+                  backgroundColor: _textPrimary,
                   foregroundColor: Colors.white,
-                  disabledForegroundColor: _textTertiary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: Text(
-                  isReady ? 'Pilih Tanggal Sewa' : 'Tidak Tersedia',
+                child: const Text(
+                  'Cek & Pilih Tanggal',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

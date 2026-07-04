@@ -105,6 +105,10 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                       const SizedBox(width: 8),
                       _buildFilterChip('Active'),
                       const SizedBox(width: 8),
+                      _buildFilterChip('Returned'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Checking'),
+                      const SizedBox(width: 8),
                       _buildFilterChip('Completed'),
                       const SizedBox(width: 8),
                       _buildFilterChip('Cancellation'),
@@ -256,6 +260,47 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             ),
           ],
 
+          // Show Terima & Cek button for Returned orders
+          if (rental.status == 'Returned') ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  RentalManager.instance.updateRentalStatus(rental.transactionId, 'Checking');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Order moved to Checking phase.', style: TextStyle(fontFamily: 'Inter'))),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.inventory_rounded, size: 16),
+                label: const Text("Terima & Cek Kostum", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+              ),
+            ),
+          ],
+
+          // Show Selesaikan Sewa button for Checking orders
+          if (rental.status == 'Checking') ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _showDepositDeductionDialog(context, rental),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF16A34A),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
+                label: const Text("Selesaikan Sewa (Deposit)", style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter')),
+              ),
+            ),
+          ],
+
           // Show Atur Pemesanan button for Packaging orders
           if (rental.status == 'Packaging') ...[
             const SizedBox(height: 16),
@@ -392,6 +437,14 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
         bgColor = const Color(0xFFFFE4E6);
         textColor = const Color(0xFFE11D48);
         break;
+      case 'Returned':
+        bgColor = const Color(0xFFFEF9C3); // yellow-100
+        textColor = const Color(0xFFA16207); // yellow-800
+        break;
+      case 'Checking':
+        bgColor = const Color(0xFFE0F2FE); // sky-100
+        textColor = const Color(0xFF0369A1); // sky-700
+        break;
       case 'Completed':
         bgColor = const Color(0xFFDBEAFE);
         textColor = const Color(0xFF1D4ED8);
@@ -454,6 +507,128 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDepositDeductionDialog(BuildContext context, Rental rental) {
+    int deductionAmount = 0;
+    String deductionReason = '';
+    final _formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text("Penyelesaian & Deposit", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w800, fontSize: 18)),
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFBBF7D0)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF16A34A), size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Uang Jaminan: Rp ${rental.deposit ?? 0}",
+                      style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A), fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text("Denda / Potongan (Rp)", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12)),
+              const SizedBox(height: 6),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: "Contoh: 20000 (Kosongkan jika tidak ada)",
+                  hintStyle: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: _grey500),
+                  filled: true,
+                  fillColor: const Color(0xFFF9FAFB),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: _grey200)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: _grey200)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                ),
+                style: const TextStyle(fontFamily: 'Inter', fontSize: 13),
+                onChanged: (val) {
+                  deductionAmount = int.tryParse(val) ?? 0;
+                },
+                validator: (val) {
+                  if (val != null && val.isNotEmpty) {
+                    final valInt = int.tryParse(val);
+                    if (valInt == null) return "Harus berupa angka";
+                    if (valInt > (rental.deposit ?? 0)) return "Denda melebihi deposit!";
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              const Text("Alasan Denda", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12)),
+              const SizedBox(height: 6),
+              TextFormField(
+                decoration: InputDecoration(
+                  hintText: "Contoh: Terlambat 1 hari / Noda di baju",
+                  hintStyle: const TextStyle(fontFamily: 'Inter', fontSize: 12, color: _grey500),
+                  filled: true,
+                  fillColor: const Color(0xFFF9FAFB),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: _grey200)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: _grey200)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                ),
+                style: const TextStyle(fontFamily: 'Inter', fontSize: 13),
+                onChanged: (val) => deductionReason = val,
+                validator: (val) {
+                  if (deductionAmount > 0 && (val == null || val.isEmpty)) {
+                    return "Alasan wajib diisi jika ada denda";
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Batal", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _grey500)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                Navigator.pop(ctx);
+                RentalManager.instance.updateRentalStatus(
+                  rental.transactionId,
+                  'Completed',
+                  depositDeduction: deductionAmount,
+                  deductionReason: deductionAmount > 0 ? deductionReason : null,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Order completed! Refund: Rp ${(rental.deposit ?? 0) - deductionAmount}', style: const TextStyle(fontFamily: 'Inter')),
+                    backgroundColor: const Color(0xFF16A34A),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _black,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text("Konfirmasi Selesai", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }

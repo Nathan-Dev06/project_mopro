@@ -10,6 +10,8 @@ class Voucher {
   final String code;
   final String description;
   final int discountPercent; // e.g., 20 for 20%
+  final String discountType;
+  final int usageCount;
   bool isClaimed;
   bool isUsed;
 
@@ -17,6 +19,8 @@ class Voucher {
     required this.code,
     required this.description,
     required this.discountPercent,
+    this.discountType = 'Persentase',
+    this.usageCount = 0,
     this.isClaimed = false,
     this.isUsed = false,
   });
@@ -60,7 +64,8 @@ class VoucherManager {
 
   static int _parseInt(dynamic value) {
     if (value is int) return value;
-    return int.tryParse(value?.toString() ?? '') ?? 0;
+    if (value is double) return value.toInt();
+    return double.tryParse(value?.toString() ?? '')?.toInt() ?? 0;
   }
 
   VoucherManager._privateConstructor() {
@@ -118,6 +123,8 @@ class VoucherManager {
           code: v.code,
           description: v.description,
           discountPercent: v.discountPercent,
+          discountType: v.discountType,
+          usageCount: v.usageCount,
           isClaimed: state?['isClaimed'] == true,
           isUsed: state?['isUsed'] == true,
         );
@@ -135,6 +142,8 @@ class VoucherManager {
         discountPercent: _parseInt(
           data['discountPercent'] ?? data['discountValue'],
         ),
+        discountType: (data['discountType'] ?? 'Persentase').toString(),
+        usageCount: _parseInt(data['usageCount']),
         isClaimed: state?['isClaimed'] == true,
         isUsed: state?['isUsed'] == true,
       );
@@ -147,9 +156,9 @@ class VoucherManager {
     required int discountPercent,
     String? discountType,
     String? expiresAt,
-  }) {
+  }) async {
     final normalizedCode = code.toUpperCase().trim();
-    return FirebaseSyncService.vouchersCollection().doc(normalizedCode).set({
+    await FirebaseSyncService.vouchersCollection().doc(normalizedCode).set({
       'code': normalizedCode,
       'description': description,
       'discountPercent': discountPercent,
@@ -159,6 +168,15 @@ class VoucherManager {
       'updatedAt': FieldValue.serverTimestamp(),
       'createdAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+
+    // Create global notification
+    String discountStr = (discountType == 'Nominal Fixed') ? 'Rp $discountPercent' : '$discountPercent%';
+    await FirebaseFirestore.instance.collection('global_notifications').add({
+      'title': '🎉 Promo Baru!',
+      'message': 'Gunakan kode $normalizedCode untuk mendapatkan diskon $discountStr. $description',
+      'type': 'promo',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<void> updateVoucher({
@@ -240,6 +258,11 @@ class VoucherManager {
         'isUsed': true,
         'usedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+
+      // UPDATE GLOBAL USAGE COUNT
+      await FirebaseSyncService.vouchersCollection().doc(normalizedCode).update({
+        'usageCount': FieldValue.increment(1),
+      });
     } catch (e) {
       debugPrint('Firestore useVoucher failed: $e');
     }

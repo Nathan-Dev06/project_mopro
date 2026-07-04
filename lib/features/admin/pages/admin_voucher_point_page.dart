@@ -157,7 +157,10 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
               ValueListenableBuilder<List<Voucher>>(
                 valueListenable: VoucherManager.instance.vouchersNotifier,
                 builder: (context, vouchers, _) {
-                  final usedCount = vouchers.where((voucher) => voucher.isUsed).length;
+                  int usedCount = 0;
+                  for (var v in vouchers) {
+                    usedCount += v.usageCount;
+                  }
 
                   return Row(
                     children: [
@@ -282,7 +285,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Terpakai: ${item.isUsed ? '1x' : '0x'}",
+                                    "Terpakai: ${item.usageCount}x",
                                     style: const TextStyle(color: _black, fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'Inter'),
                                   ),
                                   Text(

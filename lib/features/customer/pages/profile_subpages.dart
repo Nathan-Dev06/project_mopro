@@ -8,16 +8,16 @@ import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
-import 'package:project_mopro/features/customer/pages/payment_page.dart';
+
 import 'package:project_mopro/features/customer/pages/pending_payment_page.dart';
 import 'package:intl/intl.dart';
 
 // =============================================
-// PROFILE SUBPAGES â€” Kick Avenue Clean Minimalist
+// PROFILE SUBPAGES - Kick Avenue Clean Minimalist
 // All pages: white Scaffold, white AppBar, elevation 0
 // =============================================
 
-// â”€â”€ Shared Design Tokens â”€â”€
+// -- Shared Design Tokens --
 class _K {
   static const Color bg = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF111111);
@@ -60,7 +60,7 @@ PreferredSizeWidget _minimalAppBar(BuildContext context, String title) {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  1. MY RENTALS PAGE â€” Tabbed (Active / Completed / Canceled)
+//  1. MY RENTALS PAGE - Tabbed (Active / Completed / Canceled)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class MyRentalsPage extends StatelessWidget {
   const MyRentalsPage({Key? key}) : super(key: key);
@@ -121,7 +121,7 @@ class MyRentalsPage extends StatelessWidget {
 
             return TabBarView(
               children: [
-                // â”€â”€ TAB 1: ACTIVE â”€â”€
+                // -- TAB 1: ACTIVE --
                 activeRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.shopping_bag_outlined,
@@ -130,7 +130,7 @@ class MyRentalsPage extends StatelessWidget {
                       )
                     : _RentalsListTab(rentals: activeRentals),
 
-                // â”€â”€ TAB 2: COMPLETED â”€â”€
+                // -- TAB 2: COMPLETED --
                 completedRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.check_circle_outline_rounded,
@@ -140,7 +140,7 @@ class MyRentalsPage extends StatelessWidget {
                       )
                     : _RentalsListTab(rentals: completedRentals),
 
-                // â”€â”€ TAB 3: CANCELED â”€â”€
+                // -- TAB 3: CANCELED --
                 canceledRentals.isEmpty
                     ? const _EmptyStateTab(
                         icon: Icons.cancel_outlined,
@@ -185,7 +185,7 @@ class _RentalsListTab extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // â”€â”€ Card Header: Order ID + Status Badge â”€â”€
+              // -- Card Header: Order ID + Status Badge --
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -215,7 +215,7 @@ class _RentalsListTab extends StatelessWidget {
                 ),
               ),
 
-              // â”€â”€ Card Body: Costume Info â”€â”€
+              // -- Card Body: Costume Info --
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -254,7 +254,7 @@ class _RentalsListTab extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "${rental.costumeSeries} â€¢ Size ${rental.size}",
+                            "${rental.costumeSeries} • Size ${rental.size}",
                             style: const TextStyle(
                               color: _K.grey500,
                               fontSize: 12,
@@ -269,7 +269,7 @@ class _RentalsListTab extends StatelessWidget {
                                   size: 13, color: _K.grey400),
                               const SizedBox(width: 6),
                               Text(
-                                "${dateFormat.format(rental.startDate)} â€“ ${dateFormat.format(rental.endDate)}",
+                                "${dateFormat.format(rental.startDate)} - ${dateFormat.format(rental.endDate)}",
                                 style: const TextStyle(
                                   color: _K.grey500,
                                   fontSize: 12,
@@ -305,6 +305,7 @@ class _RentalsListTab extends StatelessWidget {
                 ),
               ),
               // ── Card Footer: Action Buttons ──
+              _buildRentalTimeline(rental),
               _buildCardFooter(context, rental),
             ],
           ),
@@ -370,7 +371,7 @@ class _RentalsListTab extends StatelessWidget {
                   icon: Icons.location_on_outlined,
                   title: "3. Send to Our Address",
                   subtitle:
-                      "Cosvoria Studio\nJl. Meruya Selatan No. 12, Kembangan\nJakarta Barat, 11650\nPhone: 0812-3456-7890",
+                      "Cosvoria HQ\nJl. Kemang Raya No. 10, Bangka\nJakarta Selatan, 12730\nPhone: 0812-3456-7890",
                 ),
                 const SizedBox(height: 32),
                 SizedBox(
@@ -571,7 +572,7 @@ class _RentalsListTab extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "${rental.costumeSeries} â€¢ Size ${rental.size}",
+                                  "${rental.costumeSeries} • Size ${rental.size}",
                                   style: const TextStyle(
                                     color: _K.grey500,
                                     fontSize: 13,
@@ -607,35 +608,95 @@ class _RentalsListTab extends StatelessWidget {
                               "Return By", dateFormat.format(rental.endDate)),
                         ],
                       ),
-                      const SizedBox(height: 32),
-                      // Important Notes
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFFBEB), // Light amber
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFFDE68A)),
+                      if (rental.status == "Completed") ...[
+                        const SizedBox(height: 32),
+                        const Text(
+                          "Payment & Deposit Summary",
+                          style: TextStyle(
+                            color: _K.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Inter',
+                          ),
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.info_outline_rounded,
-                                color: _K.amber, size: 20),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                "Please ensure the costume is shipped back before the return date to avoid late fees. Keep your receipt of shipping.",
-                                style: TextStyle(
-                                  color: Colors.amber.shade900,
-                                  fontSize: 13,
-                                  fontFamily: 'Inter',
-                                  height: 1.5,
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FAFB),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: _K.grey200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDepositRow("Rental Price", rental.totalRentPrice ?? 0),
+                              const SizedBox(height: 8),
+                              _buildDepositRow("Deposit Paid", rental.deposit ?? 0),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Divider(color: _K.grey200, height: 1),
+                              ),
+                              _buildDepositRow("Damage / Late Fee", -(rental.depositDeduction ?? 0), color: const Color(0xFFDC2626)),
+                              if (rental.deductionReason != null && rental.deductionReason!.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        "Note: ${rental.deductionReason}",
+                                        textAlign: TextAlign.right,
+                                        style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: Color(0xFFDC2626), fontStyle: FontStyle.italic),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Divider(color: _K.grey200, height: 1),
+                              ),
+                              _buildDepositRow(
+                                "Deposit Refunded",
+                                (rental.deposit ?? 0) - (rental.depositDeduction ?? 0),
+                                color: const Color(0xFF16A34A),
+                                isBold: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else if (rental.status != "Canceled" && rental.status != "Cancellation Request") ...[
+                        const SizedBox(height: 32),
+                        // Important Notes
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFBEB), // Light amber
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFFDE68A)),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.info_outline_rounded,
+                                  color: _K.amber, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "Please ensure the costume is shipped back before the return date to avoid late fees. Keep your receipt of shipping.",
+                                  style: TextStyle(
+                                    color: Colors.amber.shade900,
+                                    fontSize: 13,
+                                    fontFamily: 'Inter',
+                                    height: 1.5,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -708,6 +769,14 @@ class _RentalsListTab extends StatelessWidget {
       case "Cancellation Request":
         bgColor = const Color(0xFFFFE4E6);
         textColor = const Color(0xFFE11D48);
+        break;
+      case "Returned":
+        bgColor = const Color(0xFFFEF9C3); // yellow-100
+        textColor = const Color(0xFFA16207); // yellow-800
+        break;
+      case "Checking":
+        bgColor = const Color(0xFFE0F2FE); // sky-100
+        textColor = const Color(0xFF0369A1); // sky-700
         break;
       case "Completed":
         bgColor = const Color(0xFFDBEAFE);
@@ -872,131 +941,82 @@ class _RentalsListTab extends StatelessWidget {
     if (rental.status == "Shipped") {
       return Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      title: const Text("Order Not Arrived Yet?", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Please contact Shopee Express or the shop owner for immediate updates regarding your shipment:",
-                            style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF), // blue-50
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFBFDBFE)), // blue-200
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.local_shipping_outlined, color: Color(0xFF2563EB), size: 20),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      "Paket sedang dalam perjalanan menuju alamatmu. Mohon tekan tombol di bawah HANYA JIKA paket sudah kamu terima dan cek kondisinya.",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF1E3A8A), height: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Text("Konfirmasi Terima Pesanan", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                        content: const Text(
+                          "Apakah paket sudah kamu terima dengan aman? Dengan menekan tombol ini, masa sewa kamu akan resmi dimulai.",
+                          style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text("Belum", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
                           ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: _K.grey100,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.local_shipping_outlined, color: _K.black, size: 18),
-                                    const SizedBox(width: 8),
-                                    const Text("Shopee Express:", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13)),
-                                    const Spacer(),
-                                    SelectableText("+62 812-9876-5432", style: TextStyle(fontFamily: 'Inter', color: Colors.blue.shade700, fontWeight: FontWeight.w600, fontSize: 13)),
-                                  ],
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              RentalManager.instance.updateRentalStatus(rental.transactionId, "Active");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Pesanan diterima. Masa sewa dimulai!", style: TextStyle(fontFamily: 'Inter')),
+                                  backgroundColor: Color(0xFF16A34A),
                                 ),
-                                const Divider(height: 16),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.store_mall_directory_outlined, color: _K.black, size: 18),
-                                    const SizedBox(width: 8),
-                                    const Text("Shop Owner:", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13)),
-                                    const Spacer(),
-                                    SelectableText("+62 821-3456-7890", style: TextStyle(fontFamily: 'Inter', color: Colors.blue.shade700, fontWeight: FontWeight.w600, fontSize: 13)),
-                                  ],
-                                ),
-                              ],
-                            ),
+                              );
+                            },
+                            child: const Text("Ya, Terima", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
                           ),
                         ],
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          child: const Text("Close", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.black)),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: _K.black,
-                  side: const BorderSide(color: _K.grey200),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text(
-                  "Not Arrived",
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2563EB),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
+                  label: const Text(
+                    "Konfirmasi Terima Barang",
+                    style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      title: const Text("Confirm Receipt", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
-                      content: const Text(
-                        "Has your package arrived safely? Would you like to rate and review the costume now?",
-                        style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(ctx);
-                            RentalManager.instance.updateRentalStatus(rental.transactionId, "Completed");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Order marked as received!", style: TextStyle(fontFamily: 'Inter')),
-                                backgroundColor: Color(0xFF16A34A),
-                              ),
-                            );
-                          },
-                          child: const Text("Later", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(ctx);
-                            _showReviewSheet(context, rental);
-                          },
-                          child: const Text("Rate & Review", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _K.black,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
-                label: const Text(
-                  "Received",
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -1005,39 +1025,141 @@ class _RentalsListTab extends StatelessWidget {
     if (rental.status == "Active" || rental.status == "Renting") {
       return Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _showReturnInfo(context, rental),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: _K.black,
-                  side: const BorderSide(color: _K.grey200),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text(
-                  "Return Info",
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF0FDF4), // green-50
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFBBF7D0)), // green-200
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.play_circle_outline_rounded, color: Color(0xFF16A34A), size: 20),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      "Masa sewamu sedang berjalan. Harap kembalikan kostum ke admin sebelum batas waktu habis agar terhindar dari denda.",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF14532D), height: 1.5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => _showReturnInfo(context, rental),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF16A34A),
+                        side: const BorderSide(color: Color(0xFF86EFAC)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text(
+                        "Info Pengembalian",
+                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => _showRentalDetails(context, rental),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _K.black,
+                        foregroundColor: _K.bg,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const Text(
+                        "Rincian",
+                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Text("Kembalikan Kostum", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                        content: const Text(
+                          "Apakah kamu sudah mengirimkan kostum kembali ke admin? Silakan konfirmasi untuk menghentikan masa sewa.",
+                          style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text("Batal", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              RentalManager.instance.updateRentalStatus(rental.transactionId, "Returned");
+                            },
+                            child: const Text("Ya, Sudah Dikembalikan", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.black)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  icon: const Icon(Icons.keyboard_return_rounded, size: 18),
+                  label: const Text(
+                    "Kembalikan Kostum",
+                    style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () => _showRentalDetails(context, rental),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _K.black,
-                  foregroundColor: _K.bg,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text(
-                  "View Details",
-                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // Returned or Checking → Waiting for Admin
+    if (rental.status == "Returned" || rental.status == "Checking") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFEF9C3), // yellow-100
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFFEF08A)), // yellow-200
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.shield_outlined, color: Color(0xFFA16207), size: 20), // yellow-800
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  rental.status == "Returned" 
+                      ? "Kostum sedang dalam perjalanan / sudah dikembalikan. Menunggu admin melakukan pengecekan kualitas." 
+                      : "Admin sedang melakukan pengecekan kondisi kostum. Mohon tunggu proses pengembalian deposit.",
+                  style: const TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF713F12), height: 1.5), // yellow-900
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -1049,6 +1171,47 @@ class _RentalsListTab extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Deposit Refund Summary
+            if (rental.deposit != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4), // green-50
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFBBF7D0)), // green-200
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.account_balance_wallet_rounded, size: 16, color: Color(0xFF16A34A)),
+                        SizedBox(width: 6),
+                        Text("Deposit Refund Info", style: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDepositRow("Initial Deposit", rental.deposit!),
+                    if (rental.depositDeduction != null && rental.depositDeduction! > 0) ...[
+                      const SizedBox(height: 4),
+                      _buildDepositRow("Penalty Deduction", -rental.depositDeduction!, color: Colors.red),
+                      if (rental.deductionReason != null)
+                        Text(
+                          "Reason: ${rental.deductionReason}",
+                          style: const TextStyle(fontFamily: 'Inter', fontSize: 11, color: Colors.red, fontStyle: FontStyle.italic),
+                        ),
+                    ],
+                    const Divider(height: 16, color: Color(0xFFBBF7D0)),
+                    _buildDepositRow(
+                      "Total Refund",
+                      (rental.deposit!) - (rental.depositDeduction ?? 0),
+                      isBold: true,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             // Show existing review if present
             if (rental.rating != null) ...[
               Container(
@@ -1086,23 +1249,27 @@ class _RentalsListTab extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
-            SizedBox(
-              width: double.infinity,
-              child: rental.rating != null
-                  ? OutlinedButton.icon(
-                      onPressed: () => _showRentalDetails(context, rental),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _K.black,
-                        side: const BorderSide(color: _K.grey200),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                      icon: const Icon(Icons.visibility_outlined, size: 16),
-                      label: const Text(
-                        "View Details",
-                        style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
-                      ),
-                    )
-                  : ElevatedButton.icon(
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showRentalDetails(context, rental),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _K.black,
+                      side: const BorderSide(color: _K.grey200),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    icon: const Icon(Icons.visibility_outlined, size: 16),
+                    label: const Text(
+                      "View Details",
+                      style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+                ),
+                if (rental.rating == null) ...[
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
                       onPressed: () => _showReviewSheet(context, rental),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _K.black,
@@ -1112,10 +1279,13 @@ class _RentalsListTab extends StatelessWidget {
                       ),
                       icon: const Icon(Icons.rate_review_outlined, size: 16),
                       label: const Text(
-                        "Write Review / Complaint",
+                        "Write Review",
                         style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
                       ),
                     ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),
@@ -1149,9 +1319,106 @@ class _RentalsListTab extends StatelessWidget {
         ),
       );
     }
-
     // Canceled → no actions
     return const SizedBox.shrink();
+  }
+  Widget _buildRentalTimeline(Rental rental) {
+    if (rental.status == "Canceled" || rental.status == "Cancellation Request" || rental.status == "Pending") {
+      return const SizedBox.shrink();
+    }
+
+    int currentStep = 0;
+    if (rental.status == "Packaging") currentStep = 0;
+    else if (rental.status == "Shipped") currentStep = 1;
+    else if (rental.status == "Active" || rental.status == "Renting") currentStep = 2;
+    else if (rental.status == "Returned" || rental.status == "Checking") currentStep = 3;
+    else if (rental.status == "Completed") currentStep = 4;
+
+    final steps = ["Dikemas", "Dikirim", "Disewa", "Selesai"];
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: List.generate(steps.length * 2 - 1, (index) {
+          if (index.isEven) {
+            final stepIdx = index ~/ 2;
+            final isCompleted = stepIdx < currentStep;
+            final isActive = stepIdx == currentStep;
+            final color = isCompleted || isActive ? _K.black : _K.grey200;
+            
+            return SizedBox(
+              width: 50,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isCompleted ? _K.black : (isActive ? Colors.white : _K.grey100),
+                      border: Border.all(color: color, width: isActive ? 2 : 1),
+                    ),
+                    child: isCompleted 
+                        ? const Icon(Icons.check, size: 14, color: Colors.white)
+                        : (isActive ? Center(child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: _K.black, shape: BoxShape.circle))) : null),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    steps[stepIdx],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 10,
+                      fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                      color: isCompleted || isActive ? _K.black : _K.grey400,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            final lineIdx = index ~/ 2;
+            final isLineCompleted = lineIdx < currentStep;
+            return Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(top: 11),
+                height: 2,
+                color: isLineCompleted ? _K.black : _K.grey200,
+              ),
+            );
+          }
+        }),
+      ),
+    );
+  }
+
+  Widget _buildDepositRow(String label, int amount, {Color color = _K.black, bool isBold = false}) {
+    final currencyFormat = NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 12,
+            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
+            color: color == _K.black ? _K.grey500 : color,
+          ),
+        ),
+        Text(
+          amount < 0 ? "-${currencyFormat.format(amount.abs())}" : currencyFormat.format(amount),
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 12,
+            fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
+            color: color,
+          ),
+        ),
+      ],
+    );
   }
 
   // ── Cancellation Dialog (checks working hours 07:00 - 17:00) ──
@@ -1774,7 +2041,7 @@ class IdentityVerificationPage extends StatelessWidget {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  3. SIZE PROFILE PAGE â€” Height & Weight input
+//  3. SIZE PROFILE PAGE - Height & Weight input
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class SizeProfilePage extends StatefulWidget {
   const SizeProfilePage({Key? key}) : super(key: key);
@@ -1975,7 +2242,7 @@ Future<void> _saveSizeProfile() async {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  4. MY VOUCHERS PAGE â€” Empty state
+//  4. MY VOUCHERS PAGE - Empty state
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class MyVouchersPage extends StatelessWidget {
   const MyVouchersPage({Key? key}) : super(key: key);
@@ -2200,7 +2467,7 @@ class MyVouchersPage extends StatelessWidget {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  5. WISHLIST PAGE â€” Empty state
+//  5. WISHLIST PAGE - Empty state
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class WishlistPage extends StatelessWidget {
   const WishlistPage({Key? key}) : super(key: key);
@@ -2397,7 +2664,7 @@ class WishlistPage extends StatelessWidget {
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  6. SETTINGS PAGE â€” Empty state
+//  6. SETTINGS PAGE - Empty state
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);

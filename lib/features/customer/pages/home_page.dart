@@ -4,6 +4,7 @@ import 'package:project_mopro/features/customer/pages/notification_page.dart';
 import 'package:project_mopro/features/customer/pages/profile_page.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // =============================================
 // DESIGN SYSTEM â€” Kick Avenue Aesthetic
@@ -885,17 +886,44 @@ class _MainHomePageState extends State<MainHomePage> {
       ),
       actions: [
         // Notification bell icon
-        IconButton(
-          key: const Key('notification_button'),
-          icon: const Icon(Icons.notifications_none_rounded,
-              color: _C.black, size: 22),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NotificationPage()),
+        StreamBuilder<QuerySnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('global_notifications')
+              .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now().subtract(const Duration(days: 7))))
+              .limit(1)
+              .snapshots(),
+          builder: (context, snapshot) {
+            bool hasNew = snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+            return IconButton(
+              key: const Key('notification_button'),
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.notifications_none_rounded, color: _C.black, size: 22),
+                  if (hasNew)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationPage()),
+                );
+              },
+              splashRadius: 20,
             );
-          },
-          splashRadius: 20,
+          }
         ),
         // Profile circle avatar
         GestureDetector(

@@ -37,6 +37,9 @@ class _BookingPageState extends State<BookingPage> {
   final int _deposit = 50000;
   Voucher? _selectedVoucher;
 
+  // Metode Pengiriman
+  String _shippingMethod = 'Pengiriman Instan (Gojek/Grab)';
+
   // Alamat pengiriman
   final _addressFormKey = GlobalKey<FormState>();
   final TextEditingController _recipientController = TextEditingController();
@@ -89,10 +92,24 @@ class _BookingPageState extends State<BookingPage> {
         final start = (startTs as Timestamp).toDate();
         final end = (endTs as Timestamp).toDate();
 
-        // Expand the range into individual days
+        // Expand the range into individual days + 2 Days Maintenance
         DateTime current = DateTime(start.year, start.month, start.day);
-        final endNormalized = DateTime(end.year, end.month, end.day);
-        while (!current.isAfter(endNormalized)) {
+        DateTime effectiveEnd = DateTime(end.year, end.month, end.day);
+        
+        final now = DateTime.now();
+        final todayNormalized = DateTime(now.year, now.month, now.day);
+        
+        // If the costume is still out (not Completed) and today is past the return date,
+        // it means the item is late or still being checked. Block up to today!
+        if (status != 'Completed') {
+          if (todayNormalized.isAfter(effectiveEnd)) {
+            effectiveEnd = todayNormalized;
+          }
+        }
+        
+        final endWithMaintenance = effectiveEnd.add(const Duration(days: 2));
+        
+        while (!current.isAfter(endWithMaintenance)) {
           blocked.add(current);
           current = current.add(const Duration(days: 1));
         }
@@ -122,42 +139,44 @@ class _BookingPageState extends State<BookingPage> {
     return false;
   }
 
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (_isDayBooked(selectedDay)) return;
+
+    // Otomatis hitung masa sewa 3 hari (Hari 1, Hari 2, Hari 3)
+    DateTime calculatedEnd = selectedDay.add(const Duration(days: 2));
+
+    bool isClashing = false;
+    DateTime checkDate = selectedDay;
+    while (!checkDate.isAfter(calculatedEnd)) {
+      if (_isDayBooked(checkDate)) {
+        isClashing = true;
+        break;
+      }
+      checkDate = checkDate.add(const Duration(days: 1));
+    }
+
+    if (isClashing) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              "Jadwal tidak tersedia. Terdapat pesanan lain dalam rentang 3 hari tersebut."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _focusedDay = focusedDay;
+        _rangeStart = null;
+        _rangeEnd = null;
+        _totalDays = 0;
+      });
+      return;
+    }
+
     setState(() {
       _focusedDay = focusedDay;
-      _rangeStart = start;
-      _rangeEnd = end;
-
-      if (start != null && end != null) {
-        bool isClashing = false;
-        DateTime checkDate = start;
-        while (checkDate.isBefore(end) || isSameDay(checkDate, end)) {
-          if (_isDayBooked(checkDate)) {
-            isClashing = true;
-            break;
-          }
-          checkDate = checkDate.add(const Duration(days: 1));
-        }
-
-        if (isClashing) {
-          _rangeStart = null;
-          _rangeEnd = null;
-          _totalDays = 0;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  "Rentang tanggal tidak valid. Ada tanggal yang sudah disewa!"),
-              backgroundColor: Colors.red,
-            ),
-          );
-        } else {
-          _totalDays = end.difference(start).inDays + 1;
-        }
-      } else if (start != null && end == null) {
-        _totalDays = 1;
-      } else {
-        _totalDays = 0;
-      }
+      _rangeStart = selectedDay;
+      _rangeEnd = calculatedEnd;
+      _totalDays = 3;
     });
   }
 
@@ -256,7 +275,9 @@ class _BookingPageState extends State<BookingPage> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '-${v.discountPercent}%',
+                        v.discountType == 'Nominal Fixed' 
+                            ? '-Rp ${v.discountPercent}'
+                            : '-${v.discountPercent}%',
                         style: const TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.bold,
@@ -290,7 +311,11 @@ class _BookingPageState extends State<BookingPage> {
     
     int discountAmount = 0;
     if (_selectedVoucher != null && _totalDays > 0) {
-      discountAmount = (totalRentPrice * (_selectedVoucher!.discountPercent / 100)).round();
+      if (_selectedVoucher!.discountType == 'Nominal Fixed') {
+        discountAmount = _selectedVoucher!.discountPercent;
+      } else {
+        discountAmount = (totalRentPrice * (_selectedVoucher!.discountPercent / 100)).round();
+      }
     }
     
     int grandTotal = totalRentPrice - discountAmount + _deposit;
@@ -494,6 +519,36 @@ class _BookingPageState extends State<BookingPage> {
                 ),
                 const SizedBox(height: 12),
 
+                // DISCLAIMER
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7), // Light yellow bg
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline_rounded, size: 20, color: Color(0xFFD97706)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: const Text(
+                          "Pilih Tanggal Pengiriman (H-1 sebelum Event). Sistem otomatis mengatur durasi sewa selama 3 Hari.",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF92400E),
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // TABLE CALENDAR (MODIFIED FOR LIGHT THEME)
                 Container(
                   decoration: BoxDecoration(
@@ -516,8 +571,8 @@ class _BookingPageState extends State<BookingPage> {
                       focusedDay: _focusedDay,
                       rangeStartDay: _rangeStart,
                       rangeEndDay: _rangeEnd,
-                      rangeSelectionMode: RangeSelectionMode.toggledOn,
-                      onRangeSelected: _onRangeSelected,
+                      rangeSelectionMode: RangeSelectionMode.toggledOff,
+                      onDaySelected: _onDaySelected,
                       headerStyle: HeaderStyle(
                         formatButtonVisible: false,
                         titleCentered: true,
@@ -544,10 +599,14 @@ class _BookingPageState extends State<BookingPage> {
                           color: textPrimary, // Hitam pekat sebagai penanda end
                           shape: BoxShape.circle,
                         ),
-                        withinRangeTextStyle: TextStyle(
-                            color: textPrimary,
+                        withinRangeDecoration: BoxDecoration(
+                          color: textPrimary,
+                          shape: BoxShape.circle,
+                        ),
+                        withinRangeTextStyle: const TextStyle(
+                            color: Colors.white,
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500),
+                            fontWeight: FontWeight.bold),
                         rangeStartTextStyle: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -634,6 +693,74 @@ class _BookingPageState extends State<BookingPage> {
 
                 const SizedBox(height: 32),
 
+                // METODE PENGIRIMAN
+                Text(
+                  "Metode Pengiriman",
+                  style: TextStyle(
+                    fontFamily: 'Georgia',
+                    fontWeight: FontWeight.w300,
+                    fontSize: 18,
+                    color: textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: hairlineStrong),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _shippingMethod,
+                      icon: Icon(Icons.keyboard_arrow_down_rounded, color: textPrimary),
+                      dropdownColor: surfaceColor,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _shippingMethod = newValue;
+                          });
+                        }
+                      },
+                      items: <String>[
+                        'Pengiriman Instan (Gojek/Grab)',
+                        'Ambil Sendiri di Toko'
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)')
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Text(
+                      "*Ongkir Instan Area JABODETABEK (dibayar oleh penyewa di lokasi tujuan).",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: textSecondary),
+                    ),
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 32),
+                    child: Text(
+                      "*Silakan datang langsung ke lokasi kami (Cosvoria HQ, Jakarta Selatan) pada hari H-1 event untuk mengambil kostum.",
+                      style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: textSecondary),
+                    ),
+                  ),
+
+                if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)') ...[
                 // ALAMAT PENGIRIMAN
                 Text(
                   "Alamat Pengiriman",
@@ -734,8 +861,8 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                   ),
                 ),
-
-                // helper to prefill from profile
+                const SizedBox(height: 32),
+                ],
 
                 // VOUCHER SELECTION
                 GestureDetector(
@@ -876,26 +1003,52 @@ class _BookingPageState extends State<BookingPage> {
               onPressed: _rangeStart == null
                   ? null
                   : () {
-                      // Validasi alamat sebelum lanjut
-                      if (!_addressFormKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Periksa kembali data alamat pengiriman.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
+                      Map<String, String> shippingAddress;
 
-                      final shippingAddress = {
-                        'recipient': _recipientController.text.trim(),
-                        'phone': _phoneController.text.trim(),
-                        'street': _streetController.text.trim(),
-                        'city': _cityController.text.trim(),
-                        'postal': _postalController.text.trim(),
-                        'province': _provinceController.text.trim(),
-                        'notes': _notesController.text.trim(),
-                      };
+                      if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)') {
+                        if (!_addressFormKey.currentState!.validate()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Periksa kembali data alamat pengiriman.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Check Jabodetabek radius loosely
+                        final city = _cityController.text.trim().toLowerCase();
+                        if (!city.contains('jakarta') && !city.contains('bogor') && !city.contains('depok') && !city.contains('tangerang') && !city.contains('bekasi')) {
+                           ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Maaf, pengiriman instan saat ini hanya menjangkau area JABODETABEK.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
+                        shippingAddress = {
+                          'recipient': _recipientController.text.trim(),
+                          'phone': _phoneController.text.trim(),
+                          'street': _streetController.text.trim(),
+                          'city': _cityController.text.trim(),
+                          'postal': _postalController.text.trim(),
+                          'province': _provinceController.text.trim(),
+                          'notes': _notesController.text.trim(),
+                        };
+                      } else {
+                        // Ambil Sendiri
+                        shippingAddress = {
+                          'recipient': FirebaseAuth.instance.currentUser?.displayName ?? 'Pelanggan (Ambil Sendiri)',
+                          'phone': '0812-3456-7890',
+                          'street': 'Cosvoria HQ (Jl. Kemang Raya No. 10, Bangka)',
+                          'city': 'Jakarta Selatan',
+                          'postal': '12730',
+                          'province': 'DKI Jakarta',
+                          'notes': 'Metode: Ambil Sendiri',
+                        };
+                      }
 
                       Navigator.push(
                         context,
