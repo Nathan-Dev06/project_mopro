@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
+import 'package:project_mopro/features/admin/pages/manage_shipping_page.dart';
 
 class AdminOrdersPage extends StatefulWidget {
   const AdminOrdersPage({Key? key}) : super(key: key);
@@ -251,6 +252,34 @@ class _AdminOrdersPageState extends State<AdminOrdersPage> {
                     ),
                   ],
                 ],
+              ),
+            ),
+          ],
+
+          // Show Atur Pemesanan button for Packaging orders
+          if (rental.status == 'Packaging') ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManageShippingPage(rental: rental),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.local_shipping_rounded, size: 16),
+                label: const Text(
+                  "Atur Pemesanan",
+                  style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Inter'),
+                ),
               ),
             ),
           ],

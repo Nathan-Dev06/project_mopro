@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_mopro/features/customer/pages/receipt_page.dart';
+import 'package:project_mopro/features/customer/pages/pending_payment_page.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
 
@@ -15,6 +16,7 @@ class PaymentPage extends StatefulWidget {
   final String? voucherCode;
   final int grandTotal;
   final Map<String, String>? shippingAddress;
+  final String? existingTransactionId;
 
   const PaymentPage({
     Key? key,
@@ -28,6 +30,7 @@ class PaymentPage extends StatefulWidget {
     this.voucherCode,
     required this.grandTotal,
     this.shippingAddress,
+    this.existingTransactionId,
   }) : super(key: key);
 
   @override
@@ -535,46 +538,7 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
               onPressed: _selectedMethod == null
                   ? null
-                  : () {
-                      if (widget.voucherCode != null) {
-                        VoucherManager.instance.useVoucher(widget.voucherCode!);
-                      }
-                      
-                      final generatedTrxId =
-                          "TRX-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}";
-
-                      // Add to RentalManager
-                      RentalManager.instance.addRental(
-                        Rental(
-                          transactionId: generatedTrxId,
-                          costumeName: widget.costumeData['title'] ?? 'Unknown Costume',
-                          costumeSeries: widget.costumeData['series'] ?? 'Unknown Series',
-                          size: 'L', // Or passed from booking page
-                          imagePath: widget.costumeData['image'] ?? 'assets/images/default.jpg',
-                          startDate: widget.startDate,
-                          endDate: widget.endDate,
-                          status: 'Renting',
-                        ),
-                      );
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ReceiptPage(
-                            costumeData: widget.costumeData,
-                            startDate: widget.startDate,
-                            endDate: widget.endDate,
-                            totalDays: widget.totalDays,
-                            discountAmount: widget.discountAmount,
-                            voucherCode: widget.voucherCode,
-                            grandTotal: widget.grandTotal,
-                            paymentMethod: _selectedMethod!,
-                            transactionId: generatedTrxId,
-                            shippingAddress: widget.shippingAddress,
-                          ),
-                        ),
-                      );
-                    },
+                  : () => _showPaymentSimulationDialog(context),
               child: Text(
                 "Bayar Sekarang",
                 style: TextStyle(
@@ -591,6 +555,142 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
     );
+  }
+
+  void _showPaymentSimulationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text(
+            "Select Payment Status",
+            style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16, color: Colors.black),
+          ),
+          content: const Text(
+            "Please choose the simulated response for this payment method:",
+            style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+          ),
+          actions: [
+            // 1. Pending Button
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _processCheckout(status: "Pending");
+              },
+              child: const Text(
+                "Pending",
+                style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFFF59E0B)),
+              ),
+            ),
+            // 2. Success Button
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _processCheckout(status: "Packaging");
+              },
+              child: const Text(
+                "Success",
+                style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _processCheckout({required String status}) {
+    if (widget.voucherCode != null) {
+      VoucherManager.instance.useVoucher(widget.voucherCode!);
+    }
+
+    final targetTrxId = widget.existingTransactionId ??
+        "TRX-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}";
+
+    if (widget.existingTransactionId != null) {
+      RentalManager.instance.updateRentalStatus(
+        widget.existingTransactionId!,
+        status,
+      );
+    } else {
+      // Add to RentalManager
+      RentalManager.instance.addRental(
+        Rental(
+          transactionId: targetTrxId,
+          costumeName: widget.costumeData['title'] ?? 'Unknown Costume',
+          costumeSeries: widget.costumeData['series'] ?? 'Unknown Series',
+          size: widget.costumeData['size'] ?? 'L',
+          imagePath: widget.costumeData['image'] ?? 'assets/images/default.jpg',
+          startDate: widget.startDate,
+          endDate: widget.endDate,
+          status: status,
+          recipientName: widget.shippingAddress?['recipient'],
+          phone: widget.shippingAddress?['phone'],
+          street: widget.shippingAddress?['street'],
+          city: widget.shippingAddress?['city'],
+          province: widget.shippingAddress?['province'],
+          postal: widget.shippingAddress?['postal'],
+          totalRentPrice: widget.totalRentPrice,
+          deposit: widget.deposit,
+          discountAmount: widget.discountAmount,
+          voucherCode: widget.voucherCode,
+          grandTotal: widget.grandTotal,
+        ),
+      );
+    }
+
+    if (status == "Pending") {
+      // Find the rental we just created/updated to pass to PendingPaymentPage
+      final pendingRental = Rental(
+        transactionId: targetTrxId,
+        costumeName: widget.costumeData['title'] ?? 'Unknown Costume',
+        costumeSeries: widget.costumeData['series'] ?? 'Unknown Series',
+        size: widget.costumeData['size'] ?? 'L',
+        imagePath: widget.costumeData['image'] ?? 'assets/images/default.jpg',
+        startDate: widget.startDate,
+        endDate: widget.endDate,
+        status: 'Pending',
+        customerName: widget.shippingAddress?['recipient'] ?? 'Customer',
+        recipientName: widget.shippingAddress?['recipient'],
+        phone: widget.shippingAddress?['phone'],
+        street: widget.shippingAddress?['street'],
+        city: widget.shippingAddress?['city'],
+        province: widget.shippingAddress?['province'],
+        postal: widget.shippingAddress?['postal'],
+        totalRentPrice: widget.totalRentPrice,
+        deposit: widget.deposit,
+        discountAmount: widget.discountAmount,
+        voucherCode: widget.voucherCode,
+        grandTotal: widget.grandTotal,
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PendingPaymentPage(rental: pendingRental),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ReceiptPage(
+            costumeData: widget.costumeData,
+            startDate: widget.startDate,
+            endDate: widget.endDate,
+            totalDays: widget.totalDays,
+            discountAmount: widget.discountAmount,
+            voucherCode: widget.voucherCode,
+            grandTotal: widget.grandTotal,
+            paymentMethod: _selectedMethod!,
+            transactionId: targetTrxId,
+            shippingAddress: widget.shippingAddress,
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildBillingRow(String label, String value, {Color? textColor}) {

@@ -8,6 +8,8 @@ import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
+import 'package:project_mopro/features/customer/pages/payment_page.dart';
+import 'package:project_mopro/features/customer/pages/pending_payment_page.dart';
 import 'package:intl/intl.dart';
 
 // =============================================
@@ -739,15 +741,98 @@ class _RentalsListTab extends StatelessWidget {
 
   // ── Card Footer Builder ──
   Widget _buildCardFooter(BuildContext context, Rental rental) {
-    // Packaging / Pending → Request Cancellation
-    if (rental.status == "Packaging" || rental.status == "Pending") {
+    // Pending → Direct cancellation or Payment
+    if (rental.status == "Pending") {
       return Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: Row(
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => _showReturnInfo(context, rental),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      title: const Text("Cancel Order?", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                      content: const Text(
+                        "Are you sure you want to cancel this unpaid order?",
+                        style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text("No", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.grey500)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            RentalManager.instance.updateRentalStatus(rental.transactionId, "Canceled");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Order has been canceled.", style: TextStyle(fontFamily: 'Inter')),
+                                backgroundColor: Color(0xFFDC2626),
+                              ),
+                            );
+                          },
+                          child: const Text("Yes, Cancel", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  "Cancel Order",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PendingPaymentPage(rental: rental),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF16A34A),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                icon: const Icon(Icons.payment_rounded, size: 16),
+                label: const Text(
+                  "Pay Now",
+                  style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Packaging → View Details / Request Cancellation
+    if (rental.status == "Packaging") {
+      return Padding(
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _showRentalDetails(context, rental),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: _K.black,
                   side: const BorderSide(color: _K.grey200),
@@ -797,15 +882,52 @@ class _RentalsListTab extends StatelessWidget {
                     builder: (ctx) => AlertDialog(
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      title: const Text("Not Arrived Yet?", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
-                      content: const Text(
-                        "If your order hasn't arrived, please wait a bit longer or contact our support via WhatsApp for tracking assistance.",
-                        style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                      title: const Text("Order Not Arrived Yet?", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Please contact Shopee Express or the shop owner for immediate updates regarding your shipment:",
+                            style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: _K.grey100,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.local_shipping_outlined, color: _K.black, size: 18),
+                                    const SizedBox(width: 8),
+                                    const Text("Shopee Express:", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13)),
+                                    const Spacer(),
+                                    SelectableText("+62 812-9876-5432", style: TextStyle(fontFamily: 'Inter', color: Colors.blue.shade700, fontWeight: FontWeight.w600, fontSize: 13)),
+                                  ],
+                                ),
+                                const Divider(height: 16),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.store_mall_directory_outlined, color: _K.black, size: 18),
+                                    const SizedBox(width: 8),
+                                    const Text("Shop Owner:", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13)),
+                                    const Spacer(),
+                                    SelectableText("+62 821-3456-7890", style: TextStyle(fontFamily: 'Inter', color: Colors.blue.shade700, fontWeight: FontWeight.w600, fontSize: 13)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text("OK", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700)),
+                          child: const Text("Close", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.black)),
                         ),
                       ],
                     ),
@@ -826,11 +948,38 @@ class _RentalsListTab extends StatelessWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  RentalManager.instance.updateRentalStatus(rental.transactionId, "Completed");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Order marked as received! You can now write a review.", style: TextStyle(fontFamily: 'Inter')),
-                      backgroundColor: Color(0xFF16A34A),
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      title: const Text("Confirm Receipt", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                      content: const Text(
+                        "Has your package arrived safely? Would you like to rate and review the costume now?",
+                        style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            RentalManager.instance.updateRentalStatus(rental.transactionId, "Completed");
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Order marked as received!", style: TextStyle(fontFamily: 'Inter')),
+                                backgroundColor: Color(0xFF16A34A),
+                              ),
+                            );
+                          },
+                          child: const Text("Later", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            _showReviewSheet(context, rental);
+                          },
+                          child: const Text("Rate & Review", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
+                        ),
+                      ],
                     ),
                   );
                 },

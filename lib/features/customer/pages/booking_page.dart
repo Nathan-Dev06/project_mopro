@@ -51,19 +51,71 @@ class _BookingPageState extends State<BookingPage> {
   void initState() {
     super.initState();
     _fillFromProfile();
+    _loadBookedDatesFromFirestore();
   }
 
-  // DUMMY TANGGAL YANG SUDAH DI-BOOKING
-  final List<DateTime> _bookedDates = [
-    DateTime.now().add(const Duration(days: 1)),
-    DateTime.now().add(const Duration(days: 2)),
-    DateTime.now().add(const Duration(days: 7)),
-    DateTime.now().add(const Duration(days: 8)),
-  ];
+  // BOOKED DATES — loaded from Firestore in real-time
+  List<DateTime> _bookedDates = [];
+  bool _isLoadingDates = true;
+
+  /// Query Firestore for all active rentals of THIS costume and expand
+  /// their date ranges into individual blocked days.
+  Future<void> _loadBookedDatesFromFirestore() async {
+    try {
+      final costumeName = widget.costumeData['title'] ?? '';
+      if (costumeName.isEmpty) {
+        setState(() => _isLoadingDates = false);
+        return;
+      }
+
+      final snapshot = await FirebaseFirestore.instance
+          .collection('rentals')
+          .where('costumeName', isEqualTo: costumeName)
+          .get();
+
+      final List<DateTime> blocked = [];
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final status = data['status'] ?? '';
+
+        // Skip canceled orders — those dates are freed up
+        if (status == 'Canceled') continue;
+
+        final startTs = data['startDate'];
+        final endTs = data['endDate'];
+        if (startTs == null || endTs == null) continue;
+
+        final start = (startTs as Timestamp).toDate();
+        final end = (endTs as Timestamp).toDate();
+
+        // Expand the range into individual days
+        DateTime current = DateTime(start.year, start.month, start.day);
+        final endNormalized = DateTime(end.year, end.month, end.day);
+        while (!current.isAfter(endNormalized)) {
+          blocked.add(current);
+          current = current.add(const Duration(days: 1));
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _bookedDates = blocked;
+          _isLoadingDates = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading booked dates: $e');
+      if (mounted) setState(() => _isLoadingDates = false);
+    }
+  }
 
   bool _isDayBooked(DateTime day) {
+    final normalized = DateTime(day.year, day.month, day.day);
     for (DateTime bookedDay in _bookedDates) {
-      if (isSameDay(day, bookedDay)) {
+      if (normalized.year == bookedDay.year &&
+          normalized.month == bookedDay.month &&
+          normalized.day == bookedDay.day) {
         return true;
       }
     }
@@ -395,14 +447,50 @@ class _BookingPageState extends State<BookingPage> {
                 const SizedBox(height: 28),
 
                 // CALENDAR HEADER
-                Text(
-                  "Pilih Tanggal Sewa",
-                  style: TextStyle(
-                    fontFamily: 'Georgia',
-                    fontWeight: FontWeight.w300,
-                    fontSize: 18,
-                    color: textPrimary,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Pilih Tanggal Sewa",
+                      style: TextStyle(
+                        fontFamily: 'Georgia',
+                        fontWeight: FontWeight.w300,
+                        fontSize: 18,
+                        color: textPrimary,
+                      ),
+                    ),
+                    if (_isLoadingDates)
+                      SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: textSecondary,
+                        ),
+                      )
+                    else
+                      GestureDetector(
+                        onTap: () {
+                          setState(() => _isLoadingDates = true);
+                          _loadBookedDatesFromFirestore();
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.sync_rounded, size: 14, color: accentMint),
+                            const SizedBox(width: 4),
+                            Text(
+                              "Synced",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: accentMint,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 12),
 
@@ -479,23 +567,50 @@ class _BookingPageState extends State<BookingPage> {
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.bold),
 
-                        // Default Text Style
+                        // Default Text Style (Hitam semua)
                         defaultTextStyle:
                             TextStyle(color: textPrimary, fontFamily: 'Inter'),
-                        weekendTextStyle: const TextStyle(
-                            color: Color(0xFFC2410C),
-                            fontFamily: 'Inter'), // Burnt Orange untuk weekend
+                        weekendTextStyle: TextStyle(
+                            color: textPrimary, // Diubah menjadi warna hitam sesuai request
+                            fontFamily: 'Inter'), 
 
                         // Disabled / Booked Dates Style
                         disabledDecoration: const BoxDecoration(
                           shape: BoxShape.circle,
                         ),
                         disabledTextStyle: const TextStyle(
-                          color: Color(
-                              0xFFFCA5A5), // Merah soft bertanda tidak bisa dipilih
-                          decoration: TextDecoration.lineThrough,
+                          color: Color(0xFFD1D5DB),
                           fontFamily: 'Inter',
                         ),
+                      ),
+                      calendarBuilders: CalendarBuilders(
+                        disabledBuilder: (context, day, focusedDay) {
+                          if (_isDayBooked(day)) {
+                            // Tanggal yang sudah di-sewa tampil berwarna MERAH dengan coretan
+                            return Center(
+                              child: Text(
+                                "${day.day}",
+                                style: const TextStyle(
+                                  color: Color(0xFFEF4444), // Merah
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Tanggal mati biasa (seperti tanggal lampau) tampil warna abu-abu
+                            return Center(
+                              child: Text(
+                                "${day.day}",
+                                style: const TextStyle(
+                                  color: Color(0xFFD1D5DB), // Abu-abu
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                       enabledDayPredicate: (day) {
                         return !_isDayBooked(day);

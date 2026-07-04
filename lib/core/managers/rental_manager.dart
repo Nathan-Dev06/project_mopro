@@ -18,6 +18,18 @@ class Rental {
   final String? reviewText;
   final String? reviewMediaPath;
   final String? reviewMediaType;
+  final String? receiptNumber;
+  final String? recipientName;
+  final String? phone;
+  final String? street;
+  final String? city;
+  final String? province;
+  final String? postal;
+  final int? totalRentPrice;
+  final int? deposit;
+  final int? discountAmount;
+  final String? voucherCode;
+  final int? grandTotal;
 
   Rental({
     required this.transactionId,
@@ -35,6 +47,18 @@ class Rental {
     this.reviewText,
     this.reviewMediaPath,
     this.reviewMediaType,
+    this.receiptNumber,
+    this.recipientName,
+    this.phone,
+    this.street,
+    this.city,
+    this.province,
+    this.postal,
+    this.totalRentPrice,
+    this.deposit,
+    this.discountAmount,
+    this.voucherCode,
+    this.grandTotal,
   });
 }
 
@@ -93,6 +117,18 @@ class RentalManager {
           reviewText: data['reviewText'],
           reviewMediaPath: data['reviewMediaPath'],
           reviewMediaType: data['reviewMediaType'],
+          receiptNumber: data['receiptNumber'],
+          recipientName: data['recipientName'],
+          phone: data['phone'],
+          street: data['street'],
+          city: data['city'],
+          province: data['province'],
+          postal: data['postal'],
+          totalRentPrice: data['totalRentPrice'] as int?,
+          deposit: data['deposit'] as int?,
+          discountAmount: data['discountAmount'] as int?,
+          voucherCode: data['voucherCode'],
+          grandTotal: data['grandTotal'] as int?,
         );
       }).toList();
 
@@ -224,6 +260,18 @@ class RentalManager {
       'reviewText': rental.reviewText,
       'reviewMediaPath': rental.reviewMediaPath,
       'reviewMediaType': rental.reviewMediaType,
+      'receiptNumber': rental.receiptNumber,
+      'recipientName': rental.recipientName,
+      'phone': rental.phone,
+      'street': rental.street,
+      'city': rental.city,
+      'province': rental.province,
+      'postal': rental.postal,
+      'totalRentPrice': rental.totalRentPrice,
+      'deposit': rental.deposit,
+      'discountAmount': rental.discountAmount,
+      'voucherCode': rental.voucherCode,
+      'grandTotal': rental.grandTotal,
     }, SetOptions(merge: true));
   }
 
@@ -236,6 +284,7 @@ class RentalManager {
     String? reviewText,
     String? reviewMediaPath,
     String? reviewMediaType,
+    String? receiptNumber,
   }) async {
     final updates = <String, dynamic>{
       'status': newStatus,
@@ -254,6 +303,9 @@ class RentalManager {
     }
     if (reviewMediaType != null) {
       updates['reviewMediaType'] = reviewMediaType;
+    }
+    if (receiptNumber != null) {
+      updates['receiptNumber'] = receiptNumber;
     }
 
     await FirebaseFirestore.instance
