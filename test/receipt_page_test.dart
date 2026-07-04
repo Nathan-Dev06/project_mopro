@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:project_mopro/receipt_page.dart';
+import 'package:project_mopro/features/customer/pages/receipt_page.dart';
 import 'test_helper.dart';
 
 void main() {
