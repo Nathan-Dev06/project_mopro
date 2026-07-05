@@ -12,4 +12,10 @@ class CostumeManager {
       ValueNotifier<List<CostumeData>>(
     List<CostumeData>.from(kCostumes),
   );
+
+  void updateCostume(int index, CostumeData newCostume) {
+    final costumes = List<CostumeData>.from(costumesNotifier.value);
+    costumes[index] = newCostume;
+    costumesNotifier.value = costumes;
+  }
 }

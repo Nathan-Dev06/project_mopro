@@ -6,12 +6,12 @@ import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final VoidCallback? onSeeAllPressed;
-  final VoidCallback? onProfilePressed; 
+  final VoidCallback? onProfilePressed;
 
   const AdminDashboard({
-    Key? key, 
+    Key? key,
     this.onSeeAllPressed,
-    this.onProfilePressed, 
+    this.onProfilePressed,
   }) : super(key: key);
 
   @override
@@ -19,10 +19,18 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  static const Color _bg = Color(0xFFFFFFFF);
+  static const Color _bg = Color(0xFFF8F9FA);
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
+
+  // Tema Cosvoria - Warna menarik
+  static const Color _primaryDark = Color(0xFF1E1E1E);
+  static const Color _primaryPurple = Color(0xFF6A11CB);
+  static const Color _primaryBlue = Color(0xFF2575FC);
+  static const Color _accentOrange = Color(0xFFFF6B00);
+  static const Color _accentGreen = Color(0xFF22C55E);
+  static const Color _accentPink = Color(0xFFE91E8C);
 
   @override
   Widget build(BuildContext context) {
@@ -40,56 +48,113 @@ class _AdminDashboardState extends State<AdminDashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              
-              // â”€â”€ Header â”€â”€
+
+              // ── Header dengan Desain Cosvoria ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Dashboard", style: TextStyle(color: _black, fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Inter', letterSpacing: -0.3)),
-                        const SizedBox(height: 4),
-                        Text('Welcome back, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}', style: const TextStyle(color: _grey500, fontSize: 14, fontFamily: 'Inter')),
-                      ],
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E1E1E), Color(0xFF3A3A3A)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    
-                    // â”€â”€ LOGO ADMIN PROFIL INTERAKTIF â”€â”€
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (widget.onProfilePressed != null) {
-                            widget.onProfilePressed!();
-                          }
-                        },
-                        child: Container(
-                          width: 44, 
-                          height: 44, 
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5), 
-                            shape: BoxShape.circle, 
-                            border: Border.all(color: _grey200),
-                          ), 
-                          child: const Icon(Icons.person_outline, color: _black),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("COSVORIA ADMIN",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Inter',
+                                  letterSpacing: 2)),
+                          const SizedBox(height: 4),
+                          Text(
+                              'Welcome back, ${UserProfile.name.isEmpty ? 'Admin' : UserProfile.name}',
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 14,
+                                  fontFamily: 'Inter')),
+                        ],
+                      ),
+
+                      // ── LOGO ADMIN PROFIL INTERAKTIF ──
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (widget.onProfilePressed != null) {
+                              widget.onProfilePressed!();
+                            }
+                          },
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      const Color(0xFF2575FC).withOpacity(0.4),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(Icons.person_outline,
+                                color: Colors.white, size: 26),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 28),
 
-              // â”€â”€ Summary Cards â”€â”€
+              // ── Summary Cards dengan Warna Cosvoria ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    _SummaryCard(title: 'Today Income', value: ReportService.formatCurrency(todayIncome), icon: Icons.payments_outlined),
+                    _SummaryCard(
+                      title: 'Today Income',
+                      value: ReportService.formatCurrency(todayIncome),
+                      icon: Icons.payments_outlined,
+                      gradientColors: const [
+                        Color(0xFF6A11CB),
+                        Color(0xFF2575FC)
+                      ],
+                    ),
                     const SizedBox(width: 12),
-                    _SummaryCard(title: 'This Month', value: ReportService.formatCurrency(monthIncome), icon: Icons.account_balance_wallet_outlined),
+                    _SummaryCard(
+                      title: 'This Month',
+                      value: ReportService.formatCurrency(monthIncome),
+                      icon: Icons.account_balance_wallet_outlined,
+                      gradientColors: const [
+                        Color(0xFFFF6B00),
+                        Color(0xFFE91E8C)
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -97,17 +162,33 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  children: const [
-                    _SummaryCard(title: 'Active Rentals', value: '12', icon: Icons.local_mall_outlined),
-                    SizedBox(width: 12),
-                    _SummaryCard(title: 'Pending Verify', value: '4', icon: Icons.verified_user_outlined),
+                  children: [
+                    _SummaryCard(
+                      title: 'Active Rentals',
+                      value: '12',
+                      icon: Icons.local_mall_outlined,
+                      gradientColors: const [
+                        Color(0xFF22C55E),
+                        Color(0xFF16A34A)
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+                    _SummaryCard(
+                      title: 'Pending Verify',
+                      value: '4',
+                      icon: Icons.verified_user_outlined,
+                      gradientColors: const [
+                        Color(0xFFEF4444),
+                        Color(0xFFDC2626)
+                      ],
+                    ),
                   ],
                 ),
               ),
 
               const SizedBox(height: 32),
 
-              // â”€â”€ Admin Menu â”€â”€
+              // ── Admin Menu ──
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
@@ -137,6 +218,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           ),
                         );
                       },
+                      gradientColors: const [
+                        Color(0xFF1E1E1E),
+                        Color(0xFF3A3A3A)
+                      ],
                     ),
                     const SizedBox(height: 12),
                     _MenuCard(
@@ -151,56 +236,125 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           ),
                         );
                       },
+                      gradientColors: const [
+                        Color(0xFF6A11CB),
+                        Color(0xFF2575FC)
+                      ],
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
 
-              // â”€â”€ Top Rented Section â”€â”€
+              // ── Top Rented Section ──
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20), 
-                child: Text('Admin Menu', style: TextStyle(color: _black, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'))
-              ),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text('Top Rented Costumes',
+                      style: TextStyle(
+                          color: _black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter'))),
               const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20), 
-                child: Card(
-                  elevation: 0, 
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: _grey200)), 
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: _grey200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: ListTile(
-                    leading: const Icon(Icons.receipt_long, color: _black), 
-                    title: const Text('Manage Orders', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)), 
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: _grey500), 
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ManageOrdersPage())),
-                  )
-                )
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child:
+                          const Icon(Icons.receipt_long, color: Colors.white),
+                    ),
+                    title: const Text('Manage Orders',
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+                    trailing: const Icon(Icons.arrow_forward_ios,
+                        size: 14, color: _grey500),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage())),
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20), 
-                child: Card(
-                  elevation: 0, 
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: _grey200)), 
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: _grey200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: ListTile(
-                    leading: const Icon(Icons.checkroom, color: _black), 
-                    title: const Text('Manage Costumes', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)), 
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: _grey500), 
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ManageCostumesPage())),
-                  )
-                )
+                    leading: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFF6B00), Color(0xFFE91E8C)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.checkroom, color: Colors.white),
+                    ),
+                    title: const Text('Manage Costumes',
+                        style: TextStyle(
+                            fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+                    trailing: const Icon(Icons.arrow_forward_ios,
+                        size: 14, color: _grey500),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ManageCostumesPage())),
+                  ),
+                ),
               ),
 
               const SizedBox(height: 32),
-              
-              // â”€â”€ Top Rented + Lihat Semua â”€â”€
+
+              // ── Top Rented + Lihat Semua ──
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Top Rented Costumes', style: TextStyle(color: _black, fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Inter')),
-                    
+                    const Text('Most Popular',
+                        style: TextStyle(
+                            color: _black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Inter')),
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
@@ -209,7 +363,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
                             widget.onSeeAllPressed!();
                           }
                         },
-                        child: const Text('Lihat semua', style: TextStyle(color: _grey500, fontSize: 14, fontWeight: FontWeight.w600, fontFamily: 'Inter')),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('View All',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inter')),
+                        ),
                       ),
                     ),
                   ],
@@ -222,17 +393,67 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: top.keys.length,
-                separatorBuilder: (context, index) => const Divider(color: _grey200, height: 1),
+                separatorBuilder: (context, index) =>
+                    const Divider(color: _grey200, height: 1),
                 itemBuilder: (context, index) {
                   final key = top.keys.elementAt(index);
                   final count = top[key]!;
 
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(8)), child: Center(child: Text('#${index + 1}', style: const TextStyle(color: _black, fontWeight: FontWeight.w800, fontFamily: 'Inter')))),
-                    title: Text(key, style: const TextStyle(color: _black, fontWeight: FontWeight.w600, fontSize: 14, fontFamily: 'Inter')),
-                    subtitle: Text('$count rentals this month', style: const TextStyle(color: _grey500, fontSize: 12, fontFamily: 'Inter')),
-                    trailing: const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: index % 2 == 0
+                                      ? const [
+                                          Color(0xFF6A11CB),
+                                          Color(0xFF2575FC)
+                                        ]
+                                      : const [
+                                          Color(0xFFFF6B00),
+                                          Color(0xFFE91E8C)
+                                        ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Center(
+                                child: Text('#${index + 1}',
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Inter')))),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(key,
+                                  style: const TextStyle(
+                                      color: _black,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      fontFamily: 'Inter')),
+                              const SizedBox(height: 4),
+                              Text('$count rentals this month',
+                                  style: const TextStyle(
+                                      color: _grey500,
+                                      fontSize: 12,
+                                      fontFamily: 'Inter')),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, color: _grey500),
+                      ],
+                    ),
                   );
                 },
               ),
@@ -251,6 +472,7 @@ class _MenuCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final VoidCallback onTap;
+  final List<Color> gradientColors;
 
   const _MenuCard({
     Key? key,
@@ -258,6 +480,7 @@ class _MenuCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.onTap,
+    required this.gradientColors,
   }) : super(key: key);
 
   @override
@@ -268,25 +491,37 @@ class _MenuCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFE8E8E8)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 6,
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF5F5F5),
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: gradientColors.first.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              child: Icon(icon, color: const Color(0xFF111111)),
+              child: Icon(icon, color: Colors.white, size: 26),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -297,8 +532,8 @@ class _MenuCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       color: Color(0xFF111111),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
                       fontFamily: 'Inter',
                     ),
                   ),
@@ -307,14 +542,22 @@ class _MenuCard extends StatelessWidget {
                     subtitle,
                     style: const TextStyle(
                       color: Color(0xFF888888),
-                      fontSize: 12,
+                      fontSize: 13,
                       fontFamily: 'Inter',
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color(0xFFB0B0B0)),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F5F5),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.chevron_right,
+                  color: Color(0xFF888888), size: 20),
+            ),
           ],
         ),
       ),
@@ -326,42 +569,61 @@ class _SummaryCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
+  final List<Color> gradientColors;
 
   const _SummaryCard({
     Key? key,
     required this.title,
     required this.value,
     required this.icon,
+    required this.gradientColors,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE8E8E8)),
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 6,
+              color: gradientColors.first.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: const Color(0xFFB0B0B0), size: 22),
-            const SizedBox(height: 12),
-            Text(title, style: const TextStyle(color: Color(0xFF888888), fontSize: 12, fontFamily: 'Inter')),
-            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.white, size: 24),
+            ),
+            const SizedBox(height: 14),
+            Text(title,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 12,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                )),
+            const SizedBox(height: 6),
             Text(
               value,
               style: const TextStyle(
-                color: Color(0xFF111111),
-                fontSize: 18,
+                color: Colors.white,
+                fontSize: 20,
                 fontWeight: FontWeight.w800,
                 fontFamily: 'Inter',
               ),

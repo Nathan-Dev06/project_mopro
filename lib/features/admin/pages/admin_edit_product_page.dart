@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 class AdminEditProductPage extends StatefulWidget {
+  final int? costumeIndex;
+  final CostumeData? costume;
   final Map<String, dynamic>? productData;
 
-  const AdminEditProductPage({Key? key, this.productData}) : super(key: key);
+  const AdminEditProductPage({
+    Key? key,
+    this.costumeIndex,
+    this.costume,
+    this.productData,
+  }) : super(key: key);
 
   @override
   State<AdminEditProductPage> createState() => _AdminEditProductPageState();
@@ -20,26 +29,27 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
   late TextEditingController _namaController;
   late TextEditingController _animeController;
   late TextEditingController _hargaController;
-  late TextEditingController _stockController;
+  late TextEditingController _kondisiController;
   late TextEditingController _ukuranController;
+  late TextEditingController _includeController;
+  late TextEditingController _kategoriController;
 
-  String _selectedGender = "Pria";
   String _selectedStatus = "Ready";
 
   @override
   void initState() {
     super.initState();
     
-    _namaController = TextEditingController(text: widget.productData?['name'] ?? '');
-    _animeController = TextEditingController(text: widget.productData?['anime'] ?? '');
-    _hargaController = TextEditingController(text: widget.productData?['price']?.toString() ?? '');
-    _stockController = TextEditingController(text: widget.productData?['stock']?.toString() ?? '');
-    _ukuranController = TextEditingController(text: widget.productData?['sizes'] ?? 'S, M, L, XL');
+    // Inisialisasi controller dengan CostumeData (untuk edit) atau default (untuk tambah)
+    _namaController = TextEditingController(text: widget.costume?.title ?? '');
+    _animeController = TextEditingController(text: widget.costume?.series ?? '');
+    _hargaController = TextEditingController(text: widget.costume?.price ?? '');
+    _kondisiController = TextEditingController(text: widget.costume?.condition ?? '100%');
+    _ukuranController = TextEditingController(text: widget.costume?.size ?? 'S, M, L, XL');
+    _includeController = TextEditingController(text: widget.costume?.include ?? '');
+    _kategoriController = TextEditingController(text: widget.costume?.category ?? 'Anime');
     
-    if (widget.productData != null) {
-      _selectedGender = widget.productData!['gender'] ?? "Pria";
-      _selectedStatus = widget.productData!['status'] ?? "Ready";
-    }
+    _selectedStatus = widget.costume?.isReady == true ? "Ready" : "Rented";
   }
 
   @override
@@ -47,14 +57,47 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
     _namaController.dispose();
     _animeController.dispose();
     _hargaController.dispose();
-    _stockController.dispose();
+    _kondisiController.dispose();
     _ukuranController.dispose();
+    _includeController.dispose();
+    _kategoriController.dispose();
     super.dispose();
+  }
+
+  void _saveCostume() {
+    if (_formKey.currentState!.validate()) {
+      final updatedCostume = CostumeData(
+        title: _namaController.text,
+        series: _animeController.text,
+        price: _hargaController.text,
+        condition: _kondisiController.text,
+        image: widget.costume?.image ?? '', // Biarkan gambar tetap sama untuk sementara
+        include: _includeController.text,
+        size: _ukuranController.text,
+        isReady: _selectedStatus == "Ready",
+        category: _kategoriController.text,
+        rating: widget.costume?.rating ?? 4.8,
+        reviewCount: widget.costume?.reviewCount ?? 12,
+      );
+
+      if (widget.costumeIndex != null) {
+        // Edit costume
+        CostumeManager.instance.updateCostume(widget.costumeIndex!, updatedCostume);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kostum berhasil diperbarui!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isEdit = widget.productData != null;
+    bool isEdit = widget.costume != null;
 
     return Scaffold(
       backgroundColor: _bg,
@@ -66,7 +109,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isEdit ? "Edit Produk" : "Tambah Produk Baru",
+          isEdit ? "Edit Kostum" : "Tambah Kostum Baru",
           style: const TextStyle(
             color: _black,
             fontSize: 20,
@@ -86,16 +129,16 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField("Nama Karakter", _namaController, "cth. Zhongli - Genshin Impact"),
+                      _buildTextField("Nama Kostum", _namaController, "cth. Monkey D. Luffy - One Piece"),
                       const SizedBox(height: 16),
-                      _buildTextField("Judul Anime / Game", _animeController, "cth. Genshin Impact / Sailor Moon"),
+                      _buildTextField("Judul Anime / Game", _animeController, "cth. One Piece / Genshin Impact"),
                       const SizedBox(height: 16),
                       
                       Row(
                         children: [
-                          Expanded(child: _buildTextField("Harga / Hari (Rp)", _hargaController, "cth. 150000", isNumber: true)),
+                          Expanded(child: _buildTextField("Harga / Hari (Rp)", _hargaController, "cth. 150000", isNumber: false)),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildTextField("Stock", _stockController, "cth. 2", isNumber: true)),
+                          Expanded(child: _buildTextField("Kondisi", _kondisiController, "cth. 95%")),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -103,21 +146,20 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildDropdownField("Gender", ["Pria", "Wanita", "Unisex"], _selectedGender, (val) {
-                              setState(() => _selectedGender = val!);
-                            }),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildDropdownField("Status", ["Ready", "Rented", "Maintenance"], _selectedStatus, (val) {
+                            child: _buildDropdownField("Status", ["Ready", "Rented"], _selectedStatus, (val) {
                               setState(() => _selectedStatus = val!);
                             }),
                           ),
+                          const SizedBox(width: 16),
+                          Expanded(child: _buildTextField("Kategori", _kategoriController, "cth. Anime / Game")),
                         ],
                       ),
                       const SizedBox(height: 16),
 
-                      _buildTextField("Ukuran Tersedia", _ukuranController, "S, M, L, XL"),
+                      _buildTextField("Ukuran", _ukuranController, "cth. S, M, L, XL / All Size"),
+                      const SizedBox(height: 16),
+
+                      _buildTextField("Include", _includeController, "cth. Kostum, wig, aksesoris"),
                       const SizedBox(height: 20),
 
                       // Upload Foto Box
@@ -136,9 +178,8 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                         ),
                         child: InkWell(
                           onTap: () {
-                            // Simulasi interaksi upload foto
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Membuka Galeri/Kamera...")),
+                              const SnackBar(content: Text("Fitur upload foto akan datang!")),
                             );
                           },
                           borderRadius: BorderRadius.circular(12),
@@ -167,24 +208,14 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(isEdit ? 'Produk Berhasil Diperbarui!' : 'Produk Baru Berhasil Ditambahkan!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        Navigator.pop(context);
-                      }
-                    },
+                    onPressed: _saveCostume,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _black,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
                     child: Text(
-                      isEdit ? "Simpan Perubahan" : "Simpan Produk",
+                      isEdit ? "Simpan Perubahan" : "Simpan Kostum",
                       style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                     ),
                   ),

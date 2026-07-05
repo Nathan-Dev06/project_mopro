@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_mopro/features/customer/pages/home_page.dart';
 import 'package:project_mopro/core/managers/costume_manager.dart';
+import 'package:project_mopro/features/admin/pages/admin_edit_product_page.dart';
 
 class ManageCostumesPage extends StatefulWidget {
   const ManageCostumesPage({super.key});
@@ -78,7 +79,23 @@ class _ManageCostumesPageState
                     mainAxisSize:
                         MainAxisSize.min,
                     children: [
-
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Colors.blue,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AdminEditProductPage(
+                                costumeIndex: index,
+                                costume: costume,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(
                           Icons.delete,
