@@ -4,7 +4,6 @@ import 'package:project_mopro/core/models/user_profile.dart';
 import 'package:project_mopro/features/admin/pages/manage_orders_page.dart';
 import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_walkin_order_page.dart';
-import 'package:project_mopro/features/admin/pages/admin_income_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_financial_report_page.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -134,51 +133,43 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
               const SizedBox(height: 28),
 
-              // ── Summary Cards dengan Warna Cosvoria ──
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    _SummaryCard(
-                      title: 'Today Income',
-                      value: ReportService.formatCurrency(todayIncome),
-                      icon: Icons.payments_outlined,
-                      gradientColors: const [
-                        Color(0xFF6A11CB),
-                        Color(0xFF2575FC)
-                      ],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const AdminIncomePage(initialPeriod: 'today'),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 12),
-                    _SummaryCard(
-                      title: 'This Month',
-                      value: ReportService.formatCurrency(monthIncome),
-                      icon: Icons.account_balance_wallet_outlined,
-                      gradientColors: const [
-                        Color(0xFFFF6B00),
-                        Color(0xFFE91E8C)
-                      ],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const AdminIncomePage(initialPeriod: 'month'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              // ── Summary Cards ──
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 20),
+  child: Row(
+    children: [
+      _SummaryCard(
+        title: 'Today Income',
+        value: ReportService.formatCurrency(todayIncome),
+        icon: Icons.payments_outlined,
+        gradientColors: const [Color(0xFF6A11CB), Color(0xFF2575FC)],
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AdminFinancialReportPage(), // Diubah ke sini
+            ),
+          );
+        },
+      ),
+      const SizedBox(width: 12),
+      _SummaryCard(
+        title: 'This Month',
+        value: ReportService.formatCurrency(monthIncome),
+        icon: Icons.account_balance_wallet_outlined,
+        gradientColors: const [Color(0xFFFF6B00), Color(0xFFE91E8C)],
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AdminFinancialReportPage(), // Diubah ke sini
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+),
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
