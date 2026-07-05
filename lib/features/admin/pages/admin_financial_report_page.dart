@@ -36,59 +36,11 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
     return DateFormat('dd MMM yyyy').format(DateTime.now());
   }
 
-  void _showTarikDanaDialog(BuildContext context, int availableBalance) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Konfirmasi Penarikan',
-          style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w800),
-        ),
-        content: const Text(
-          'Apakah anda yakin ingin menarik saldo ini ke rekening terdaftar?',
-          style: TextStyle(fontFamily: 'Inter'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal', style: TextStyle(color: _grey500)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await FirebaseSyncService.createPayoutRequest(
-                amount: availableBalance > 0 ? availableBalance : 0,
-                title: 'Penarikan Saldo',
-              );
-
-              final current =
-                  await FirebaseSyncService.financialSummaryDoc().get();
-              final data = current.data() ??
-                  FirebaseSyncService.defaultFinancialSummary();
-              final available = (data['availableBalance'] ?? 0) as int;
-              final withdrawn = (data['totalWithdrawn'] ?? 0) as int;
-
-              await FirebaseSyncService.saveFinancialSummary({
-                'availableBalance': 0,
-                'totalIncome': data['totalIncome'] ?? 0,
-                'totalWithdrawn': withdrawn + available,
-              });
-
-              if (!mounted) return;
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content:
-                      Text('Permintaan penarikan dana berhasil diproses! 💸'),
-                  backgroundColor: _accentGreen,
-                ),
-              );
-            },
-            child: const Text('Tarik',
-                style: TextStyle(
-                    color: _primaryPurple, fontWeight: FontWeight.w800)),
-          ),
-        ],
+  void _printReport() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Fitur cetak laporan sedang dikembangkan! 🖨️'),
+        backgroundColor: _primaryPurple,
       ),
     );
   }
@@ -115,6 +67,13 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
             fontFamily: 'Inter',
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.print_outlined, color: _black),
+            onPressed: _printReport,
+            tooltip: 'Cetak Laporan',
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -123,90 +82,6 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Saldo Tersedia Card
-              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseSyncService.financialSummaryDoc().snapshots(),
-                builder: (context, summarySnapshot) {
-                  final summary = summarySnapshot.data?.data() ??
-                      FirebaseSyncService.defaultFinancialSummary();
-                  final availableBalance =
-                      (summary['availableBalance'] ?? 0) as int;
-                  final totalIncome = (summary['totalIncome'] ?? 0) as int;
-                  final totalWithdrawn =
-                      (summary['totalWithdrawn'] ?? 0) as int;
-
-                  return Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [_primaryPurple, _primaryBlue],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _primaryPurple.withOpacity(0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Saldo Tersedia",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _currency(availableBalance),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            fontFamily: 'Inter',
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed: availableBalance > 0
-                                ? () => _showTarikDanaDialog(
-                                    context, availableBalance)
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: _primaryPurple,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text(
-                              "Tarik Dana",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: 'Inter',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
               const SizedBox(height: 20),
 
               // Quick Stats Grid
@@ -216,75 +91,57 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                   final summary = summarySnapshot.data?.data() ??
                       FirebaseSyncService.defaultFinancialSummary();
                   final totalIncome = (summary['totalIncome'] ?? 0) as int;
-                  final totalWithdrawn =
-                      (summary['totalWithdrawn'] ?? 0) as int;
 
-                  return Row(
+                  return Column(
                     children: [
-                      Expanded(
-                        child: _QuickStatCard(
-                          label: 'Pendapatan Hari Ini',
-                          value: _currency(todayIncome),
-                          icon: Icons.calendar_today,
-                          gradientColors: const [_primaryPurple, _primaryBlue],
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _QuickStatCard(
+                              label: 'Pendapatan Hari Ini',
+                              value: _currency(todayIncome),
+                              icon: Icons.calendar_today,
+                              gradientColors: const [
+                                _primaryPurple,
+                                _primaryBlue
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _QuickStatCard(
+                              label: 'Pendapatan Bulan Ini',
+                              value: _currency(monthIncome),
+                              icon: Icons.calendar_month,
+                              gradientColors: const [
+                                _accentOrange,
+                                Color(0xFFE91E8C)
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickStatCard(
-                          label: 'Pendapatan Bulan Ini',
-                          value: _currency(monthIncome),
-                          icon: Icons.calendar_month,
-                          gradientColors: const [
-                            _accentOrange,
-                            Color(0xFFE91E8C)
-                          ],
-                        ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _QuickStatCard(
+                              label: 'Total Pendapatan',
+                              value: _currency(totalIncome),
+                              icon: Icons.trending_up,
+                              gradientColors: const [
+                                _accentGreen,
+                                Color(0xFF16A34A)
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   );
                 },
               ),
-              const SizedBox(height: 12),
-              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseSyncService.financialSummaryDoc().snapshots(),
-                builder: (context, summarySnapshot) {
-                  final summary = summarySnapshot.data?.data() ??
-                      FirebaseSyncService.defaultFinancialSummary();
-                  final totalIncome = (summary['totalIncome'] ?? 0) as int;
-                  final totalWithdrawn =
-                      (summary['totalWithdrawn'] ?? 0) as int;
-
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: _QuickStatCard(
-                          label: 'Total Pendapatan',
-                          value: _currency(totalIncome),
-                          icon: Icons.trending_up,
-                          gradientColors: const [
-                            _accentGreen,
-                            Color(0xFF16A34A)
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _QuickStatCard(
-                          label: 'Sudah Ditarik',
-                          value: _currency(totalWithdrawn),
-                          icon: Icons.trending_down,
-                          gradientColors: const [
-                            Color(0xFFEF4444),
-                            Color(0xFFDC2626)
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 32),
 
               // Riwayat Transaksi Rental
               const Text(
@@ -328,52 +185,6 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                         amount: _currency(totalAmount),
                         isWalkin: isWalkin,
                         isPayout: false,
-                      );
-                    },
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // Riwayat Payout
-              const Text(
-                'Riwayat Penarikan Dana',
-                style: TextStyle(
-                  color: _black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Inter',
-                ),
-              ),
-              const SizedBox(height: 12),
-              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: FirebaseSyncService.payoutRequestsCollection()
-                    .orderBy('createdAt', descending: true)
-                    .snapshots(),
-                builder: (context, payoutSnapshot) {
-                  final payouts = payoutSnapshot.data?.docs ?? [];
-                  if (payouts.isEmpty) {
-                    return _EmptyState(
-                      icon: Icons.account_balance_wallet_outlined,
-                      message: 'Belum ada riwayat penarikan',
-                    );
-                  }
-
-                  return ListView.separated(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: payouts.length,
-                    separatorBuilder: (context, index) =>
-                        const Divider(color: Colors.transparent, height: 12),
-                    itemBuilder: (context, index) {
-                      final item = payouts[index].data();
-                      return _TransactionCard(
-                        title: (item['title'] ?? 'Penarikan Dana').toString(),
-                        subtitle: _dateLabel(item['createdAt']),
-                        amount: '- ${_currency((item['amount'] ?? 0) as int)}',
-                        isWalkin: false,
-                        isPayout: true,
                       );
                     },
                   );
