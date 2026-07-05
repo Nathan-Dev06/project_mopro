@@ -145,6 +145,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Color(0xFF6A11CB),
                         Color(0xFF2575FC)
                       ],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 12),
                     _SummaryCard(
@@ -155,6 +163,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Color(0xFFFF6B00),
                         Color(0xFFE91E8C)
                       ],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -172,6 +188,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Color(0xFF22C55E),
                         Color(0xFF16A34A)
                       ],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 12),
                     _SummaryCard(
@@ -182,6 +206,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Color(0xFFEF4444),
                         Color(0xFFDC2626)
                       ],
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ManageOrdersPage(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -589,6 +621,7 @@ class _SummaryCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final List<Color> gradientColors;
+  final VoidCallback? onTap;
 
   const _SummaryCard({
     Key? key,
@@ -596,58 +629,65 @@ class _SummaryCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.gradientColors,
+    this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: gradientColors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: gradientColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: gradientColors.first.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 24),
+                ),
+                const SizedBox(height: 14),
+                Text(title,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                    )),
+                const SizedBox(height: 6),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+              ],
+            ),
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: gradientColors.first.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: Colors.white, size: 24),
-            ),
-            const SizedBox(height: 14),
-            Text(title,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                )),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                fontFamily: 'Inter',
-              ),
-            ),
-          ],
         ),
       ),
     );
