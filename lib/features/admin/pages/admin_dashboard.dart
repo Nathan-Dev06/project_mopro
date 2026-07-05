@@ -3,6 +3,7 @@ import 'package:project_mopro/core/services/report_service.dart';
 import 'package:project_mopro/core/models/user_profile.dart';
 import 'package:project_mopro/features/admin/pages/manage_orders_page.dart';
 import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_walkin_order_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final VoidCallback? onSeeAllPressed;
@@ -206,6 +207,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
+                    _MenuCard(
+                      title: 'Buat Pesanan Walk-in',
+                      subtitle: 'Pesanan manual untuk customer langsung',
+                      icon: Icons.person_add_alt_1_outlined,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AdminWalkinOrderPage(),
+                          ),
+                        );
+                      },
+                      gradientColors: const [
+                        Color(0xFFFF6B00),
+                        Color(0xFFE91E8C)
+                      ],
+                    ),
+                    const SizedBox(height: 12),
                     _MenuCard(
                       title: 'Manage Orders',
                       subtitle: 'Manage customer rentals',
