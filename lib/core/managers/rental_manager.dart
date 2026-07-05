@@ -113,8 +113,12 @@ class RentalManager {
           costumeSeries: data['costumeSeries'] ?? '',
           size: data['size'] ?? '',
           imagePath: data['imagePath'] ?? '',
-          startDate: (data['startDate'] as Timestamp).toDate(),
-          endDate: (data['endDate'] as Timestamp).toDate(),
+          startDate: data['startDate'] != null
+              ? (data['startDate'] as Timestamp).toDate()
+              : DateTime.now(),
+          endDate: data['endDate'] != null
+              ? (data['endDate'] as Timestamp).toDate()
+              : DateTime.now(),
           status: data['status'] ?? '',
           customerName: data['customerName'] ?? 'Ayu Lestari',
           userId: data['userId'] ?? 'guest',
@@ -244,16 +248,25 @@ class RentalManager {
 
   // Add rental to Firestore
   Future<void> addRental(Rental rental) async {
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? rental.userId;
+    final currentUserId =
+        FirebaseAuth.instance.currentUser?.uid ?? rental.userId;
     String customerName = rental.customerName;
-    try {
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(currentUserId).get();
-      if (userDoc.exists && userDoc.data()?['name'] != null) {
-        customerName = userDoc.data()?['name'];
-      }
-    } catch (_) {}
 
-    await FirebaseFirestore.instance.collection('rentals').doc(rental.transactionId).set({
+    // Skip user lookup for walk-in customers
+    if (rental.userId != 'walkin-customer') {
+      try {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUserId)
+            .get();
+        if (userDoc.exists && userDoc.data()?['name'] != null) {
+          customerName = userDoc.data()?['name'];
+        }
+      } catch (_) {}
+    }
+
+    // Prepare Firestore data, only include non-null fields
+    final Map<String, dynamic> rentalData = {
       'costumeName': rental.costumeName,
       'costumeSeries': rental.costumeSeries,
       'size': rental.size,
@@ -263,26 +276,43 @@ class RentalManager {
       'status': rental.status,
       'customerName': customerName,
       'userId': currentUserId,
-      'cancellationReason': rental.cancellationReason,
-      'rating': rental.rating,
-      'reviewText': rental.reviewText,
-      'reviewMediaPath': rental.reviewMediaPath,
-      'reviewMediaType': rental.reviewMediaType,
-      'receiptNumber': rental.receiptNumber,
-      'recipientName': rental.recipientName,
-      'phone': rental.phone,
-      'street': rental.street,
-      'city': rental.city,
-      'province': rental.province,
-      'postal': rental.postal,
-      'totalRentPrice': rental.totalRentPrice,
-      'deposit': rental.deposit,
-      'discountAmount': rental.discountAmount,
-      'voucherCode': rental.voucherCode,
-      'grandTotal': rental.grandTotal,
-      'depositDeduction': rental.depositDeduction,
-      'deductionReason': rental.deductionReason,
-    }, SetOptions(merge: true));
+    };
+
+    // Add optional fields only if they are not null
+    if (rental.cancellationReason != null)
+      rentalData['cancellationReason'] = rental.cancellationReason;
+    if (rental.rating != null) rentalData['rating'] = rental.rating;
+    if (rental.reviewText != null) rentalData['reviewText'] = rental.reviewText;
+    if (rental.reviewMediaPath != null)
+      rentalData['reviewMediaPath'] = rental.reviewMediaPath;
+    if (rental.reviewMediaType != null)
+      rentalData['reviewMediaType'] = rental.reviewMediaType;
+    if (rental.receiptNumber != null)
+      rentalData['receiptNumber'] = rental.receiptNumber;
+    if (rental.recipientName != null)
+      rentalData['recipientName'] = rental.recipientName;
+    if (rental.phone != null) rentalData['phone'] = rental.phone;
+    if (rental.street != null) rentalData['street'] = rental.street;
+    if (rental.city != null) rentalData['city'] = rental.city;
+    if (rental.province != null) rentalData['province'] = rental.province;
+    if (rental.postal != null) rentalData['postal'] = rental.postal;
+    if (rental.totalRentPrice != null)
+      rentalData['totalRentPrice'] = rental.totalRentPrice;
+    if (rental.deposit != null) rentalData['deposit'] = rental.deposit;
+    if (rental.discountAmount != null)
+      rentalData['discountAmount'] = rental.discountAmount;
+    if (rental.voucherCode != null)
+      rentalData['voucherCode'] = rental.voucherCode;
+    if (rental.grandTotal != null) rentalData['grandTotal'] = rental.grandTotal;
+    if (rental.depositDeduction != null)
+      rentalData['depositDeduction'] = rental.depositDeduction;
+    if (rental.deductionReason != null)
+      rentalData['deductionReason'] = rental.deductionReason;
+
+    await FirebaseFirestore.instance
+        .collection('rentals')
+        .doc(rental.transactionId)
+        .set(rentalData, SetOptions(merge: true));
   }
 
   // Update status or review detail in Firestore
@@ -343,16 +373,17 @@ class RentalManager {
           final deposit = data['deposit'] as int? ?? 0;
           final deduction = depositDeduction ?? 0;
           final refund = deposit - deduction;
-          
+
           if (refund > 0 && userId != null) {
             final batch = FirebaseFirestore.instance.batch();
-            
+
             // 1. Update user balance
-            final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+            final userRef =
+                FirebaseFirestore.instance.collection('users').doc(userId);
             batch.update(userRef, {
               'deposit_balance': FieldValue.increment(refund),
             });
-            
+
             // 2. Add transaction record
             final txRef = userRef.collection('wallet_transactions').doc();
             batch.set(txRef, {
@@ -363,7 +394,7 @@ class RentalManager {
               'deductionReason': deductionReason ?? '',
               'timestamp': FieldValue.serverTimestamp(),
             });
-            
+
             await batch.commit();
           }
         }
