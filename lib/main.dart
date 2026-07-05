@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:project_mopro/firebase_options.dart';
 import 'package:project_mopro/features/auth/pages/splash_screen.dart';
 import 'package:project_mopro/features/customer/pages/home_page.dart';
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch},
+      ),
       builder: (context, child) => PhoneFrameWrapper(child: child!),
       title: 'Cosvoria Premium Cosplay Rental',
       debugShowCheckedModeBanner: false,
