@@ -8,7 +8,9 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp( options: DefaultFirebaseOptions.currentPlatform,);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -18,11 +20,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cosvoria â€” Premium Cosplay Rental',
+      title: 'Cosvoria Premium Cosplay Rental',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Inter',
         scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Color(0xFF111111),
+          iconTheme: IconThemeData(color: Color(0xFF111111)),
+          elevation: 0,
+        ),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF111111),
           onPrimary: Colors.white,
@@ -153,4 +161,3 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
     );
   }
 }
-

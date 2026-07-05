@@ -35,7 +35,6 @@ class FirebaseSyncService {
       'shipping': 'Rp 15.000',
       'isStoreActive': true,
       'requiresKtpVerification': true,
-      'autoApproveOrder': false,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }

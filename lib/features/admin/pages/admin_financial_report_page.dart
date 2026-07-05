@@ -447,13 +447,32 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const Color bg = Color(0xFFF8F9FA);
+    const Color black = Color(0xFF111111);
+
     return Scaffold(
+      backgroundColor: bg,
       appBar: AppBar(
-        title: const Text('Preview Laporan PDF'),
+        backgroundColor: bg,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'Preview Laporan PDF',
+          style: TextStyle(
+            color: black,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'Inter',
+          ),
+        ),
       ),
       body: PdfPreview(
         build: (format) => _generateReportPdf(format),
         canChangeOrientation: false,
+        canDebug: false,
         allowPrinting: true,
         allowSharing: true,
         initialPageFormat: pdf.PdfPageFormat.a4,
@@ -465,7 +484,18 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
     final now = DateTime.now();
     final todayIncome = ReportService.incomeForDay(now);
     final monthIncome = ReportService.incomeForMonth(now.year, now.month);
-    final totalIncome = todayIncome;
+    
+    int totalIncome = 0;
+    try {
+      final summaryDoc = await FirebaseSyncService.financialSummaryDoc().get();
+      if (summaryDoc.exists) {
+        totalIncome = (summaryDoc.data()?['totalIncome'] ?? 0) as int;
+      } else {
+        totalIncome = FirebaseSyncService.defaultFinancialSummary()['totalIncome'] as int;
+      }
+    } catch (_) {
+      totalIncome = FirebaseSyncService.defaultFinancialSummary()['totalIncome'] as int;
+    }
 
     final currencyFormat =
         NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0);
@@ -554,21 +584,13 @@ pw.Widget _buildPdfStatTile(
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(
-          label,
-          style: pw.TextStyle(
-            fontSize: 10, 
-            fontWeight: pw.FontWeight.bold,
-          ),
-        ),
+        pw.Text(label,
+            style: pw.TextStyle(
+                fontSize: 10, fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 6),
-        pw.Text(
-          value,
-          style: pw.TextStyle(
-            fontSize: 14, 
-            fontWeight: pw.FontWeight.bold,
-          ),
-        ),
+        pw.Text(value,
+            style: pw.TextStyle(
+                fontSize: 14, fontWeight: pw.FontWeight.bold)),
       ],
     ),
   );

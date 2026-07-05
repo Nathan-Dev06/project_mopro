@@ -27,7 +27,6 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
   // Status untuk tombol Switch
   bool isModeTokoAktif = true;
   bool isWajibKtp = true;
-  bool isAutoApprove = false;
   bool _isLoading = true;
 
   @override
@@ -49,7 +48,6 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
       _ongkirController.text = data['shipping']?.toString() ?? _ongkirController.text;
       isModeTokoAktif = data['isStoreActive'] ?? true;
       isWajibKtp = data['requiresKtpVerification'] ?? true;
-      isAutoApprove = data['autoApproveOrder'] ?? false;
     } catch (e) {
       debugPrint('Failed to load store settings: $e');
     }
@@ -128,12 +126,6 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                       value: isWajibKtp,
                       onChanged: (val) => setState(() => isWajibKtp = val),
                     ),
-                    _buildSwitchTile(
-                      title: 'Auto-approve Order',
-                      subtitle: 'Lewati approval manual jika KTP valid',
-                      value: isAutoApprove,
-                      onChanged: (val) => setState(() => isAutoApprove = val),
-                    ),
 
                     const SizedBox(height: 30),
 
@@ -153,7 +145,6 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                               'shipping': _ongkirController.text.trim(),
                               'isStoreActive': isModeTokoAktif,
                               'requiresKtpVerification': isWajibKtp,
-                              'autoApproveOrder': isAutoApprove,
                             });
 
                             if (!mounted) return;
