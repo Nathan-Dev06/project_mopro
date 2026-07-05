@@ -7,6 +7,7 @@ import 'package:project_mopro/features/admin/pages/admin_voucher_point_page.dart
 import 'package:project_mopro/features/auth/pages/login_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_notification_settings.dart';
 import 'package:project_mopro/core/services/firebase_sync_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({Key? key}) : super(key: key);
@@ -20,6 +21,42 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
   static const Color _black = Color(0xFF111111);
   static const Color _grey500 = Color(0xFF888888);
   static const Color _grey200 = Color(0xFFE8E8E8);
+
+  String _adminName = "Admin";
+  String _adminEmail = "admin@gmail.com";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAdminData();
+  }
+
+  Future<void> _loadAdminData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        setState(() {
+          _adminName = user.displayName ?? "Admin";
+          _adminEmail = user.email ?? "";
+        });
+
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (doc.exists && mounted) {
+          final data = doc.data()!;
+          setState(() {
+            _adminName = data['name'] ?? user.displayName ?? "Admin";
+            _adminEmail = data['email'] ?? user.email ?? "";
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading admin data: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,20 +98,20 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          "Admin",
-                          style: TextStyle(
+                          _adminName,
+                          style: const TextStyle(
                             color: _black,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          "Admin@gmail.com",
-                          style: TextStyle(
+                          _adminEmail,
+                          style: const TextStyle(
                             color: _grey500,
                             fontSize: 14,
                             fontFamily: 'Inter',
@@ -105,7 +142,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
               // Menu 2: Manage Users 
               _buildMenuRow(
                 icon: Icons.people_outline,
-                title: "Manage Users",
+                title: "Manage Customers",
                 onTap: () {
                   Navigator.push(
                     context,
