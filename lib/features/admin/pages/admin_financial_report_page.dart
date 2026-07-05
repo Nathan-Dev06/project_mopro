@@ -36,11 +36,182 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
   }
 
   void _openReportPreview() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminFinancialReportPreviewPage(),
+    _showFilterDialog();
+  }
+
+  void _showFilterDialog() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40, height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8E8E8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const Text(
+                  'Pilih Filter Cetak',
+                  style: TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter', color: _black,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Pilih rentang waktu laporan yang ingin dicetak',
+                  style: TextStyle(fontSize: 14, color: Color(0xFF888888), fontFamily: 'Inter'),
+                ),
+                const SizedBox(height: 20),
+                _FilterOption(
+                  icon: Icons.calendar_month,
+                  title: 'Per Bulan',
+                  subtitle: 'Cetak laporan untuk bulan tertentu',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickMonth();
+                  },
+                ),
+                const SizedBox(height: 12),
+                _FilterOption(
+                  icon: Icons.calendar_today_outlined,
+                  title: 'Per Tahun',
+                  subtitle: 'Cetak laporan untuk tahun tertentu',
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _pickYear();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _pickMonth() {
+    int selectedYear = DateTime.now().year;
+    int selectedMonth = DateTime.now().month;
+    final years = List.generate(DateTime.now().year - 2019, (i) => 2020 + i);
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx2, setDialogState) {
+            return AlertDialog(
+              title: const Text('Pilih Bulan', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<int>(
+                    value: selectedMonth,
+                    decoration: const InputDecoration(labelText: 'Bulan'),
+                    items: List.generate(12, (i) => DropdownMenuItem(value: i + 1, child: Text(months[i]))),
+                    onChanged: (v) => setDialogState(() => selectedMonth = v!),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<int>(
+                    value: selectedYear,
+                    decoration: const InputDecoration(labelText: 'Tahun'),
+                    items: years.map((y) => DropdownMenuItem(value: y, child: Text('$y'))).toList(),
+                    onChanged: (v) => setDialogState(() => selectedYear = v!),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: _black),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    final start = DateTime(selectedYear, selectedMonth, 1);
+                    final end = (selectedMonth == 12) ? DateTime(selectedYear + 1, 1, 1) : DateTime(selectedYear, selectedMonth + 1, 1);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AdminFinancialReportPreviewPage(
+                          filterType: 'month',
+                          filterLabel: '${months[selectedMonth - 1]} $selectedYear',
+                          startDate: start,
+                          endDate: end,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Cetak', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _pickYear() {
+    int selectedYear = DateTime.now().year;
+    final years = List.generate(DateTime.now().year - 2019, (i) => 2020 + i);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx2, setDialogState) {
+            return AlertDialog(
+              title: const Text('Pilih Tahun', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+              content: DropdownButtonFormField<int>(
+                value: selectedYear,
+                decoration: const InputDecoration(labelText: 'Tahun'),
+                items: years.map((y) => DropdownMenuItem(value: y, child: Text('$y'))).toList(),
+                onChanged: (v) => setDialogState(() => selectedYear = v!),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: _black),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    final start = DateTime(selectedYear, 1, 1);
+                    final end = DateTime(selectedYear + 1, 1, 1);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AdminFinancialReportPreviewPage(
+                          filterType: 'year',
+                          filterLabel: 'Tahun $selectedYear',
+                          startDate: start,
+                          endDate: end,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Cetak', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -443,7 +614,18 @@ class _TransactionCard extends StatelessWidget {
 }
 
 class AdminFinancialReportPreviewPage extends StatelessWidget {
-  const AdminFinancialReportPreviewPage({super.key});
+  final String filterType;
+  final String filterLabel;
+  final DateTime startDate;
+  final DateTime endDate;
+
+  const AdminFinancialReportPreviewPage({
+    super.key,
+    required this.filterType,
+    required this.filterLabel,
+    required this.startDate,
+    required this.endDate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -459,11 +641,11 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Preview Laporan PDF',
-          style: TextStyle(
+        title: Text(
+          'Laporan: $filterLabel',
+          style: const TextStyle(
             color: black,
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w800,
             fontFamily: 'Inter',
           ),
@@ -481,30 +663,26 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
   }
 
   Future<Uint8List> _generateReportPdf(pdf.PdfPageFormat format) async {
-    final now = DateTime.now();
-    final todayIncome = ReportService.incomeForDay(now);
-    final monthIncome = ReportService.incomeForMonth(now.year, now.month);
-    
-    int totalIncome = 0;
-    try {
-      final summaryDoc = await FirebaseSyncService.financialSummaryDoc().get();
-      if (summaryDoc.exists) {
-        totalIncome = (summaryDoc.data()?['totalIncome'] ?? 0) as int;
-      } else {
-        totalIncome = FirebaseSyncService.defaultFinancialSummary()['totalIncome'] as int;
-      }
-    } catch (_) {
-      totalIncome = FirebaseSyncService.defaultFinancialSummary()['totalIncome'] as int;
-    }
-
     final currencyFormat =
         NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0);
     final dateFormat = DateFormat('dd MMM yyyy');
 
-    final rentals = RentalManager.instance.monetaryRentals;
-    final doc = pw.Document();
+    // Filter rentals by date range
+    final allRentals = RentalManager.instance.monetaryRentals;
+    final rentals = allRentals.where((rental) {
+      return !rental.startDate.isBefore(startDate) &&
+          rental.startDate.isBefore(endDate);
+    }).toList();
 
-    doc.addPage(
+    // Calculate filtered income
+    int filteredIncome = 0;
+    for (final rental in rentals) {
+      filteredIncome += (rental.totalRentPrice ?? 0) + (rental.deposit ?? 0);
+    }
+
+    final pdfDoc = pw.Document();
+
+    pdfDoc.addPage(
       pw.MultiPage(
         pageFormat: format,
         margin: const pw.EdgeInsets.all(24),
@@ -514,29 +692,26 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
                 style:
                     pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 8),
-            pw.Text('Tanggal: ${dateFormat.format(now)}',
+            pw.Text('Periode: $filterLabel',
                 style: pw.TextStyle(fontSize: 12)),
+            pw.Text('Dicetak: ${dateFormat.format(DateTime.now())}',
+                style: pw.TextStyle(fontSize: 10, color: pdf.PdfColors.grey600)),
             pw.SizedBox(height: 18),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                _buildPdfStatTile('Pendapatan Hari Ini',
-                    currencyFormat.format(todayIncome), pdf.PdfColors.blue100),
-                _buildPdfStatTile(
-                    'Pendapatan Bulan Ini',
-                    currencyFormat.format(monthIncome),
-                    pdf.PdfColors.orange100),
-                _buildPdfStatTile('Total Pendapatan',
-                    currencyFormat.format(totalIncome), pdf.PdfColors.green100),
-              ],
-            ),
+            _buildPdfStatTile(
+                'Total Pendapatan ($filterLabel)',
+                currencyFormat.format(filteredIncome),
+                pdf.PdfColors.green100),
+            pw.SizedBox(height: 8),
+            pw.Text('Jumlah Transaksi: ${rentals.length}',
+                style: pw.TextStyle(fontSize: 12)),
             pw.SizedBox(height: 24),
             pw.Text('Detail Transaksi',
                 style:
                     pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 12),
             if (rentals.isEmpty)
-              pw.Text('Tidak ada transaksi dengan nilai yang bisa dicetak.',
+              pw.Text(
+                  'Tidak ada transaksi pada periode ini.',
                   style: pw.TextStyle(fontSize: 12))
             else
               pw.Table.fromTextArray(
@@ -568,7 +743,7 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
       ),
     );
 
-    return doc.save();
+    return pdfDoc.save();
   }
 }
 
@@ -629,6 +804,74 @@ class _EmptyState extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _FilterOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _FilterOption({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF111111),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: Colors.white, size: 22),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Inter',
+                      color: Color(0xFF111111),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontFamily: 'Inter',
+                      color: Color(0xFF888888),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Color(0xFF888888)),
+          ],
+        ),
       ),
     );
   }

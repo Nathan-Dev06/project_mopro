@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_mopro/features/admin/pages/admin_edit_product_page.dart'; 
+import 'package:project_mopro/core/managers/costume_manager.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_edit_product_page.dart';
 
 class AdminCatalogPage extends StatefulWidget {
   const AdminCatalogPage({Key? key}) : super(key: key);
@@ -16,42 +18,10 @@ class _AdminCatalogPageState extends State<AdminCatalogPage> {
 
   final TextEditingController _searchController = TextEditingController();
 
-  // Data dummy catalog asli milikmu
-  final List<Map<String, dynamic>> dummyCatalog = [
-    {'name': 'Zhongli - Genshin Impact', 'price': 150000, 'stock': 2, 'anime': 'Genshin Impact', 'gender': 'Pria', 'status': 'Ready', 'sizes': 'S, M, L, XL'},
-    {'name': 'Anya Forger - Spy x Family', 'price': 80000, 'stock': 5, 'anime': 'Spy x Family', 'gender': 'Wanita', 'status': 'Ready', 'sizes': 'M, L'},
-    {'name': 'Akatsuki Cloak - Naruto', 'price': 50000, 'stock': 10, 'anime': 'Naruto', 'gender': 'Unisex', 'status': 'Ready', 'sizes': 'S, M, L, XL'},
-    {'name': 'Maid Dress Classic', 'price': 100000, 'stock': 3, 'anime': 'Original / Other', 'gender': 'Wanita', 'status': 'Ready', 'sizes': 'S, M'},
-  ];
-
- 
-  List<Map<String, dynamic>> _filteredCatalog = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    _filteredCatalog = dummyCatalog;
-
-    _searchController.addListener(_onSearchChanged);
-  }
-
   @override
   void dispose() {
-    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _onSearchChanged() {
-    setState(() {
-      _filteredCatalog = dummyCatalog
-          .where((item) => item['name']
-              .toString()
-              .toLowerCase()
-              .contains(_searchController.text.toLowerCase()))
-          .toList();
-    });
   }
 
   @override
@@ -111,6 +81,7 @@ class _AdminCatalogPageState extends State<AdminCatalogPage> {
               child: TextField(
                 controller: _searchController,
                 style: const TextStyle(color: _black, fontFamily: 'Inter'),
+                onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
                   hintText: "Cari kostum...",
                   hintStyle: const TextStyle(color: _grey500, fontSize: 14),
@@ -133,98 +104,138 @@ class _AdminCatalogPageState extends State<AdminCatalogPage> {
             const SizedBox(height: 16),
 
             Expanded(
-              child: _filteredCatalog.isEmpty
-                  ? const Center(
+              child: ValueListenableBuilder<List<CostumeData>>(
+                valueListenable: CostumeManager.instance.costumesNotifier,
+                builder: (context, allCostumes, child) {
+                  final search = _searchController.text.trim().toLowerCase();
+                  final filteredCostumes = allCostumes.where((item) {
+                    return search.isEmpty ||
+                        item.title.toLowerCase().contains(search) ||
+                        item.series.toLowerCase().contains(search);
+                  }).toList();
+
+                  if (filteredCostumes.isEmpty) {
+                    return const Center(
                       child: Text(
                         "Kostum tidak ditemukan.",
                         style: TextStyle(color: _grey500, fontFamily: 'Inter', fontSize: 14),
                       ),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _filteredCatalog.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        final item = _filteredCatalog[index];
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: _grey200),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF5F5F5),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.image_outlined, color: _grey500),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: filteredCostumes.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final item = filteredCostumes[index];
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _grey200),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(8),
+                                image: item.image.isNotEmpty
+                                    ? (item.image.startsWith('assets/')
+                                        ? DecorationImage(image: AssetImage(item.image), fit: BoxFit.cover)
+                                        : DecorationImage(image: NetworkImage(item.image), fit: BoxFit.cover))
+                                    : null,
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item['name'],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                        fontFamily: 'Inter',
-                                        color: _black,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Rp ${item['price']} / day',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        fontFamily: 'Inter',
-                                        color: _grey500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                              child: item.image.isEmpty
+                                  ? const Icon(Icons.image_outlined, color: _grey500)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Stock: ${item['stock']}',
+                                    item.title,
                                     style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      fontFamily: 'Inter',
+                                      color: _black,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Rp ${item.price} / day',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                       fontFamily: 'Inter',
                                       color: _grey500,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                   
-                                  IconButton(
-                                    constraints: const BoxConstraints(),
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(Icons.edit_outlined, size: 20, color: _black),
-                                    onPressed: () {
-                           
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AdminEditProductPage(productData: item),
-                                        ),
-                                      );
-                                    },
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Series: ${item.series} • Size: ${item.sizeDisplay}',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontFamily: 'Inter',
+                                      color: _grey500,
+                                    ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: item.isReady ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    item.isReady ? 'Ready' : 'Rented',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Inter',
+                                      color: item.isReady ? const Color(0xFF16A34A) : const Color(0xFFEF4444),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                IconButton(
+                                  constraints: const BoxConstraints(),
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(Icons.edit_outlined, size: 20, color: _black),
+                                  onPressed: () {
+                                    final originalIndex = allCostumes.indexOf(item);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AdminEditProductPage(
+                                          costume: item,
+                                          costumeIndex: originalIndex != -1 ? originalIndex : null,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),
