@@ -80,20 +80,30 @@ class RentalManager {
 
   // Getters for filtered rentals lists
   List<Rental> get activeRentals => rentalsNotifier.value
-      .where((r) =>
-          r.status == "Active" ||
+      .where((r) => _hasMonetaryValue(r) &&
+          (r.status == "Active" ||
           r.status == "Pending" ||
           r.status == "Packaging" ||
           r.status == "Shipped" ||
           r.status == "Cancellation Request" ||
           r.status == "Renting" ||
           r.status == "Returned" ||
-          r.status == "Checking")
+          r.status == "Checking"))
       .toList();
-  List<Rental> get completedRentals =>
-      rentalsNotifier.value.where((r) => r.status == "Completed").toList();
-  List<Rental> get canceledRentals =>
-      rentalsNotifier.value.where((r) => r.status == "Canceled").toList();
+  List<Rental> get completedRentals => rentalsNotifier.value
+      .where((r) => r.status == "Completed" && _hasMonetaryValue(r))
+      .toList();
+  List<Rental> get canceledRentals => rentalsNotifier.value
+      .where((r) => r.status == "Canceled" && _hasMonetaryValue(r))
+      .toList();
+  List<Rental> get monetaryRentals =>
+      rentalsNotifier.value.where(_hasMonetaryValue).toList();
+
+  bool _hasMonetaryValue(Rental rental) {
+    return (rental.totalRentPrice ?? 0) > 0 ||
+        (rental.deposit ?? 0) > 0 ||
+        (rental.grandTotal ?? 0) > 0;
+  }
 
   // Listen to Firestore real-time updates
   void _listenToFirestore() {
@@ -163,6 +173,9 @@ class RentalManager {
         status: "Cancellation Request",
         customerName: "Rian Wijaya",
         cancellationReason: "Salah pilih ukuran costume, ingin ganti ke XL.",
+        totalRentPrice: 120000,
+        deposit: 50000,
+        grandTotal: 170000,
         userId: currentUserId,
       ),
       Rental(
@@ -175,6 +188,9 @@ class RentalManager {
         endDate: DateTime.now().add(const Duration(days: 5)),
         status: "Pending",
         customerName: "Budi Santoso",
+        totalRentPrice: 135000,
+        deposit: 50000,
+        grandTotal: 185000,
         userId: currentUserId,
       ),
       Rental(
@@ -187,6 +203,9 @@ class RentalManager {
         endDate: DateTime.now().add(const Duration(days: 2)),
         status: "Packaging",
         customerName: "Ayu Lestari",
+        totalRentPrice: 110000,
+        deposit: 50000,
+        grandTotal: 160000,
         userId: currentUserId,
       ),
       Rental(
@@ -199,6 +218,9 @@ class RentalManager {
         endDate: DateTime.now().add(const Duration(days: 2)),
         status: "Shipped",
         customerName: "Siti Rahma",
+        totalRentPrice: 140000,
+        deposit: 50000,
+        grandTotal: 190000,
         userId: currentUserId,
       ),
       Rental(
@@ -211,6 +233,9 @@ class RentalManager {
         endDate: DateTime.now().add(const Duration(days: 1)),
         status: "Active",
         customerName: "Dimas",
+        totalRentPrice: 125000,
+        deposit: 50000,
+        grandTotal: 175000,
         userId: currentUserId,
       ),
       Rental(
@@ -225,6 +250,9 @@ class RentalManager {
         customerName: "Eka Putri",
         rating: 5.0,
         reviewText: "Kostumnya sangat wangi dan lengkap aksesorisnya!",
+        totalRentPrice: 150000,
+        deposit: 50000,
+        grandTotal: 200000,
         userId: currentUserId,
       ),
       Rental(
@@ -237,6 +265,9 @@ class RentalManager {
         endDate: DateTime.now().subtract(const Duration(days: 9)),
         status: "Canceled",
         customerName: "Fadel",
+        totalRentPrice: 90000,
+        deposit: 50000,
+        grandTotal: 140000,
         userId: currentUserId,
       ),
     ];
