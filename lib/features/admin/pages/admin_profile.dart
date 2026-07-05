@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/admin/pages/admin_store_settings.dart'; 
 import 'package:project_mopro/features/admin/pages/admin_manage_users_page.dart';
-import 'package:project_mopro/features/admin/pages/admin_payout_page.dart'; 
 import 'package:project_mopro/features/admin/pages/admin_identity_verification_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_voucher_point_page.dart'; 
 import 'package:project_mopro/features/auth/pages/login_page.dart';
@@ -115,19 +114,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 },
               ),
 
-              // Menu 3: Payout & Financials
-              _buildMenuRow(
-                icon: Icons.account_balance_outlined,
-                title: "Payout & Financials",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const AdminPayoutPage()),
-                  );
-                },
-              ),
-
-              // Menu 4: Identity Verification
+              // Menu 3: Identity Verification
               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: FirebaseSyncService.usersCollection()
                     .where('verificationStatus', isEqualTo: 'pending')
@@ -147,7 +134,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 },
               ),
 
-              // Menu 5: Voucher
+              // Menu 4: Voucher
               _buildMenuRow(
                 icon: Icons.confirmation_number_outlined,
                 title: "Voucher & Point",
@@ -159,7 +146,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                 },
               ),
 
-              // Menu 6: Notification Settings
+              // Menu 5: Notification Settings
               _buildMenuRow(
   icon: Icons.notifications_none_outlined,
   title: "Notification Settings",
