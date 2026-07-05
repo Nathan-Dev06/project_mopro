@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      builder: (context, child) => PhoneFrameWrapper(child: child!),
       title: 'Cosvoria Premium Cosplay Rental',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -156,6 +157,57 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
               label: "Profile",
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// =============================================
+// Phone Frame Wrapper (For Web/Desktop Demo)
+// =============================================
+class PhoneFrameWrapper extends StatelessWidget {
+  final Widget child;
+
+  const PhoneFrameWrapper({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.of(context).size.width < 600) {
+      return child;
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFE5E5E5),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: Container(
+              width: 390, // Rasio mantap
+              height: 844, // HP akan selalu memanjang
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(36), // Agak dikurangi biar ga terlalu bulat
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 30,
+                    spreadRadius: 5,
+                  ),
+                ],
+                border: Border.all(
+                  color: const Color(0xFF222222),
+                  width: 12,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: child,
+              ),
+            ),
+          ),
         ),
       ),
     );

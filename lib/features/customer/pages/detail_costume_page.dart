@@ -658,20 +658,27 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // â”€â”€ Header: Judul + Size Chips â”€â”€
-          Row(
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 12,
             children: [
-              const Icon(Icons.straighten_rounded,
-                  size: 18, color: _textPrimary),
-              const SizedBox(width: 8),
-              const Text(
-                'Panduan Ukuran',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: _textPrimary,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(Icons.straighten_rounded, size: 18, color: _textPrimary),
+                  SizedBox(width: 8),
+                  Text(
+                    'Panduan Ukuran',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: _textPrimary,
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
               // â”€â”€ Interactive Size Chips â”€â”€
               Row(
                 mainAxisSize: MainAxisSize.min,
