@@ -313,6 +313,13 @@ class RentalManager {
         .collection('rentals')
         .doc(rental.transactionId)
         .set(rentalData, SetOptions(merge: true));
+
+    // Update local list manually so UI sees it immediately
+    final updatedList = List<Rental>.from(rentalsNotifier.value);
+    // Remove if exists (to avoid duplicates)
+    updatedList.removeWhere((r) => r.transactionId == rental.transactionId);
+    updatedList.add(rental);
+    rentalsNotifier.value = updatedList;
   }
 
   // Update status or review detail in Firestore
