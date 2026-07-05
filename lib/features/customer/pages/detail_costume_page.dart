@@ -561,7 +561,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'HARGA SEWA',
+                  'RENTAL PRICE',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
@@ -974,7 +974,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    'Higienis & Siap Pakai',
+                    'Hygienic & Ready to Wear',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -983,7 +983,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Kostum sudah dicuci dengan laundry profesional, wangi, dan wig sudah di\u2011styling ulang \u2014 siap pakai langsung!',
+                    'Costumes are professionally laundered, fresh, and wigs are pre-styled \u2014 ready to wear right away!',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -1368,23 +1368,23 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                     context,
                     MaterialPageRoute(
                       builder: (context) => ReviewDetailsPage(
-                        costumeTitle: data['title'] ?? 'Kostum',
+                        costumeTitle: data['title'] ?? 'Costume',
                         reviewItems: [
                           {
                             'name': 'Arisa M.',
-                            'date': '2 minggu lalu',
+                            'date': '2 weeks ago',
                             'rating': 5,
                             'comment':
-                                'Kostumnya bagus banget, jahitannya rapi dan bahannya nyaman dipakai seharian. Wig-nya juga udah di-styling, jadi tinggal pakai. Pasti sewa lagi! 🔥',
+                                'The costume is amazing, the stitching is neat and the material is super comfortable to wear all day. The wig is pre-styled too, so it\'s ready to go. Will definitely rent again! \ud83d\udd25',
                             'avatar': 'A',
                             'avatarColor': const Color(0xFFC4B5FD),
                           },
                           {
                             'name': 'Riko S.',
-                            'date': '1 bulan lalu',
+                            'date': '1 month ago',
                             'rating': 5,
                             'comment':
-                                'Detail kostumnya sangat akurat, pokoknya worth it buat event cosplay. Pelayanannya juga ramah dan fast response. Recommended! ⭐',
+                                'The costume details are spot-on accurate, totally worth it for cosplay events. Great service and fast response too. Highly recommended! \u2b50',
                             'avatar': 'R',
                             'avatarColor': const Color(0xFFFBCFE8),
                           },
@@ -1397,7 +1397,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Lihat Semua',
+                      'See All',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1417,10 +1417,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
           // Review 1
           _reviewCard(
             name: 'Arisa M.',
-            date: '2 minggu lalu',
+            date: '2 weeks ago',
             rating: 5,
             comment:
-                'Kostumnya bagus banget, jahitannya rapi dan bahannya nyaman dipakai seharian. Wig-nya juga udah di-styling, jadi tinggal pakai. Pasti sewa lagi! ðŸ”¥',
+                'The costume is amazing, the stitching is neat and the material is super comfortable to wear all day. The wig is pre-styled too, so it\'s ready to go. Will definitely rent again! \ud83d\udd25',
             avatar: 'A',
             avatarColor: const Color(0xFFC4B5FD),
           ),
@@ -1429,10 +1429,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
           // Review 2
           _reviewCard(
             name: 'Riko S.',
-            date: '1 bulan lalu',
+            date: '1 month ago',
             rating: 5,
             comment:
-                'Detail kostumnya sangat akurat, pokoknya worth it buat event cosplay. Pelayanannya juga ramah dan fast response. Recommended! â­',
+                'The costume details are spot-on accurate, totally worth it for cosplay events. Great service and fast response too. Highly recommended! ⭐',
             avatar: 'R',
             avatarColor: const Color(0xFFFBCFE8),
           ),

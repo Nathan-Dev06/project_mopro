@@ -39,7 +39,7 @@ class CategoryPage extends StatelessWidget {
       body: results.isEmpty
           ? const Center(
               child: Text(
-                "Tidak ada kostum di kategori ini.",
+                "No costumes in this category.",
                 style: TextStyle(color: Colors.grey, fontFamily: 'Inter'),
               ),
             )

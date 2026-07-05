@@ -316,7 +316,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
-                              'Catatan: ${widget.shippingAddress!['notes']}',
+                              'Notes: ${widget.shippingAddress!['notes']}',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 12,
@@ -330,9 +330,9 @@ class _PaymentPageState extends State<PaymentPage> {
                   const SizedBox(height: 28),
                 ],
 
-                // RINCIAN TAGIHAN
+                // PAYMENT SUMMARY
                 Text(
-                  "Rincian Pembayaran",
+                  "Payment Summary",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w700,
@@ -358,20 +358,20 @@ class _PaymentPageState extends State<PaymentPage> {
                   child: Column(
                     children: [
                       _buildBillingRow(
-                        "Biaya Sewa (${widget.totalDays} Hari)",
+                        "Rental Fee (${widget.totalDays} Days)",
                         currencyFormat.format(widget.totalRentPrice),
                       ),
                       if (widget.discountAmount > 0) ...[
                         const SizedBox(height: 12),
                         _buildBillingRow(
-                          "Diskon Promo (${widget.voucherCode})",
+                          "Promo Discount (${widget.voucherCode})",
                           "-${currencyFormat.format(widget.discountAmount)}",
                           textColor: const Color(0xFF16A34A),
                         ),
                       ],
                       const SizedBox(height: 12),
                       _buildBillingRow(
-                        "Uang Jaminan (Refundable Deposit)",
+                        "Security Deposit (Refundable)",
                         currencyFormat.format(widget.deposit),
                       ),
                       Padding(
@@ -382,7 +382,7 @@ class _PaymentPageState extends State<PaymentPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Total Pembayaran",
+                            "Total Payment",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,
@@ -407,9 +407,9 @@ class _PaymentPageState extends State<PaymentPage> {
 
                 const SizedBox(height: 28),
 
-                // METODE PEMBAYARAN
+                // PAYMENT METHOD
                 Text(
-                  "Metode Pembayaran",
+                  "Payment Method",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w700,
@@ -540,7 +540,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   ? null
                   : () => _showPaymentSimulationDialog(context),
               child: Text(
-                "Bayar Sekarang",
+                "Pay Now",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.bold,

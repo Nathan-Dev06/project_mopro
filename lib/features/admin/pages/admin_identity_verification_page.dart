@@ -28,7 +28,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Identitas $name berhasil disetujui!'),
+        content: Text('Identity for $name approved successfully!'),
         backgroundColor: Colors.green,
       ),
     );
@@ -44,7 +44,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Identitas $name telah ditolak.'),
+        content: Text('Identity for $name has been rejected.'),
         backgroundColor: Colors.red,
       ),
     );
@@ -62,7 +62,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Validasi Identitas",
+          "Identity Verification",
           style: TextStyle(
             color: _black,
             fontSize: 20,
@@ -79,7 +79,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Text(
-                "Setujui atau tolak KTP pelanggan sebelum mereka bisa menyewa.",
+                "Approve or reject customer identity cards (KTP) before they can rent costumes.",
                 style: TextStyle(
                   color: _grey500,
                   fontSize: 14,
@@ -99,7 +99,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                   if (snapshot.hasError) {
                     return const Center(
                       child: Text(
-                        'Gagal memuat data verifikasi.',
+                        'Failed to load verification data.',
                         style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                       ),
                     );
@@ -119,7 +119,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                           Icon(Icons.gpp_good_outlined, size: 64, color: _grey200),
                           SizedBox(height: 16),
                           Text(
-                            "Semua identitas sudah divalidasi!",
+                            "All identities have been validated!",
                             style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                           ),
                         ],
@@ -136,7 +136,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                       final name = (item['name'] ?? 'Unknown').toString();
                       final email = (item['email'] ?? '').toString();
                       final ktp = (item['ktpNumber'] ?? item['ktp'] ?? '-').toString();
-                      final date = (item['verificationRequestedAtLabel'] ?? 'Menunggu review').toString();
+                      final date = (item['verificationRequestedAtLabel'] ?? 'Awaiting review').toString();
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
@@ -190,7 +190,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        "No. KTP: $ktp",
+                                        "ID Card No: $ktp",
                                         style: const TextStyle(
                                           color: _black,
                                           fontSize: 13,
@@ -227,7 +227,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                         ),
                                       ),
                                       child: const Text(
-                                        "Tolak",
+                                        "Reject",
                                         style: TextStyle(
                                           color: Colors.red,
                                           fontWeight: FontWeight.bold,
@@ -252,7 +252,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                         ),
                                       ),
                                       child: const Text(
-                                        "Setujui",
+                                        "Approve",
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Inter',

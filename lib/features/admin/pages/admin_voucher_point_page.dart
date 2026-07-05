@@ -54,20 +54,20 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
             children: [
               TextField(
                 controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Deskripsi'),
+                decoration: const InputDecoration(labelText: 'Description'),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: discountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Diskon (%)'),
+                decoration: const InputDecoration(labelText: 'Discount (%)'),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Batal'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -82,10 +82,10 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                 if (!mounted) return;
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Voucher ${voucher.code} berhasil diperbarui.')),
+                  SnackBar(content: Text('Voucher ${voucher.code} updated successfully.')),
                 );
               },
-              child: const Text('Simpan'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -98,16 +98,16 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Hapus Voucher'),
-          content: Text('Hapus voucher ${voucher.code}?'),
+          title: const Text('Delete Voucher'),
+          content: Text('Delete voucher ${voucher.code}?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Batal'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Hapus'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -121,7 +121,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Voucher ${voucher.code} dihapus.')),
+      SnackBar(content: Text('Voucher ${voucher.code} deleted.')),
     );
   }
 
@@ -167,7 +167,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                       Expanded(
                         child: _buildStatCard(
                           icon: Icons.confirmation_number_outlined,
-                          title: "Voucher Aktif",
+                          title: "Active Vouchers",
                           value: vouchers.length.toString(),
                         ),
                       ),
@@ -175,7 +175,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                       Expanded(
                         child: _buildStatCard(
                           icon: Icons.percent_outlined,
-                          title: "Total Terpakai",
+                          title: "Total Used",
                           value: '${usedCount}x',
                         ),
                       ),
@@ -189,7 +189,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween, 
                 children: [
                   const Text(
-                    "Voucher Aktif",
+                    "Active Vouchers",
                     style: TextStyle(
                       color: _black,
                       fontSize: 18,
@@ -209,7 +209,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                       if (result != null && result is Map<String, String>) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Voucher ${result['code']} Berhasil Dibuat! ðŸŽ‰'),
+                            content: Text('Voucher ${result['code']} Created Successfully! 🎉'),
                             backgroundColor: Colors.green,
                           ),
                         );
@@ -217,7 +217,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                     },
                     icon: const Icon(Icons.add, size: 18, color: _black),
                     label: const Text(
-                      "Buat",
+                      "Create",
                       style: TextStyle(color: _black, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                     ),
                     style: OutlinedButton.styleFrom(
@@ -237,7 +237,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                     if (vouchers.isEmpty) {
                       return const Center(
                         child: Text(
-                          'Belum ada voucher.',
+                          'No vouchers created yet.',
                           style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                         ),
                       );
@@ -285,11 +285,11 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Terpakai: ${item.usageCount}x",
+                                    "Used: ${item.usageCount}x",
                                     style: const TextStyle(color: _black, fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'Inter'),
                                   ),
                                   Text(
-                                    item.isClaimed ? 'Claimed' : 'Belum diklaim',
+                                    item.isClaimed ? 'Claimed' : 'Not claimed yet',
                                     style: const TextStyle(color: _grey500, fontSize: 12, fontFamily: 'Inter'),
                                   ),
                                 ],
@@ -320,7 +320,7 @@ class _AdminVoucherPointPageState extends State<AdminVoucherPointPage> {
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                       ),
                                       child: const Text(
-                                        'Hapus',
+                                        'Delete',
                                         style: TextStyle(color: Colors.red, fontFamily: 'Inter', fontWeight: FontWeight.w700),
                                       ),
                                     ),

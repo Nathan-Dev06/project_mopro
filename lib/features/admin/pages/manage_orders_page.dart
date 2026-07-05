@@ -59,11 +59,27 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                   children: [
                     _FilterChip('All', _selectedFilter == 'All', () => setState(() => _selectedFilter = 'All')),
                     const SizedBox(width: 8),
-                    _FilterChip('Active', _selectedFilter == 'Active', () => setState(() => _selectedFilter = 'Active')),
+                    _FilterChip('Ongoing', _selectedFilter == 'Ongoing', () => setState(() => _selectedFilter = 'Ongoing')),
                     const SizedBox(width: 8),
                     _FilterChip('Pending', _selectedFilter == 'Pending', () => setState(() => _selectedFilter = 'Pending')),
                     const SizedBox(width: 8),
+                    _FilterChip('Packaging', _selectedFilter == 'Packaging', () => setState(() => _selectedFilter = 'Packaging')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Shipped', _selectedFilter == 'Shipped', () => setState(() => _selectedFilter = 'Shipped')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Active', _selectedFilter == 'Active', () => setState(() => _selectedFilter = 'Active')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Renting', _selectedFilter == 'Renting', () => setState(() => _selectedFilter = 'Renting')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Returned', _selectedFilter == 'Returned', () => setState(() => _selectedFilter = 'Returned')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Checking', _selectedFilter == 'Checking', () => setState(() => _selectedFilter = 'Checking')),
+                    const SizedBox(width: 8),
                     _FilterChip('Completed', _selectedFilter == 'Completed', () => setState(() => _selectedFilter = 'Completed')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Cancellation', _selectedFilter == 'Cancellation', () => setState(() => _selectedFilter = 'Cancellation')),
+                    const SizedBox(width: 8),
+                    _FilterChip('Canceled', _selectedFilter == 'Canceled', () => setState(() => _selectedFilter = 'Canceled')),
                     const SizedBox(width: 8),
                     _FilterChip('Walk-in', _selectedFilter == 'Walk-in', () => setState(() => _selectedFilter = 'Walk-in')),
                   ],
@@ -74,13 +90,20 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
               child: ValueListenableBuilder<List<Rental>>(
                 valueListenable: RentalManager.instance.rentalsNotifier,
                 builder: (context, rentals, child) {
-                  // Filter orders
+                  // Filter orders — each filter matches EXACTLY its own status
                   List<Rental> filteredRentals = rentals.where((rental) {
                     if (_selectedFilter == 'All') {
                       return true;
                     } else if (_selectedFilter == 'Walk-in') {
                       return rental.userId == 'walkin-customer';
+                    } else if (_selectedFilter == 'Ongoing') {
+                      // Ongoing = all non-completed, non-canceled statuses
+                      return rental.status != 'Completed' &&
+                             rental.status != 'Canceled';
+                    } else if (_selectedFilter == 'Cancellation') {
+                      return rental.status == 'Cancellation Request';
                     } else {
+                      // Exact status match for all other filters
                       return rental.status == _selectedFilter;
                     }
                   }).toList();
@@ -93,7 +116,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                           Icon(Icons.receipt_long_outlined, color: _grey500, size: 64),
                           const SizedBox(height: 16),
                           Text(
-                            _selectedFilter == 'Walk-in' ? 'Belum ada pesanan walk-in' : 'Belum ada pesanan',
+                            _selectedFilter == 'Walk-in' ? 'No walk-in orders yet' : 'No orders yet',
                             style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                           ),
                         ],
@@ -273,7 +296,7 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const Text(
-                                      'Tanggal Sewa',
+                                      'Rental Dates',
                                       style: TextStyle(
                                         fontFamily: 'Inter',
                                         fontSize: 11,

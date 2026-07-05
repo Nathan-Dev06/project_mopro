@@ -49,7 +49,7 @@ class _ManageShippingPageState extends State<ManageShippingPage> {
         ),
         centerTitle: true,
         title: const Text(
-          "Atur Pengiriman",
+          "Arrange Shipment",
           style: TextStyle(
             color: Colors.black,
             fontFamily: 'Inter',
@@ -176,14 +176,14 @@ class _ManageShippingPageState extends State<ManageShippingPage> {
                         // Recipient info
                         _buildLabelRow(
                           icon: Icons.person_pin_circle_rounded,
-                          title: "Penerima",
+                          title: "Recipient",
                           content: "$recipientName\n$recipientPhone\n$recipientAddress",
                         ),
                         const SizedBox(height: 20),
                         // Sender info
                         _buildLabelRow(
                           icon: Icons.store_mall_directory_rounded,
-                          title: "Pengirim",
+                          title: "Sender",
                           content: "Cosvoria Studio\n+62 821-3456-7890\nJl. Meruya Selatan No. 12, Kembangan, Jakarta Barat",
                         ),
                       ],
@@ -297,7 +297,7 @@ class _ManageShippingPageState extends State<ManageShippingPage> {
                   ),
                 ),
                 child: const Text(
-                  "Setel Kirim",
+                  "Ship Order",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w800,

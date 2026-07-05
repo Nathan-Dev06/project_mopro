@@ -52,8 +52,8 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
                   children: [
             
                     _buildNotificationSwitch(
-                      title: "Order Baru",
-                      subtitle: "Notifikasi saat ada order masuk",
+                      title: "New Order",
+                      subtitle: "Notify when a new order is received",
                       value: _isOrderBaru,
                       onChanged: (val) {
                         setState(() {
@@ -64,8 +64,8 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
 
      
                     _buildNotificationSwitch(
-                      title: "Pengajuan Verifikasi KTP",
-                      subtitle: "Notifikasi pengajuan baru",
+                      title: "Identity Verification Submission",
+                      subtitle: "Notify when a new ID is submitted for review",
                       value: _isVerifikasiKTP,
                       onChanged: (val) {
                         setState(() {
@@ -75,8 +75,8 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
                     ),
 
                     _buildNotificationSwitch(
-                      title: "Stock Menipis",
-                      subtitle: "Peringatan saat stock ≤ 1",
+                      title: "Low Stock Alert",
+                      subtitle: "Notify when item stock is 1 or less",
                       value: _isStockMenipis,
                       onChanged: (val) {
                         setState(() {
@@ -87,8 +87,8 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
 
             
                     _buildNotificationSwitch(
-                      title: "Voucher Akan Expired",
-                      subtitle: "Peringatan 3 hari sebelum expired",
+                      title: "Voucher Expiring Soon",
+                      subtitle: "Notify 3 days before voucher expires",
                       value: _isVoucherExpired,
                       onChanged: (val) {
                         setState(() {
@@ -112,7 +112,7 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
              
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Pengaturan notifikasi berhasil disimpan!'),
+                        content: Text('Notification settings saved successfully!'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -126,7 +126,7 @@ class _AdminNotificationSettingsPageState extends State<AdminNotificationSetting
                     elevation: 0,
                   ),
                   child: const Text(
-                    "Simpan",
+                    "Save Settings",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,

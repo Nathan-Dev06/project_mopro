@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:project_mopro/core/services/report_service.dart';
+import 'package:project_mopro/core/managers/rental_manager.dart';
 import 'package:project_mopro/core/models/user_profile.dart';
 import 'package:project_mopro/features/admin/pages/manage_orders_page.dart';
 import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_walkin_order_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_financial_report_page.dart';
+import 'package:project_mopro/core/services/firebase_sync_service.dart';
+import 'package:project_mopro/features/admin/pages/admin_identity_verification_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminDashboard extends StatefulWidget {
   final VoidCallback? onSeeAllPressed;
@@ -36,9 +40,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now();
-    final todayIncome = ReportService.incomeForDay(today);
-    final monthIncome = ReportService.incomeForMonth(today.year, today.month);
     final top = ReportService.topCostumes(limit: 10);
 
     return Scaffold(
@@ -134,86 +135,124 @@ class _AdminDashboardState extends State<AdminDashboard> {
               const SizedBox(height: 28),
 
               // ── Summary Cards ──
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 20),
-  child: Row(
-    children: [
-      _SummaryCard(
-        title: 'Today Income',
-        value: ReportService.formatCurrency(todayIncome),
-        icon: Icons.payments_outlined,
-        gradientColors: const [Color(0xFF6A11CB), Color(0xFF2575FC)],
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AdminFinancialReportPage(), // Diubah ke sini
-            ),
-          );
-        },
-      ),
-      const SizedBox(width: 12),
-      _SummaryCard(
-        title: 'This Month',
-        value: ReportService.formatCurrency(monthIncome),
-        icon: Icons.account_balance_wallet_outlined,
-        gradientColors: const [Color(0xFFFF6B00), Color(0xFFE91E8C)],
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AdminFinancialReportPage(), // Diubah ke sini
-            ),
-          );
-        },
-      ),
-    ],
-  ),
-),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    _SummaryCard(
-                      title: 'Active Rentals',
-                      value: '12',
-                      icon: Icons.local_mall_outlined,
-                      gradientColors: const [
-                        Color(0xFF22C55E),
-                        Color(0xFF16A34A)
-                      ],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                const ManageOrdersPage(initialFilter: 'Active'),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 12),
-                    _SummaryCard(
-                      title: 'Pending Verify',
-                      value: '4',
-                      icon: Icons.verified_user_outlined,
-                      gradientColors: const [
-                        Color(0xFFEF4444),
-                        Color(0xFFDC2626)
-                      ],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ManageOrdersPage(
-                                initialFilter: 'Pending'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+              // ── Summary Cards ──
+              ValueListenableBuilder<List<Rental>>(
+                valueListenable: RentalManager.instance.rentalsNotifier,
+                builder: (context, rentals, child) {
+                  final now = DateTime.now();
+                  final todayStart = DateTime(now.year, now.month, now.day);
+                  final todayEnd = todayStart.add(const Duration(days: 1));
+                  
+                  // Calculate income dynamically from all rentals where start date is today
+                  final todayIncome = rentals
+                      .where((r) => !r.startDate.isBefore(todayStart) && r.startDate.isBefore(todayEnd))
+                      .fold<int>(0, (sum, r) => sum + (r.totalRentPrice ?? 0) + (r.deposit ?? 0));
+
+                  // Calculate income dynamically from all rentals where start date is within current month
+                  final monthStart = DateTime(now.year, now.month, 1);
+                  final monthEnd = (now.month == 12) ? DateTime(now.year + 1, 1, 1) : DateTime(now.year, now.month + 1, 1);
+                  final monthIncome = rentals
+                      .where((r) => !r.startDate.isBefore(monthStart) && r.startDate.isBefore(monthEnd))
+                      .fold<int>(0, (sum, r) => sum + (r.totalRentPrice ?? 0) + (r.deposit ?? 0));
+
+                  // Calculate active rentals dynamically
+                  final activeRentalsCount = RentalManager.instance.activeRentals.length;
+
+                  // Calculate pending orders (Pending verification status) dynamically
+                  final pendingCount = rentals.where((r) => r.status == 'Pending').length;
+
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            _SummaryCard(
+                              title: 'Today Income',
+                              value: ReportService.formatCurrency(todayIncome),
+                              icon: Icons.payments_outlined,
+                              gradientColors: const [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AdminFinancialReportPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 12),
+                            _SummaryCard(
+                              title: 'This Month',
+                              value: ReportService.formatCurrency(monthIncome),
+                              icon: Icons.account_balance_wallet_outlined,
+                              gradientColors: const [Color(0xFFFF6B00), Color(0xFFE91E8C)],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const AdminFinancialReportPage(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          children: [
+                            _SummaryCard(
+                              title: 'Ongoing Orders',
+                              value: '$activeRentalsCount',
+                              icon: Icons.local_mall_outlined,
+                              gradientColors: const [
+                                Color(0xFF22C55E),
+                                Color(0xFF16A34A)
+                              ],
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ManageOrdersPage(initialFilter: 'Ongoing'),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 12),
+                            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                              stream: FirebaseSyncService.usersCollection()
+                                  .where('verificationStatus', isEqualTo: 'pending')
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                final count = snapshot.data?.docs.length ?? 0;
+                                return _SummaryCard(
+                                  title: 'Pending Verify',
+                                  value: '$count',
+                                  icon: Icons.verified_user_outlined,
+                                  gradientColors: const [
+                                    Color(0xFFEF4444),
+                                    Color(0xFFDC2626)
+                                  ],
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const AdminIdentityVerificationPage(),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
 
               const SizedBox(height: 32),
@@ -237,8 +276,8 @@ Padding(
                 child: Column(
                   children: [
                     _MenuCard(
-                      title: 'Laporan Keuangan',
-                      subtitle: 'Lihat laporan keuangan lengkap',
+                      title: 'Financial Report',
+                      subtitle: 'View complete financial reports',
                       icon: Icons.bar_chart_outlined,
                       onTap: () {
                         Navigator.push(
@@ -255,8 +294,8 @@ Padding(
                     ),
                     const SizedBox(height: 12),
                     _MenuCard(
-                      title: 'Buat Pesanan Walk-in',
-                      subtitle: 'Pesanan manual untuk customer langsung',
+                      title: 'Create Walk-in Order',
+                      subtitle: 'Manual order for direct customers',
                       icon: Icons.person_add_alt_1_outlined,
                       onTap: () {
                         Navigator.push(

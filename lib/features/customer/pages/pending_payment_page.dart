@@ -419,7 +419,7 @@ class _PendingPaymentPageState extends State<PendingPaymentPage> {
                   ),
                 ),
                 child: const Text(
-                  "Bayar Sekarang",
+                  "Pay Now",
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w800,

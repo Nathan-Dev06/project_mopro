@@ -126,7 +126,7 @@ class DepositBalancePage extends StatelessWidget {
                                     onPressed: () {
                                       if (depositBalance < 20000) {
                                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                          content: Text("Minimal penarikan adalah Rp 20.000"),
+                                          content: Text("Minimum withdrawal is Rp 20,000"),
                                           backgroundColor: _K.red,
                                         ));
                                         return;
@@ -189,10 +189,10 @@ class DepositBalancePage extends StatelessWidget {
                             child: Padding(
                               padding: EdgeInsets.all(32.0),
                               child: Center(
-                                child: Text(
-                                  "Belum ada riwayat transaksi.",
-                                  style: TextStyle(color: _K.grey500, fontFamily: 'Inter'),
-                                ),
+                                  child: Text(
+                                    "No transaction history yet.",
+                                    style: TextStyle(color: _K.grey500, fontFamily: 'Inter'),
+                                  ),
                               ),
                             ),
                           );
@@ -314,10 +314,10 @@ class _TransactionTile extends StatelessWidget {
                               const Icon(Icons.info_outline_rounded, color: Color(0xFF856404), size: 14),
                               const SizedBox(width: 6),
                               Expanded(
-                                child: Text(
-                                  "Potongan ${format.format(deductionAmount)}: $deductionReason",
-                                  style: const TextStyle(color: Color(0xFF856404), fontFamily: 'Inter', fontSize: 11, fontWeight: FontWeight.w500),
-                                ),
+                                  child: Text(
+                                    "Deduction of ${format.format(deductionAmount)}: $deductionReason",
+                                    style: const TextStyle(color: Color(0xFF856404), fontFamily: 'Inter', fontSize: 11, fontWeight: FontWeight.w500),
+                                  ),
                               ),
                             ],
                           ),
@@ -396,7 +396,7 @@ class _TransactionDetailModal extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Detail Transaksi",
+                "Transaction Details",
                 style: TextStyle(fontFamily: 'Inter', fontSize: 18, fontWeight: FontWeight.w700, color: _K.black),
               ),
               IconButton(
@@ -434,7 +434,7 @@ class _TransactionDetailModal extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  isAddition ? "Dana Masuk (Refund)" : "Penarikan Berhasil",
+                  isAddition ? "Funds In (Refund)" : "Withdrawal Successful",
                   style: const TextStyle(color: _K.grey500, fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -442,19 +442,19 @@ class _TransactionDetailModal extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           const Text(
-            "Rincian",
+            "Details",
             style: TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w700, color: _K.black),
           ),
           const SizedBox(height: 16),
-          _buildDetailRow("Keterangan", title),
-          _buildDetailRow("Tanggal", dateStr),
-          _buildDetailRow("Status", "Berhasil", isStatus: true),
+          _buildDetailRow("Description", title),
+          _buildDetailRow("Date", dateStr),
+          _buildDetailRow("Status", "Successful", isStatus: true),
           if (isAddition) ...[
             const Divider(height: 32, color: _K.grey200),
-            _buildDetailRow("Total Uang Jaminan", format.format(totalDeposit)),
-            _buildDetailRow("Denda / Potongan", "- ${format.format(deductionAmount)}", isDeduction: true),
+            _buildDetailRow("Total Security Deposit", format.format(totalDeposit)),
+            _buildDetailRow("Fine / Deduction", "- ${format.format(deductionAmount)}", isDeduction: true),
             if (deductionAmount > 0)
-              _buildDetailRow("Alasan Potongan", deductionReason),
+              _buildDetailRow("Deduction Reason", deductionReason),
           ],
           const SizedBox(height: 32),
         ],
@@ -527,15 +527,15 @@ class _WithdrawModalState extends State<_WithdrawModal> {
     final account = _accountController.text.trim();
 
     if (amount < 20000) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Minimal penarikan adalah Rp 20.000")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Minimum withdrawal is Rp 20,000")));
       return;
     }
     if (amount > widget.currentBalance) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saldo tidak mencukupi")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Insufficient balance")));
       return;
     }
     if (account.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Masukkan nomor rekening / HP")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please enter account number / HP")));
       return;
     }
 
@@ -566,13 +566,13 @@ class _WithdrawModalState extends State<_WithdrawModal> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Permintaan penarikan berhasil dikirim."),
+          content: Text("Withdrawal request successfully sent."),
           backgroundColor: _K.green,
         ));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Terjadi kesalahan: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("An error occurred: $e")));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -615,7 +615,7 @@ class _WithdrawModalState extends State<_WithdrawModal> {
           ),
           const SizedBox(height: 24),
           const Text(
-            "Pilih Metode Penarikan",
+            "Select Withdrawal Method",
             style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
           ),
           const SizedBox(height: 8),
@@ -642,7 +642,7 @@ class _WithdrawModalState extends State<_WithdrawModal> {
           ),
           const SizedBox(height: 16),
           const Text(
-            "Nomor Rekening / E-Wallet",
+            "Account Number / E-Wallet",
             style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
           ),
           const SizedBox(height: 8),
@@ -651,7 +651,7 @@ class _WithdrawModalState extends State<_WithdrawModal> {
             keyboardType: TextInputType.number,
             style: const TextStyle(fontFamily: 'Inter', fontSize: 14),
             decoration: InputDecoration(
-              hintText: "Contoh: 081234567890",
+              hintText: "Example: 081234567890",
               hintStyle: const TextStyle(color: _K.grey500),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: _K.grey200)),
@@ -663,11 +663,11 @@ class _WithdrawModalState extends State<_WithdrawModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Nominal Penarikan",
+                "Withdrawal Amount",
                 style: TextStyle(fontFamily: 'Inter', fontSize: 13, fontWeight: FontWeight.w600, color: _K.black),
               ),
               Text(
-                "Maks: ${formatCurrency.format(widget.currentBalance)}",
+                "Max: ${formatCurrency.format(widget.currentBalance)}",
                 style: const TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w500, color: _K.blue),
               ),
             ],
@@ -701,7 +701,7 @@ class _WithdrawModalState extends State<_WithdrawModal> {
               ),
               child: _isLoading
                   ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text("Tarik Dana", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 15)),
+                  : const Text("Withdraw Funds", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 15)),
             ),
           )
         ],

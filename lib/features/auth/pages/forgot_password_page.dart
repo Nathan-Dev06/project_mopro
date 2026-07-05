@@ -19,7 +19,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     if (email.isEmpty) {
       setState(() {
-        _message = "Masukkan email";
+        _message = "Please enter your email";
       });
       return;
     }
@@ -30,7 +30,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     if (!emailRegex.hasMatch(email)) {
       setState(() {
-        _message = "Format email tidak valid";
+        _message = "Invalid email format";
       });
       return;
     }
@@ -47,11 +47,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
       setState(() {
         _message =
-            "Link reset password telah dikirim ke email Anda.";
+            "A password reset link has been sent to your email.";
       });
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _message = e.message ?? "Gagal mengirim email reset";
+        _message = e.message ?? "Failed to send reset email";
       });
     }
 

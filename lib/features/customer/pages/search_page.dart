@@ -451,7 +451,7 @@ class _SearchPageState extends State<SearchPage> {
           height: 280,
           child: categoryItems.isEmpty
               ? const Center(
-                  child: Text("Belum ada kostum",
+                  child: Text("No costumes yet",
                       style: TextStyle(color: _grey500)),
                 )
               : ListView.separated(

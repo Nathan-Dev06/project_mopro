@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/auth/pages/login_page.dart';
@@ -115,9 +116,16 @@ class MyRentalsPage extends StatelessWidget {
         body: ValueListenableBuilder<List<Rental>>(
           valueListenable: RentalManager.instance.rentalsNotifier,
           builder: (context, rentals, child) {
-            final activeRentals = RentalManager.instance.activeRentals;
-            final completedRentals = RentalManager.instance.completedRentals;
-            final canceledRentals = RentalManager.instance.canceledRentals;
+            final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+            final activeRentals = RentalManager.instance.activeRentals
+                .where((r) => r.userId == currentUserId)
+                .toList();
+            final completedRentals = RentalManager.instance.completedRentals
+                .where((r) => r.userId == currentUserId)
+                .toList();
+            final canceledRentals = RentalManager.instance.canceledRentals
+                .where((r) => r.userId == currentUserId)
+                .toList();
 
             return TabBarView(
               children: [
@@ -1835,20 +1843,32 @@ class _EmptyStateTab extends StatelessWidget {
 class IdentityVerificationPage extends StatelessWidget {
   const IdentityVerificationPage({Key? key}) : super(key: key);
 
-  Future<void> _submitKtp(BuildContext context, String ktpNumber) async {
+  Future<bool> _submitKtp(BuildContext context, String ktpNumber) async {
     final user = FirebaseAuth.instance.currentUser;
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     if (user == null) {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Silakan login terlebih dahulu.')),
+        const SnackBar(content: Text('Please login first.')),
       );
-      return;
+      return false;
+    }
+
+    final trimmedKtp = ktpNumber.trim();
+    final numericRegex = RegExp(r'^[0-9]+$');
+    if (trimmedKtp.length != 16 || !numericRegex.hasMatch(trimmedKtp)) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('ID number must be exactly 16 digits and numeric only.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
     }
 
     await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
       {
-        'ktpNumber': ktpNumber.trim(),
+        'ktpNumber': trimmedKtp,
         'verificationStatus': 'pending',
         'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
         'verificationSubmittedAt': FieldValue.serverTimestamp(),
@@ -1856,11 +1876,12 @@ class IdentityVerificationPage extends StatelessWidget {
       SetOptions(merge: true),
     );
 
-    if (!navigator.mounted) return;
+    if (!navigator.mounted) return true;
 
     messenger.showSnackBar(
-      const SnackBar(content: Text('KTP berhasil dikirim ke admin untuk verifikasi.')),
+      const SnackBar(content: Text('ID successfully submitted to admin for verification.')),
     );
+    return true;
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> _verificationStream() {
@@ -1984,28 +2005,32 @@ class IdentityVerificationPage extends StatelessWidget {
                             final dialogNavigator = Navigator.of(dialogContext);
 
                             return AlertDialog(
-                              title: const Text('Upload KTP / Kartu Pelajar'),
+                              title: const Text('Upload ID / Student Card'),
                               content: TextField(
                                 controller: ktpController,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(16),
+                                ],
                                 decoration: const InputDecoration(
-                                  labelText: 'Nomor KTP / Kartu Pelajar',
+                                  labelText: 'ID / Student Card Number',
                                   hintText: '3175xxxxxxxxxxxx',
                                 ),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(dialogContext),
-                                  child: const Text('Batal'),
+                                  child: const Text('Cancel'),
                                 ),
                                 ElevatedButton(
                                   onPressed: () async {
-                                    await _submitKtp(context, ktpController.text);
-                                    if (dialogNavigator.mounted) {
+                                    final success = await _submitKtp(context, ktpController.text);
+                                    if (success && dialogNavigator.mounted) {
                                       dialogNavigator.pop();
                                     }
                                   },
-                                  child: const Text('Kirim'),
+                                  child: const Text('Submit'),
                                 ),
                               ],
                             );
@@ -2014,7 +2039,7 @@ class IdentityVerificationPage extends StatelessWidget {
                       },
                       icon: const Icon(Icons.upload_file_outlined, size: 20),
                       label: const Text(
-                        "Upload KTP / Kartu Pelajar",
+                        "Upload ID / Student Card",
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -2118,7 +2143,7 @@ Future<void> _saveSizeProfile() async {
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Gagal menyimpan data: $e'),
+        content: Text('Failed to save data: $e'),
       ),
     );
   }
@@ -2405,7 +2430,7 @@ class MyVouchersPage extends StatelessWidget {
                             final messenger = ScaffoldMessenger.of(context);
                             await VoucherManager.instance.claimVoucher(voucher.code);
                             messenger.showSnackBar(
-                              SnackBar(content: Text('Voucher ${voucher.code} berhasil diklaim.')),
+                              SnackBar(content: Text('Voucher ${voucher.code} successfully claimed.')),
                             );
                           },
                           style: OutlinedButton.styleFrom(
@@ -2914,7 +2939,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Profil berhasil diperbarui'),
+          content: const Text('Profile updated successfully'),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -2931,7 +2956,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Gagal menyimpan profile: $e'),
+          content: Text('Failed to save profile: $e'),
         ),
       );
     }

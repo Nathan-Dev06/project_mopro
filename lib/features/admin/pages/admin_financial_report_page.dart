@@ -65,7 +65,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                   ),
                 ),
                 const Text(
-                  'Pilih Filter Cetak',
+                  'Select Print Filter',
                   style: TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold,
                     fontFamily: 'Inter', color: _black,
@@ -73,14 +73,14 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Pilih rentang waktu laporan yang ingin dicetak',
+                  'Select the report time range you wish to print',
                   style: TextStyle(fontSize: 14, color: Color(0xFF888888), fontFamily: 'Inter'),
                 ),
                 const SizedBox(height: 20),
                 _FilterOption(
                   icon: Icons.calendar_month,
-                  title: 'Per Bulan',
-                  subtitle: 'Cetak laporan untuk bulan tertentu',
+                  title: 'Monthly',
+                  subtitle: 'Print report for a specific month',
                   onTap: () {
                     Navigator.pop(ctx);
                     _pickMonth();
@@ -89,8 +89,8 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                 const SizedBox(height: 12),
                 _FilterOption(
                   icon: Icons.calendar_today_outlined,
-                  title: 'Per Tahun',
-                  subtitle: 'Cetak laporan untuk tahun tertentu',
+                  title: 'Yearly',
+                  subtitle: 'Print report for a specific year',
                   onTap: () {
                     Navigator.pop(ctx);
                     _pickYear();
@@ -109,8 +109,8 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
     int selectedMonth = DateTime.now().month;
     final years = List.generate(DateTime.now().year - 2019, (i) => 2020 + i);
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
     showDialog(
@@ -119,27 +119,27 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
         return StatefulBuilder(
           builder: (ctx2, setDialogState) {
             return AlertDialog(
-              title: const Text('Pilih Bulan', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+              title: const Text('Select Month', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<int>(
                     value: selectedMonth,
-                    decoration: const InputDecoration(labelText: 'Bulan'),
+                    decoration: const InputDecoration(labelText: 'Month'),
                     items: List.generate(12, (i) => DropdownMenuItem(value: i + 1, child: Text(months[i]))),
                     onChanged: (v) => setDialogState(() => selectedMonth = v!),
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<int>(
                     value: selectedYear,
-                    decoration: const InputDecoration(labelText: 'Tahun'),
+                    decoration: const InputDecoration(labelText: 'Year'),
                     items: years.map((y) => DropdownMenuItem(value: y, child: Text('$y'))).toList(),
                     onChanged: (v) => setDialogState(() => selectedYear = v!),
                   ),
                 ],
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: _black),
                   onPressed: () {
@@ -158,7 +158,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                       ),
                     );
                   },
-                  child: const Text('Cetak', style: TextStyle(color: Colors.white)),
+                  child: const Text('Print', style: TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -178,15 +178,15 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
         return StatefulBuilder(
           builder: (ctx2, setDialogState) {
             return AlertDialog(
-              title: const Text('Pilih Tahun', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
+              title: const Text('Select Year', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.bold)),
               content: DropdownButtonFormField<int>(
                 value: selectedYear,
-                decoration: const InputDecoration(labelText: 'Tahun'),
+                decoration: const InputDecoration(labelText: 'Year'),
                 items: years.map((y) => DropdownMenuItem(value: y, child: Text('$y'))).toList(),
                 onChanged: (v) => setDialogState(() => selectedYear = v!),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: _black),
                   onPressed: () {
@@ -198,14 +198,14 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                       MaterialPageRoute(
                         builder: (_) => AdminFinancialReportPreviewPage(
                           filterType: 'year',
-                          filterLabel: 'Tahun $selectedYear',
+                          filterLabel: 'Year $selectedYear',
                           startDate: start,
                           endDate: end,
                         ),
                       ),
                     );
                   },
-                  child: const Text('Cetak', style: TextStyle(color: Colors.white)),
+                  child: const Text('Print', style: TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -217,10 +217,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
     final dateFormat = DateFormat('dd MMM yyyy');
-    final todayIncome = ReportService.incomeForDay(now);
-    final monthIncome = ReportService.incomeForMonth(now.year, now.month);
 
     return Scaffold(
       backgroundColor: _bg,
@@ -228,7 +225,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
         backgroundColor: _bg,
         elevation: 0,
         title: const Text(
-          'Laporan Keuangan',
+          'Financial Report',
           style: TextStyle(
             color: _black,
             fontSize: 20,
@@ -240,34 +237,50 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
           IconButton(
             icon: const Icon(Icons.print_outlined, color: _black),
             onPressed: _openReportPreview,
-            tooltip: 'Cetak Laporan',
+            tooltip: 'Print Report',
           ),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
+        child: ValueListenableBuilder<List<Rental>>(
+          valueListenable: RentalManager.instance.rentalsNotifier,
+          builder: (context, rentals, child) {
+            final now = DateTime.now();
+            final todayStart = DateTime(now.year, now.month, now.day);
+            final todayEnd = todayStart.add(const Duration(days: 1));
+            
+            // Calculate today's revenue dynamically
+            final todayIncome = rentals
+                .where((r) => !r.startDate.isBefore(todayStart) && r.startDate.isBefore(todayEnd))
+                .fold<int>(0, (sum, r) => sum + (r.totalRentPrice ?? 0) + (r.deposit ?? 0));
 
-              // Quick Stats Grid
-              StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseSyncService.financialSummaryDoc().snapshots(),
-                builder: (context, summarySnapshot) {
-                  final summary = summarySnapshot.data?.data() ??
-                      FirebaseSyncService.defaultFinancialSummary();
-                  final totalIncome = (summary['totalIncome'] ?? 0) as int;
+            // Calculate this month's revenue dynamically
+            final monthStart = DateTime(now.year, now.month, 1);
+            final monthEnd = (now.month == 12) ? DateTime(now.year + 1, 1, 1) : DateTime(now.year, now.month + 1, 1);
+            final monthIncome = rentals
+                .where((r) => !r.startDate.isBefore(monthStart) && r.startDate.isBefore(monthEnd))
+                .fold<int>(0, (sum, r) => sum + (r.totalRentPrice ?? 0) + (r.deposit ?? 0));
 
-                  return Column(
+            // Calculate total revenue dynamically
+            final totalIncome = rentals
+                .fold<int>(0, (sum, r) => sum + (r.totalRentPrice ?? 0) + (r.deposit ?? 0));
+
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+
+                  // Quick Stats Grid
+                  Column(
                     children: [
                       Row(
                         children: [
                           Expanded(
                             child: _QuickStatCard(
-                              label: 'Pendapatan Hari Ini',
+                              label: 'Today\'s Revenue',
                               value: _currency(todayIncome),
                               icon: Icons.calendar_today,
                               gradientColors: const [
@@ -279,7 +292,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _QuickStatCard(
-                              label: 'Pendapatan Bulan Ini',
+                              label: 'This Month\'s Revenue',
                               value: _currency(monthIncome),
                               icon: Icons.calendar_month,
                               gradientColors: const [
@@ -295,7 +308,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                         children: [
                           Expanded(
                             child: _QuickStatCard(
-                              label: 'Total Pendapatan',
+                              label: 'Total Revenue',
                               value: _currency(totalIncome),
                               icon: Icons.trending_up,
                               gradientColors: const [
@@ -307,14 +320,12 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                         ],
                       ),
                     ],
-                  );
-                },
-              ),
+                  ),
               const SizedBox(height: 32),
 
               // Riwayat Transaksi Rental
               const Text(
-                'Riwayat Transaksi Sewa',
+                'Rental Transaction History',
                 style: TextStyle(
                   color: _black,
                   fontSize: 18,
@@ -331,7 +342,7 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
                   if (monetaryRentals.isEmpty) {
                     return _EmptyState(
                       icon: Icons.receipt_long_outlined,
-                      message: 'Belum ada transaksi sewa',
+                      message: 'No rental transactions yet',
                     );
                   }
 
@@ -414,9 +425,11 @@ class _AdminFinancialReportPageState extends State<AdminFinancialReportPage> {
               const SizedBox(height: 24),
             ],
           ),
-        ),
-      ),
-    );
+        );
+      },
+    ),
+  ),
+);
   }
 }
 
@@ -642,7 +655,7 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Laporan: $filterLabel',
+          'Report: $filterLabel',
           style: const TextStyle(
             color: black,
             fontSize: 18,
@@ -688,34 +701,34 @@ class AdminFinancialReportPreviewPage extends StatelessWidget {
         margin: const pw.EdgeInsets.all(24),
         build: (context) {
           return [
-            pw.Text('Laporan Keuangan',
+            pw.Text('Financial Report',
                 style:
                     pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 8),
-            pw.Text('Periode: $filterLabel',
+            pw.Text('Period: $filterLabel',
                 style: pw.TextStyle(fontSize: 12)),
-            pw.Text('Dicetak: ${dateFormat.format(DateTime.now())}',
+            pw.Text('Printed: ${dateFormat.format(DateTime.now())}',
                 style: pw.TextStyle(fontSize: 10, color: pdf.PdfColors.grey600)),
             pw.SizedBox(height: 18),
             _buildPdfStatTile(
-                'Total Pendapatan ($filterLabel)',
+                'Total Revenue ($filterLabel)',
                 currencyFormat.format(filteredIncome),
                 pdf.PdfColors.green100),
             pw.SizedBox(height: 8),
-            pw.Text('Jumlah Transaksi: ${rentals.length}',
+            pw.Text('Number of Transactions: ${rentals.length}',
                 style: pw.TextStyle(fontSize: 12)),
             pw.SizedBox(height: 24),
-            pw.Text('Detail Transaksi',
+            pw.Text('Transaction Details',
                 style:
                     pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
             pw.SizedBox(height: 12),
             if (rentals.isEmpty)
               pw.Text(
-                  'Tidak ada transaksi pada periode ini.',
+                  'No transactions in this period.',
                   style: pw.TextStyle(fontSize: 12))
             else
               pw.Table.fromTextArray(
-                headers: ['ID', 'Item', 'Periode', 'Jumlah'],
+                headers: ['ID', 'Item', 'Period', 'Amount'],
                 data: rentals.map((rental) {
                   final amount =
                       (rental.totalRentPrice ?? 0) + (rental.deposit ?? 0);

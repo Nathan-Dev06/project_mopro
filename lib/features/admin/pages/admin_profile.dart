@@ -213,7 +213,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
                           (route) => false,
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Berhasil keluar dari akun Admin!')),
+                          const SnackBar(content: Text('Logged out of Admin account successfully!')),
                         );
                       },
                       style: OutlinedButton.styleFrom(

@@ -32,8 +32,8 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
 
   String _formatDateLong(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-      'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return "${date.day} ${months[date.month - 1]} ${date.year}";
   }
@@ -110,7 +110,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          "Buat Voucher",
+          "Create Voucher",
           style: TextStyle(
             color: _black,
             fontSize: 20,
@@ -126,18 +126,18 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. KODE VOUCHER
-              _buildLabel("Kode Voucher"),
+              _buildLabel("Voucher Code"),
               _buildTextField(
                 controller: _codeController,
-                hintText: "cth. ANIME25",
+                hintText: "e.g., ANIME25",
               ),
               const SizedBox(height: 18),
 
               // 2. DESKRIPSI
-              _buildLabel("Deskripsi"),
+              _buildLabel("Description"),
               _buildTextField(
                 controller: _descController,
-                hintText: "Diskon untuk semua kostum",
+                hintText: "Discount for all costumes",
               ),
               const SizedBox(height: 18),
 
@@ -149,7 +149,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel("Tipe Diskon"),
+                        _buildLabel("Discount Type"),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
@@ -158,10 +158,10 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
-                              value: _selectedDiscountType,
+                              value: _selectedDiscountType == 'Persentase' ? 'Percentage' : (_selectedDiscountType == 'Nominal Fixed' ? 'Fixed Amount' : _selectedDiscountType),
                               isExpanded: true,
                               icon: const Icon(Icons.keyboard_arrow_down, color: _black),
-                              items: <String>['Persentase', 'Nominal Fixed'].map((String value) {
+                              items: <String>['Percentage', 'Fixed Amount'].map((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(value, style: const TextStyle(fontFamily: 'Inter', color: _black)),
@@ -169,7 +169,13 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                               }).toList(),
                               onChanged: (newValue) {
                                 setState(() {
-                                  _selectedDiscountType = newValue!;
+                                  if (newValue == 'Percentage') {
+                                    _selectedDiscountType = 'Persentase';
+                                  } else if (newValue == 'Fixed Amount') {
+                                    _selectedDiscountType = 'Nominal Fixed';
+                                  } else {
+                                    _selectedDiscountType = newValue!;
+                                  }
                                 });
                               },
                             ),
@@ -184,7 +190,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel("Nilai"),
+                        _buildLabel("Value"),
                         _buildTextField(
                           controller: _valueController,
                           hintText: "20",
@@ -204,7 +210,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel("Berlaku Dari"),
+                        _buildLabel("Valid From"),
                         GestureDetector(
                           onTap: () => _selectStartDate(context),
                           child: _buildStaticDateTile(_formatDate(_startDate), Icons.calendar_today_outlined),
@@ -217,7 +223,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel("Sampai"),
+                        _buildLabel("Until"),
                         GestureDetector(
                           onTap: () => _selectEndDate(context),
                           child: _buildStaticDateTile(_formatDate(_endDate), Icons.calendar_today_outlined),
@@ -238,7 +244,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     if (_codeController.text.trim().isNotEmpty) {
                       final code = _codeController.text.toUpperCase().trim();
                       final description = _descController.text.trim().isEmpty 
-                          ? 'Diskon spesial khusus untukmu.' 
+                          ? 'Special discount just for you.' 
                           : _descController.text.trim();
                       final discountValue = int.tryParse(_valueController.text.trim()) ?? 0;
 
@@ -260,7 +266,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Tolong isi Kode Voucher terlebih dahulu ya!'),
+                          content: Text('Please fill in the Voucher Code first!'),
                           backgroundColor: Colors.black,
                         ),
                       );
@@ -275,7 +281,7 @@ class _AdminCreateVoucherPageState extends State<AdminCreateVoucherPage> {
                     ),
                   ),
                   child: const Text(
-                    "Buat Voucher",
+                    "Create Voucher",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

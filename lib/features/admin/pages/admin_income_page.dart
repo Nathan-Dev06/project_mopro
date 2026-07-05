@@ -46,7 +46,7 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
         backgroundColor: _bg,
         elevation: 0,
         title: const Text(
-          'Laporan Pendapatan',
+          'Revenue Report',
           style: TextStyle(
             color: _black,
             fontSize: 20,
@@ -66,13 +66,13 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
               Row(
                 children: [
                   _FilterChip(
-                    'Hari Ini',
+                    'Today',
                     _selectedPeriod == 'today',
                     () => setState(() => _selectedPeriod = 'today'),
                   ),
                   const SizedBox(width: 12),
                   _FilterChip(
-                    'Bulan Ini',
+                    'This Month',
                     _selectedPeriod == 'month',
                     () => setState(() => _selectedPeriod = 'month'),
                   ),
@@ -105,7 +105,7 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _selectedPeriod == 'today' ? 'Pendapatan Hari Ini' : 'Pendapatan Bulan Ini',
+                      _selectedPeriod == 'today' ? 'Today\'s Revenue' : 'This Month\'s Revenue',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.85),
                         fontSize: 14,
@@ -140,7 +140,7 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
 
               // Transaction List
               const Text(
-                'Detail Transaksi',
+                'Transaction Details',
                 style: TextStyle(
                   color: _black,
                   fontSize: 18,
@@ -177,7 +177,7 @@ class _AdminIncomePageState extends State<AdminIncomePage> {
                           Icon(Icons.receipt_outlined, color: _grey500, size: 64),
                           const SizedBox(height: 16),
                           Text(
-                            'Belum ada transaksi',
+                            'No transactions yet',
                             style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                           ),
                         ],

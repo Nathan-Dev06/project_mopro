@@ -88,23 +88,23 @@ class _LoginPageState extends State<LoginPage> {
 
     switch (e.code) {
       case 'user-not-found':
-        message = 'Email belum terdaftar';
+        message = 'Email not registered';
         break;
 
       case 'wrong-password':
-        message = 'Password salah';
+        message = 'Incorrect password';
         break;
 
       case 'invalid-email':
-        message = 'Format email tidak valid';
+        message = 'Invalid email format';
         break;
 
       case 'invalid-credential':
-        message = 'Email atau password salah';
+        message = 'Incorrect email or password';
         break;
 
       default:
-        message = e.message ?? 'Login gagal';
+        message = e.message ?? 'Login failed';
     }
 
     setState(() {
@@ -185,7 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           prefixIcon: const Icon(Icons.email_outlined, color: inkSecondary, size: 22),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan email' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please enter your email' : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -210,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () => setState(() => _obscure = !_obscure),
                           ),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan password' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please enter your password' : null,
                       ),
                       const SizedBox(height: 12),
 

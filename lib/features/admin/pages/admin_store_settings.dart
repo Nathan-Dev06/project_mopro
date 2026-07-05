@@ -103,26 +103,26 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputField('Nama Toko', _namaTokoController),
-                    _buildInputField('Provinsi Utama', _provinsiController),
-                    _buildInputField('Kota Utama', _kotaController),
-                    _buildInputField('Nomor WhatsApp CS', _whatsappController),
-                    _buildInputField('Biaya Deposit Default', _depositController),
-                    _buildInputField('Ongkir Default', _ongkirController),
+                    _buildInputField('Store Name', _namaTokoController),
+                    _buildInputField('Primary Province', _provinsiController),
+                    _buildInputField('Primary City', _kotaController),
+                    _buildInputField('CS WhatsApp Number', _whatsappController),
+                    _buildInputField('Default Deposit Fee', _depositController),
+                    _buildInputField('Default Shipping Fee', _ongkirController),
                     
                     const SizedBox(height: 10),
                     const Divider(color: _grey200, height: 1),
                     const SizedBox(height: 15),
 
                     _buildSwitchTile(
-                      title: 'Mode Toko Aktif',
-                      subtitle: 'Matikan untuk menutup sementara semua sewa',
+                      title: 'Active Store Mode',
+                      subtitle: 'Turn off to temporarily close all rentals',
                       value: isModeTokoAktif,
                       onChanged: (val) => setState(() => isModeTokoAktif = val),
                     ),
                     _buildSwitchTile(
-                      title: 'Wajib Verifikasi KTP',
-                      subtitle: 'Pelanggan harus verifikasi sebelum sewa',
+                      title: 'Require ID (KTP) Verification',
+                      subtitle: 'Customers must verify their identity before renting',
                       value: isWajibKtp,
                       onChanged: (val) => setState(() => isWajibKtp = val),
                     ),
@@ -150,7 +150,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                             if (!mounted) return;
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Pengaturan berhasil disimpan!')),
+                              const SnackBar(content: Text('Settings saved successfully!')),
                             );
                           },
                           style: OutlinedButton.styleFrom(
@@ -160,7 +160,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                             ),
                           ),
                           child: const Text(
-                            'Simpan Pengaturan',
+                            'Save Settings',
                             style: TextStyle(
                               color: _black,
                               fontSize: 16,

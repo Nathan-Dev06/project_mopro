@@ -331,7 +331,10 @@ class _ProfilePageState extends State<ProfilePage> {
               ValueListenableBuilder<List<Rental>>(
                 valueListenable: RentalManager.instance.rentalsNotifier,
                 builder: (context, rentals, child) {
-                  final activeCount = RentalManager.instance.activeRentals.length;
+                  final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+                  final activeCount = RentalManager.instance.activeRentals
+                      .where((r) => r.userId == currentUserId)
+                      .length;
                   return _MenuTile(
                     icon: Icons.shopping_bag_outlined,
                     title: "My Rentals",

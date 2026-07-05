@@ -85,7 +85,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
         CostumeManager.instance.updateCostume(widget.costumeIndex!, updatedCostume);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Kostum berhasil diperbarui!'),
+            content: Text('Costume updated successfully!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -109,7 +109,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isEdit ? "Edit Kostum" : "Tambah Kostum Baru",
+          isEdit ? "Edit Costume" : "Add New Costume",
           style: const TextStyle(
             color: _black,
             fontSize: 20,
@@ -129,16 +129,16 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildTextField("Nama Kostum", _namaController, "cth. Monkey D. Luffy - One Piece"),
+                      _buildTextField("Costume Name", _namaController, "e.g., Monkey D. Luffy - One Piece"),
                       const SizedBox(height: 16),
-                      _buildTextField("Judul Anime / Game", _animeController, "cth. One Piece / Genshin Impact"),
+                      _buildTextField("Anime / Game Title", _animeController, "e.g., One Piece / Genshin Impact"),
                       const SizedBox(height: 16),
                       
                       Row(
                         children: [
-                          Expanded(child: _buildTextField("Harga / Hari (Rp)", _hargaController, "cth. 150000", isNumber: false)),
+                          Expanded(child: _buildTextField("Price / Day (Rp)", _hargaController, "e.g., 150000", isNumber: false)),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildTextField("Kondisi", _kondisiController, "cth. 95%")),
+                          Expanded(child: _buildTextField("Condition", _kondisiController, "e.g., 95%")),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -151,20 +151,20 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                             }),
                           ),
                           const SizedBox(width: 16),
-                          Expanded(child: _buildTextField("Kategori", _kategoriController, "cth. Anime / Game")),
+                          Expanded(child: _buildTextField("Category", _kategoriController, "e.g., Anime / Game")),
                         ],
                       ),
                       const SizedBox(height: 16),
 
-                      _buildTextField("Ukuran", _ukuranController, "cth. S, M, L, XL / All Size"),
+                      _buildTextField("Size", _ukuranController, "e.g., S, M, L, XL / All Size"),
                       const SizedBox(height: 16),
 
-                      _buildTextField("Include", _includeController, "cth. Kostum, wig, aksesoris"),
+                      _buildTextField("Includes", _includeController, "e.g., Costume, wig, accessories"),
                       const SizedBox(height: 20),
 
                       // Upload Foto Box
                       const Text(
-                        "Foto Kostum",
+                        "Costume Photo",
                         style: TextStyle(color: _black, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                       ),
                       const SizedBox(height: 8),
@@ -179,7 +179,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                         child: InkWell(
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Fitur upload foto akan datang!")),
+                              const SnackBar(content: Text("Photo upload feature coming soon!")),
                             );
                           },
                           borderRadius: BorderRadius.circular(12),
@@ -189,7 +189,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                               Icon(Icons.cloud_upload_outlined, color: _grey500, size: 32),
                               SizedBox(height: 8),
                               Text(
-                                "Klik untuk upload foto",
+                                "Click to upload photo",
                                 style: TextStyle(color: _grey500, fontSize: 13, fontFamily: 'Inter'),
                               ),
                             ],
@@ -215,7 +215,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
                       elevation: 0,
                     ),
                     child: Text(
-                      isEdit ? "Simpan Perubahan" : "Simpan Kostum",
+                      isEdit ? "Save Changes" : "Save Costume",
                       style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
                     ),
                   ),
@@ -253,7 +253,7 @@ class _AdminEditProductPageState extends State<AdminEditProductPage> {
               borderSide: const BorderSide(color: _black, width: 1.5),
             ),
           ),
-          validator: (value) => value == null || value.isEmpty ? "Field ini tidak boleh kosong" : null,
+          validator: (value) => value == null || value.isEmpty ? "This field cannot be empty" : null,
         ),
       ],
     );

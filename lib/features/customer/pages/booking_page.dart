@@ -37,10 +37,10 @@ class _BookingPageState extends State<BookingPage> {
   final int _deposit = 50000;
   Voucher? _selectedVoucher;
 
-  // Metode Pengiriman
-  String _shippingMethod = 'Pengiriman Instan (Gojek/Grab)';
+  // Shipping Method
+  String _shippingMethod = 'Instant Delivery (Gojek/Grab)';
 
-  // Alamat pengiriman
+  // Shipping address
   final _addressFormKey = GlobalKey<FormState>();
   final TextEditingController _recipientController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -630,7 +630,7 @@ class _BookingPageState extends State<BookingPage> {
                         defaultTextStyle:
                             TextStyle(color: textPrimary, fontFamily: 'Inter'),
                         weekendTextStyle: TextStyle(
-                            color: textPrimary, // Diubah menjadi warna hitam sesuai request
+                            color: textPrimary, // Changed to black as per request
                             fontFamily: 'Inter'), 
 
                         // Disabled / Booked Dates Style
@@ -645,12 +645,12 @@ class _BookingPageState extends State<BookingPage> {
                       calendarBuilders: CalendarBuilders(
                         disabledBuilder: (context, day, focusedDay) {
                           if (_isDayBooked(day)) {
-                            // Tanggal yang sudah di-sewa tampil berwarna MERAH dengan coretan
+                            // Booked dates shown in RED with strikethrough
                             return Center(
                               child: Text(
                                 "${day.day}",
                                 style: const TextStyle(
-                                  color: Color(0xFFEF4444), // Merah
+                                  color: Color(0xFFEF4444), // Red
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.bold,
                                   decoration: TextDecoration.lineThrough,
@@ -658,12 +658,12 @@ class _BookingPageState extends State<BookingPage> {
                               ),
                             );
                           } else {
-                            // Tanggal mati biasa (seperti tanggal lampau) tampil warna abu-abu
+                            // Regular past dates shown in grey
                             return Center(
                               child: Text(
                                 "${day.day}",
                                 style: const TextStyle(
-                                  color: Color(0xFFD1D5DB), // Abu-abu
+                                  color: Color(0xFFD1D5DB), // Grey
                                   fontFamily: 'Inter',
                                 ),
                               ),
@@ -678,24 +678,24 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
 
-                // LEGEND KALENDER
+                // CALENDAR LEGEND
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildLegendItem(surfaceColor, "Tersedia",
+                    _buildLegendItem(surfaceColor, "Available",
                         hasBorder: true, borderColor: hairlineStrong),
-                    _buildLegendItem(const Color(0xFFFCA5A5), "Rented (Coret)"),
-                    _buildLegendItem(textPrimary, "Pilihanmu",
+                    _buildLegendItem(const Color(0xFFFCA5A5), "Booked"),
+                    _buildLegendItem(textPrimary, "Your Pick",
                         textColor: textPrimary),
                   ],
                 ),
 
                 const SizedBox(height: 32),
 
-                // METODE PENGIRIMAN
+                // SHIPPING METHOD
                 Text(
-                  "Metode Pengiriman",
+                  "Shipping Method",
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontWeight: FontWeight.w300,
@@ -731,8 +731,8 @@ class _BookingPageState extends State<BookingPage> {
                         }
                       },
                       items: <String>[
-                        'Pengiriman Instan (Gojek/Grab)',
-                        'Ambil Sendiri di Toko'
+                        'Instant Delivery (Gojek/Grab)',
+                        'Self Pickup at Store'
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -743,11 +743,11 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)')
+                if (_shippingMethod == 'Instant Delivery (Gojek/Grab)')
                   Padding(
                     padding: const EdgeInsets.only(bottom: 32),
                     child: Text(
-                      "*Ongkir Instan Area JABODETABEK (dibayar oleh penyewa di lokasi tujuan).",
+                      "*Instant delivery covers the Greater Jakarta area (shipping paid by renter at destination).",
                       style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: textSecondary),
                     ),
                   )
@@ -755,15 +755,15 @@ class _BookingPageState extends State<BookingPage> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 32),
                     child: Text(
-                      "*Silakan datang langsung ke lokasi kami (Cosvoria HQ, Jakarta Selatan) pada hari H-1 event untuk mengambil kostum.",
+                      "*Please come directly to our location (Cosvoria HQ, South Jakarta) one day before the event to pick up your costume.",
                       style: TextStyle(fontFamily: 'Inter', fontSize: 12, color: textSecondary),
                     ),
                   ),
 
-                if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)') ...[
-                // ALAMAT PENGIRIMAN
+                if (_shippingMethod == 'Instant Delivery (Gojek/Grab)') ...[
+                // SHIPPING ADDRESS
                 Text(
-                  "Alamat Pengiriman",
+                  "Shipping Address",
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontWeight: FontWeight.w300,
@@ -776,7 +776,7 @@ class _BookingPageState extends State<BookingPage> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _fillFromProfile,
-                    child: const Text('Isi dari Profil'),
+                    child: const Text('Fill from Profile'),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -794,10 +794,10 @@ class _BookingPageState extends State<BookingPage> {
                         TextFormField(
                           controller: _recipientController,
                           decoration: const InputDecoration(
-                            labelText: 'Nama Penerima',
+                            labelText: 'Recipient Name',
                           ),
                           validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Masukkan nama penerima'
+                              ? 'Please enter recipient name'
                               : null,
                         ),
                         const SizedBox(height: 8),
@@ -805,20 +805,20 @@ class _BookingPageState extends State<BookingPage> {
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
                           decoration: const InputDecoration(
-                            labelText: 'No. Telepon',
+                            labelText: 'Phone Number',
                           ),
                           validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Masukkan nomor telepon'
+                              ? 'Please enter phone number'
                               : null,
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _streetController,
                           decoration: const InputDecoration(
-                            labelText: 'Jalan / Alamat',
+                            labelText: 'Street / Address',
                           ),
                           validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Masukkan alamat lengkap'
+                              ? 'Please enter full address'
                               : null,
                         ),
                         const SizedBox(height: 8),
@@ -828,9 +828,9 @@ class _BookingPageState extends State<BookingPage> {
                               child: TextFormField(
                                 controller: _cityController,
                                 decoration:
-                                    const InputDecoration(labelText: 'Kota/Kabupaten'),
+                                    const InputDecoration(labelText: 'City/Regency'),
                                 validator: (v) => (v == null || v.trim().isEmpty)
-                                    ? 'Kota dibutuhkan'
+                                    ? 'City required'
                                     : null,
                               ),
                             ),
@@ -840,7 +840,7 @@ class _BookingPageState extends State<BookingPage> {
                                 controller: _postalController,
                                 keyboardType: TextInputType.number,
                                 decoration:
-                                    const InputDecoration(labelText: 'Kode Pos'),
+                                    const InputDecoration(labelText: 'Postal Code'),
                               ),
                             ),
                           ],
@@ -848,13 +848,13 @@ class _BookingPageState extends State<BookingPage> {
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _provinceController,
-                          decoration: const InputDecoration(labelText: 'Provinsi'),
+                          decoration: const InputDecoration(labelText: 'Province'),
                         ),
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: _notesController,
                           decoration: const InputDecoration(
-                              labelText: 'Catatan Pengiriman (opsional)'),
+                              labelText: 'Shipping Notes (optional)'),
                           maxLines: 2,
                         ),
                       ],
@@ -889,8 +889,8 @@ class _BookingPageState extends State<BookingPage> {
                         Expanded(
                           child: Text(
                             _selectedVoucher == null
-                                ? "Makin hemat pakai promo"
-                                : "Promo: ${_selectedVoucher!.code} dipakai!",
+                                ? "Save more with a promo code"
+                                : "Promo: ${_selectedVoucher!.code} applied!",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 14,
@@ -905,9 +905,9 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
 
-                // RINCIAN BIAYA
+                // PAYMENT DETAILS
                 Text(
-                  "Rincian Pembayaran",
+                  "Payment Summary",
                   style: TextStyle(
                     fontFamily: 'Georgia',
                     fontWeight: FontWeight.w300,
@@ -932,16 +932,16 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                   child: Column(
                     children: [
-                      _buildCostRow("Biaya Sewa ($_totalDays Hari)",
+                      _buildCostRow("Rental Fee ($_totalDays Days)",
                           currencyFormat.format(totalRentPrice)),
                       if (discountAmount > 0) ...[
                         const SizedBox(height: 12),
-                        _buildCostRow("Diskon Promo (${_selectedVoucher!.code})",
+                        _buildCostRow("Promo Discount (${_selectedVoucher!.code})",
                             "-${currencyFormat.format(discountAmount)}",
                             textColor: Colors.green),
                       ],
                       const SizedBox(height: 12),
-                      _buildCostRow("Deposit (Uang Jaminan)",
+                      _buildCostRow("Deposit (Security Deposit)",
                           currencyFormat.format(_deposit)),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -951,7 +951,7 @@ class _BookingPageState extends State<BookingPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Total Pembayaran",
+                            "Total Payment",
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w500,
@@ -975,7 +975,7 @@ class _BookingPageState extends State<BookingPage> {
                 ),
                 const SizedBox(
                     height:
-                        120), // Memberi ruang gulir agar tidak tertutup bottomSheet
+                        120), // Extra scroll space to prevent overlap with bottomSheet
               ],
             ),
           ),
@@ -1005,11 +1005,11 @@ class _BookingPageState extends State<BookingPage> {
                   : () {
                       Map<String, String> shippingAddress;
 
-                      if (_shippingMethod == 'Pengiriman Instan (Gojek/Grab)') {
+                      if (_shippingMethod == 'Instant Delivery (Gojek/Grab)') {
                         if (!_addressFormKey.currentState!.validate()) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Periksa kembali data alamat pengiriman.'),
+                              content: Text('Please check the shipping address details.'),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -1021,7 +1021,7 @@ class _BookingPageState extends State<BookingPage> {
                         if (!city.contains('jakarta') && !city.contains('bogor') && !city.contains('depok') && !city.contains('tangerang') && !city.contains('bekasi')) {
                            ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Maaf, pengiriman instan saat ini hanya menjangkau area JABODETABEK.'),
+                              content: Text('Sorry, instant delivery currently only covers the Greater Jakarta area.'),
                               backgroundColor: Colors.red,
                             ),
                           );
@@ -1038,15 +1038,15 @@ class _BookingPageState extends State<BookingPage> {
                           'notes': _notesController.text.trim(),
                         };
                       } else {
-                        // Ambil Sendiri
+                        // Self Pickup
                         shippingAddress = {
-                          'recipient': FirebaseAuth.instance.currentUser?.displayName ?? 'Pelanggan (Ambil Sendiri)',
+                          'recipient': FirebaseAuth.instance.currentUser?.displayName ?? 'Customer (Self Pickup)',
                           'phone': '0812-3456-7890',
                           'street': 'Cosvoria HQ (Jl. Kemang Raya No. 10, Bangka)',
                           'city': 'Jakarta Selatan',
                           'postal': '12730',
                           'province': 'DKI Jakarta',
-                          'notes': 'Metode: Ambil Sendiri',
+                          'notes': 'Method: Self Pickup',
                         };
                       }
 
@@ -1069,7 +1069,7 @@ class _BookingPageState extends State<BookingPage> {
                       );
                     },
               child: Text(
-                "Lanjut Pembayaran",
+                "Proceed to Payment",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.bold,

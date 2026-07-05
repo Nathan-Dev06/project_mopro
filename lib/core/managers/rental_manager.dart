@@ -80,21 +80,21 @@ class RentalManager {
 
   // Getters for filtered rentals lists
   List<Rental> get activeRentals => rentalsNotifier.value
-      .where((r) => _hasMonetaryValue(r) &&
-          (r.status == "Active" ||
+      .where((r) =>
+          r.status == "Active" ||
           r.status == "Pending" ||
           r.status == "Packaging" ||
           r.status == "Shipped" ||
           r.status == "Cancellation Request" ||
           r.status == "Renting" ||
           r.status == "Returned" ||
-          r.status == "Checking"))
+          r.status == "Checking")
       .toList();
   List<Rental> get completedRentals => rentalsNotifier.value
-      .where((r) => r.status == "Completed" && _hasMonetaryValue(r))
+      .where((r) => r.status == "Completed")
       .toList();
   List<Rental> get canceledRentals => rentalsNotifier.value
-      .where((r) => r.status == "Canceled" && _hasMonetaryValue(r))
+      .where((r) => r.status == "Canceled")
       .toList();
   List<Rental> get monetaryRentals =>
       rentalsNotifier.value.where(_hasMonetaryValue).toList();
@@ -111,10 +111,6 @@ class RentalManager {
         .collection('rentals')
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        _seedDummyData();
-        return;
-      }
       final rentals = snapshot.docs.map((doc) {
         final data = doc.data();
         return Rental(
@@ -130,7 +126,7 @@ class RentalManager {
               ? (data['endDate'] as Timestamp).toDate()
               : DateTime.now(),
           status: data['status'] ?? '',
-          customerName: data['customerName'] ?? 'Ayu Lestari',
+          customerName: data['customerName'] ?? 'Customer',
           userId: data['userId'] ?? 'guest',
           cancellationReason: data['cancellationReason'],
           rating: (data['rating'] as num?)?.toDouble(),
@@ -156,125 +152,6 @@ class RentalManager {
 
       rentalsNotifier.value = rentals;
     });
-  }
-
-  // Populate Firestore with default data if empty
-  Future<void> _seedDummyData() async {
-    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? 'guest';
-    final dummyData = [
-      Rental(
-        transactionId: "TRX-1004",
-        costumeName: "Chainsaw Man Denji",
-        costumeSeries: "Chainsaw Man",
-        size: "L",
-        imagePath: "assets/images/deadpool.jpg",
-        startDate: DateTime.now(),
-        endDate: DateTime.now().add(const Duration(days: 3)),
-        status: "Cancellation Request",
-        customerName: "Rian Wijaya",
-        cancellationReason: "Salah pilih ukuran costume, ingin ganti ke XL.",
-        totalRentPrice: 120000,
-        deposit: 50000,
-        grandTotal: 170000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-1003",
-        costumeName: "Genshin Impact Zhongli",
-        costumeSeries: "Genshin Impact",
-        size: "L",
-        imagePath: "assets/images/gojo.jpg",
-        startDate: DateTime.now().add(const Duration(days: 2)),
-        endDate: DateTime.now().add(const Duration(days: 5)),
-        status: "Pending",
-        customerName: "Budi Santoso",
-        totalRentPrice: 135000,
-        deposit: 50000,
-        grandTotal: 185000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-1002",
-        costumeName: "Spy x Family Anya",
-        costumeSeries: "Spy x Family",
-        size: "S",
-        imagePath: "assets/images/anya.jpg",
-        startDate: DateTime.now().subtract(const Duration(days: 1)),
-        endDate: DateTime.now().add(const Duration(days: 2)),
-        status: "Packaging",
-        customerName: "Ayu Lestari",
-        totalRentPrice: 110000,
-        deposit: 50000,
-        grandTotal: 160000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-1005",
-        costumeName: "Frieren Beyond Journey's End",
-        costumeSeries: "Frieren",
-        size: "M",
-        imagePath: "assets/images/frieren.jpg",
-        startDate: DateTime.now().subtract(const Duration(days: 2)),
-        endDate: DateTime.now().add(const Duration(days: 2)),
-        status: "Shipped",
-        customerName: "Siti Rahma",
-        totalRentPrice: 140000,
-        deposit: 50000,
-        grandTotal: 190000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-1001",
-        costumeName: "Naruto Akatsuki Cloak",
-        costumeSeries: "Naruto",
-        size: "XL",
-        imagePath: "assets/images/luffy_wano.jpg",
-        startDate: DateTime.now().subtract(const Duration(days: 5)),
-        endDate: DateTime.now().add(const Duration(days: 1)),
-        status: "Active",
-        customerName: "Dimas",
-        totalRentPrice: 125000,
-        deposit: 50000,
-        grandTotal: 175000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-1000",
-        costumeName: "Genshin Impact Raiden Shogun",
-        costumeSeries: "Genshin Impact",
-        size: "M",
-        imagePath: "assets/images/raiden.jpg",
-        startDate: DateTime.now().subtract(const Duration(days: 10)),
-        endDate: DateTime.now().subtract(const Duration(days: 7)),
-        status: "Completed",
-        customerName: "Eka Putri",
-        rating: 5.0,
-        reviewText: "Kostumnya sangat wangi dan lengkap aksesorisnya!",
-        totalRentPrice: 150000,
-        deposit: 50000,
-        grandTotal: 200000,
-        userId: currentUserId,
-      ),
-      Rental(
-        transactionId: "TRX-0999",
-        costumeName: "Neon Genesis Evangelion Zero Two",
-        costumeSeries: "Evangelion",
-        size: "S",
-        imagePath: "assets/images/zero_two.jpg",
-        startDate: DateTime.now().subtract(const Duration(days: 12)),
-        endDate: DateTime.now().subtract(const Duration(days: 9)),
-        status: "Canceled",
-        customerName: "Fadel",
-        totalRentPrice: 90000,
-        deposit: 50000,
-        grandTotal: 140000,
-        userId: currentUserId,
-      ),
-    ];
-
-    for (final r in dummyData) {
-      await addRental(r);
-    }
   }
 
   // Add rental to Firestore

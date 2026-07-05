@@ -37,7 +37,7 @@ class NotificationPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator(color: Colors.black));
           }
           if (snapshot.hasError) {
-            return const Center(child: Text("Gagal memuat notifikasi."));
+            return const Center(child: Text("Failed to load notifications."));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(

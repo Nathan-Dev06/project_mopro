@@ -25,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   if (_passwordCtrl.text != _confirmCtrl.text) {
     setState(() {
-      _error = 'Password dan konfirmasi tidak cocok';
+      _error = 'Password and confirmation do not match';
     });
     return;
   }
@@ -64,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
 await FirebaseAuth.instance.currentUser?.reload();
 
-// Logout setelah register agar user wajib login
+// Sign out after register so user must login
 await FirebaseAuth.instance.signOut();
 
 if (!mounted) return;
@@ -83,7 +83,7 @@ ScaffoldMessenger.of(context).showSnackBar(
   ),
 );
 
-// Kembali ke halaman login
+// Go back to login page
 Navigator.of(context).pushAndRemoveUntil(
   PageRouteBuilder(
     pageBuilder: (_, __, ___) => const LoginPage(),
@@ -98,19 +98,19 @@ Navigator.of(context).pushAndRemoveUntil(
 
     switch (e.code) {
       case 'email-already-in-use':
-        message = 'Email sudah terdaftar';
+        message = 'Email is already registered';
         break;
 
       case 'weak-password':
-        message = 'Password minimal 6 karakter';
+        message = 'Password must be at least 6 characters';
         break;
 
       case 'invalid-email':
-        message = 'Format email tidak valid';
+        message = 'Invalid email format';
         break;
 
       default:
-        message = e.message ?? 'Registrasi gagal';
+        message = e.message ?? 'Registration failed';
     }
 
     setState(() {
@@ -195,7 +195,7 @@ Navigator.of(context).pushAndRemoveUntil(
                           ),
                           prefixIcon: const Icon(Icons.person_outline_rounded, color: inkSecondary, size: 22),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan nama' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please enter your name' : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -215,7 +215,7 @@ Navigator.of(context).pushAndRemoveUntil(
                           ),
                           prefixIcon: const Icon(Icons.email_outlined, color: inkSecondary, size: 22),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan email' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please enter your email' : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -240,7 +240,7 @@ Navigator.of(context).pushAndRemoveUntil(
                             onPressed: () => setState(() => _obscure = !_obscure),
                           ),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Masukkan password' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please enter a password' : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -261,7 +261,7 @@ Navigator.of(context).pushAndRemoveUntil(
                           ),
                           prefixIcon: const Icon(Icons.lock_outline_rounded, color: inkSecondary, size: 22),
                         ),
-                        validator: (v) => (v == null || v.isEmpty) ? 'Konfirmasi password' : null,
+                        validator: (v) => (v == null || v.isEmpty) ? 'Please confirm your password' : null,
                       ),
                       const SizedBox(height: 12),
 

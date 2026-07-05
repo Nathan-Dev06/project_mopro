@@ -85,7 +85,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                   onChanged: (_) => setState(() {}),
                   decoration: const InputDecoration(
                     icon: Icon(Icons.search, color: _grey500),
-                    hintText: "Cari customer...",
+                    hintText: "Search customer...",
                     hintStyle: TextStyle(color: _grey500),
                     border: InputBorder.none,
                   ),
@@ -102,7 +102,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                   if (snapshot.hasError) {
                     return const Center(
                       child: Text(
-                        'Gagal memuat data customer.',
+                        'Failed to load customer data.',
                         style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                       ),
                     );
@@ -125,7 +125,7 @@ class _AdminManageUsersPageState extends State<AdminManageUsersPage> {
                   if (filteredUsers.isEmpty) {
                     return const Center(
                       child: Text(
-                        'Tidak ada customer yang cocok.',
+                        'No matching customers found.',
                         style: TextStyle(color: _grey500, fontFamily: 'Inter'),
                       ),
                     );

@@ -148,7 +148,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-              "Jadwal tidak tersedia. Terdapat pesanan lain dalam rentang 3 hari tersebut."),
+              "Schedule not available. There is another order in this 3-day range."),
           backgroundColor: Colors.red,
         ),
       );
@@ -173,7 +173,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
     if (_selectedCostume == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Pilih kostum terlebih dahulu!"),
+            content: Text("Please select a costume first!"),
             backgroundColor: Colors.red),
       );
       return;
@@ -182,7 +182,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
     if (_rangeStart == null || _rangeEnd == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Pilih tanggal sewa!"), backgroundColor: Colors.red),
+            content: Text("Please select rental dates!"), backgroundColor: Colors.red),
       );
       return;
     }
@@ -233,7 +233,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Pesanan Walk-in berhasil dibuat!"),
+            content: Text("Walk-in order created successfully!"),
             backgroundColor: Colors.green,
           ),
         );
@@ -242,7 +242,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Gagal membuat pesanan: $e"),
+            content: Text("Failed to create order: $e"),
             backgroundColor: Colors.red),
       );
     }
@@ -296,9 +296,9 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // PILIH KOSTUM
+            // SELECT COSTUME
             const Text(
-              "Pilih Kostum",
+              "Select Costume",
               style: TextStyle(
                 color: _black,
                 fontSize: 18,
@@ -318,7 +318,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                 child: DropdownButton<CostumeData>(
                   isExpanded: true,
                   value: _selectedCostume,
-                  hint: const Text("Pilih Kostum"),
+                  hint: const Text("Select Costume"),
                   items: _availableCostumes.map((costume) {
                     return DropdownMenuItem<CostumeData>(
                       value: costume,
@@ -422,7 +422,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Data Customer",
+                      "Customer Details",
                       style: TextStyle(
                         color: _black,
                         fontSize: 18,
@@ -434,7 +434,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                     TextFormField(
                       controller: _customerNameController,
                       decoration: InputDecoration(
-                        labelText: 'Nama Customer',
+                        labelText: 'Customer Name',
                         filled: true,
                         fillColor: Colors.white,
                         enabledBorder: OutlineInputBorder(
@@ -449,7 +449,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                         ),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Masukkan nama customer'
+                          ? 'Enter customer name'
                           : null,
                     ),
                     const SizedBox(height: 12),
@@ -457,7 +457,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                       controller: _customerPhoneController,
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
-                        labelText: 'No. Telepon',
+                        labelText: 'Phone Number',
                         filled: true,
                         fillColor: Colors.white,
                         enabledBorder: OutlineInputBorder(
@@ -472,7 +472,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                         ),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Masukkan nomor telepon'
+                          ? 'Enter phone number'
                           : null,
                     ),
                     const SizedBox(height: 12),
@@ -488,7 +488,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                         child: DropdownButton<String>(
                           isExpanded: true,
                           value: _selectedSize,
-                          hint: const Text("Pilih Ukuran"),
+                          hint: const Text("Select Size"),
                           items: ['S', 'M', 'L', 'XL', 'All Size']
                               .map((size) => DropdownMenuItem<String>(
                                     value: size,
@@ -509,7 +509,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                     TextFormField(
                       controller: _notesController,
                       decoration: InputDecoration(
-                        labelText: 'Catatan (Opsional)',
+                        labelText: 'Notes (Optional)',
                         filled: true,
                         fillColor: Colors.white,
                         enabledBorder: OutlineInputBorder(
@@ -548,7 +548,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "Metode Pembayaran",
+                            "Payment Method",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -558,8 +558,8 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                           ),
                           Text(
                             _isCashPayment
-                                ? "Bayar Cash / Offline"
-                                : "Non-Tunai",
+                                ? "Cash / Offline Payment"
+                                : "Non-Cash",
                             style: const TextStyle(
                               fontSize: 12,
                               color: Color(0xFF92400E),
@@ -583,7 +583,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
 
               // PILIH TANGGAL
               const Text(
-                "Pilih Tanggal Sewa",
+                "Select Rental Dates",
                 style: TextStyle(
                   color: _black,
                   fontSize: 18,
@@ -606,7 +606,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "Pilih Tanggal Mulai Sewa. Sistem otomatis mengatur durasi sewa selama 3 Hari.",
+                        "Select start rental date. The system automatically sets rental duration for 3 Days.",
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
@@ -713,10 +713,10 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildLegendItem(Colors.white, "Tersedia",
+                  _buildLegendItem(Colors.white, "Available",
                       hasBorder: true, borderColor: _grey200),
-                  _buildLegendItem(const Color(0xFFFCA5A5), "Rented (Coret)"),
-                  _buildLegendItem(_primaryPurple, "Pilihanmu",
+                  _buildLegendItem(const Color(0xFFFCA5A5), "Rented (Strikethrough)"),
+                  _buildLegendItem(_primaryPurple, "Your Selection",
                       textColor: Colors.white),
                 ],
               ),
@@ -724,7 +724,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
 
               // RINCIAN BIAYA
               const Text(
-                "Rincian Pembayaran",
+                "Payment Details",
                 style: TextStyle(
                   color: _black,
                   fontSize: 18,
@@ -742,10 +742,10 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                 ),
                 child: Column(
                   children: [
-                    _buildCostRow("Biaya Sewa ($_totalDays Hari)",
+                    _buildCostRow("Rental Fee ($_totalDays Days)",
                         currencyFormat.format(totalRentPrice)),
                     const SizedBox(height: 12),
-                    _buildCostRow("Deposit (Uang Jaminan)",
+                    _buildCostRow("Deposit (Security Guarantee)",
                         currencyFormat.format(_deposit)),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -755,7 +755,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          "Total Pembayaran",
+                          "Total Payment",
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
@@ -794,7 +794,7 @@ class _AdminWalkinOrderPageState extends State<AdminWalkinOrderPage> {
                   ),
                   onPressed: _rangeStart == null ? null : _createWalkinOrder,
                   child: Text(
-                    "Buat Pesanan Walk-in",
+                    "Create Walk-in Order",
                     style: TextStyle(
                       color: _rangeStart == null ? _grey500 : Colors.white,
                       fontSize: 16,
