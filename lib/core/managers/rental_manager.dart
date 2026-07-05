@@ -330,5 +330,46 @@ class RentalManager {
         .collection('rentals')
         .doc(transactionId)
         .update(updates);
+
+    if (newStatus == 'Completed') {
+      try {
+        final rentalDoc = await FirebaseFirestore.instance
+            .collection('rentals')
+            .doc(transactionId)
+            .get();
+        if (rentalDoc.exists) {
+          final data = rentalDoc.data()!;
+          final userId = data['userId'];
+          final deposit = data['deposit'] as int? ?? 0;
+          final deduction = depositDeduction ?? 0;
+          final refund = deposit - deduction;
+          
+          if (refund > 0 && userId != null) {
+            final batch = FirebaseFirestore.instance.batch();
+            
+            // 1. Update user balance
+            final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+            batch.update(userRef, {
+              'deposit_balance': FieldValue.increment(refund),
+            });
+            
+            // 2. Add transaction record
+            final txRef = userRef.collection('wallet_transactions').doc();
+            batch.set(txRef, {
+              'title': 'Deposit Refund - Rental #$transactionId',
+              'type': 'refund',
+              'amount': refund,
+              'deductionAmount': deduction,
+              'deductionReason': deductionReason ?? '',
+              'timestamp': FieldValue.serverTimestamp(),
+            });
+            
+            await batch.commit();
+          }
+        }
+      } catch (e) {
+        debugPrint('Error refunding deposit: $e');
+      }
+    }
   }
 }

@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/customer/pages/booking_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:intl/intl.dart';
+import 'package:project_mopro/features/customer/pages/review_details_page.dart';
 
 class DetailCostumePage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -532,32 +534,6 @@ class _DetailCostumePageState extends State<DetailCostumePage>
             style: TextStyle(
               fontSize: 12,
               color: _textSecondary,
-            ),
-          ),
-          const Spacer(),
-          // Condition chip
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: _surfaceColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _hairline),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.verified_outlined,
-                    size: 14, color: _accentGreen),
-                const SizedBox(width: 4),
-                Text(
-                  'Kondisi ${data['condition'] ?? '-'}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _textPrimary,
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -1233,6 +1209,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   //  6. RENTAL & DEPOSIT POLICY
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   Widget _buildRentalPolicy() {
+    final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
+    final depositVal = data['deposit'] ?? 50000;
+    final depositAmt = depositVal is int ? depositVal : int.tryParse(depositVal.toString()) ?? 50000;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
       child: Column(
@@ -1267,7 +1247,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   icon: Icons.shield_outlined,
                   iconBg: const Color(0xFFFEF3C7),
                   iconColor: const Color(0xFFD97706),
-                  title: 'Wajib Deposit Rp ${data['deposit'] ?? '50.000'}',
+                  title: 'Wajib Deposit ${formatCurrency.format(depositAmt)}',
                   subtitle:
                       'Uang jaminan dikembalikan penuh 1x24 jam setelah kostum kami terima kembali dalam kondisi baik.',
                 ),
@@ -1375,17 +1355,54 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 ),
               ),
               const Spacer(),
-              Text(
-                'Lihat Semua',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: _textSecondary.withOpacity(0.7),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewDetailsPage(
+                        costumeTitle: data['title'] ?? 'Kostum',
+                        reviewItems: [
+                          {
+                            'name': 'Arisa M.',
+                            'date': '2 minggu lalu',
+                            'rating': 5,
+                            'comment':
+                                'Kostumnya bagus banget, jahitannya rapi dan bahannya nyaman dipakai seharian. Wig-nya juga udah di-styling, jadi tinggal pakai. Pasti sewa lagi! 🔥',
+                            'avatar': 'A',
+                            'avatarColor': const Color(0xFFC4B5FD),
+                          },
+                          {
+                            'name': 'Riko S.',
+                            'date': '1 bulan lalu',
+                            'rating': 5,
+                            'comment':
+                                'Detail kostumnya sangat akurat, pokoknya worth it buat event cosplay. Pelayanannya juga ramah dan fast response. Recommended! ⭐',
+                            'avatar': 'R',
+                            'avatarColor': const Color(0xFFFBCFE8),
+                          },
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Lihat Semua',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _textSecondary.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_ios_rounded,
+                        size: 12, color: _textSecondary.withOpacity(0.7)),
+                  ],
                 ),
               ),
-              const SizedBox(width: 4),
-              Icon(Icons.arrow_forward_ios_rounded,
-                  size: 12, color: _textSecondary.withOpacity(0.7)),
             ],
           ),
           const SizedBox(height: 14),

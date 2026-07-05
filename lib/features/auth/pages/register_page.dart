@@ -56,7 +56,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
     // Wallet
     'deposit_balance': 0,
-    'cosmo_points': 0,
     });
 
     await FirebaseAuth.instance.currentUser?.updateDisplayName(

@@ -958,7 +958,7 @@ class _RentalsListTab extends StatelessWidget {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      "Paket sedang dalam perjalanan menuju alamatmu. Mohon tekan tombol di bawah HANYA JIKA paket sudah kamu terima dan cek kondisinya.",
+                      "The package is on its way to your address. Please press the button below ONLY IF you have received the package and checked its condition.",
                       style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF1E3A8A), height: 1.5),
                     ),
                   ),
@@ -974,15 +974,15 @@ class _RentalsListTab extends StatelessWidget {
                       builder: (ctx) => AlertDialog(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: const Text("Konfirmasi Terima Pesanan", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                        title: const Text("Confirm Order Received", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
                         content: const Text(
-                          "Apakah paket sudah kamu terima dengan aman? Dengan menekan tombol ini, masa sewa kamu akan resmi dimulai.",
+                          "Have you received the package safely? By pressing this button, your rental period will officially start.",
                           style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text("Belum", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
+                            child: const Text("Not yet", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
                           ),
                           TextButton(
                             onPressed: () {
@@ -990,12 +990,12 @@ class _RentalsListTab extends StatelessWidget {
                               RentalManager.instance.updateRentalStatus(rental.transactionId, "Active");
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("Pesanan diterima. Masa sewa dimulai!", style: TextStyle(fontFamily: 'Inter')),
+                                  content: Text("Order received. Rental period started!", style: TextStyle(fontFamily: 'Inter')),
                                   backgroundColor: Color(0xFF16A34A),
                                 ),
                               );
                             },
-                            child: const Text("Ya, Terima", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
+                            child: const Text("Yes, I've received it", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: Color(0xFF16A34A))),
                           ),
                         ],
                       ),
@@ -1010,7 +1010,7 @@ class _RentalsListTab extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
                   label: const Text(
-                    "Konfirmasi Terima Barang",
+                    "Confirm Item Received",
                     style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13),
                   ),
                 ),
@@ -1042,7 +1042,7 @@ class _RentalsListTab extends StatelessWidget {
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
-                      "Masa sewamu sedang berjalan. Harap kembalikan kostum ke admin sebelum batas waktu habis agar terhindar dari denda.",
+                      "Your rental period is ongoing. Please return the costume to the admin before the time limit ends to avoid penalties.",
                       style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF14532D), height: 1.5),
                     ),
                   ),
@@ -1060,7 +1060,7 @@ class _RentalsListTab extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: const Text(
-                        "Info Pengembalian",
+                        "Return Info",
                         style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12),
                       ),
                     ),
@@ -1076,7 +1076,7 @@ class _RentalsListTab extends StatelessWidget {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: const Text(
-                        "Rincian",
+                        "Details",
                         style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, fontSize: 12),
                       ),
                     ),
@@ -1093,22 +1093,22 @@ class _RentalsListTab extends StatelessWidget {
                       builder: (ctx) => AlertDialog(
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: const Text("Kembalikan Kostum", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
+                        title: const Text("Return Costume", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 16)),
                         content: const Text(
-                          "Apakah kamu sudah mengirimkan kostum kembali ke admin? Silakan konfirmasi untuk menghentikan masa sewa.",
+                          "Have you shipped the costume back to the admin? Please confirm to end your rental period.",
                           style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF555555), height: 1.5),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text("Batal", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
+                            child: const Text("Cancel", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600, color: _K.grey500)),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(ctx);
                               RentalManager.instance.updateRentalStatus(rental.transactionId, "Returned");
                             },
-                            child: const Text("Ya, Sudah Dikembalikan", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.black)),
+                            child: const Text("Yes, Already Returned", style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, color: _K.black)),
                           ),
                         ],
                       ),
@@ -1122,7 +1122,7 @@ class _RentalsListTab extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.keyboard_return_rounded, size: 18),
                   label: const Text(
-                    "Kembalikan Kostum",
+                    "Return Costume",
                     style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700, fontSize: 13),
                   ),
                 ),
@@ -1153,8 +1153,8 @@ class _RentalsListTab extends StatelessWidget {
               Expanded(
                 child: Text(
                   rental.status == "Returned" 
-                      ? "Kostum sedang dalam perjalanan / sudah dikembalikan. Menunggu admin melakukan pengecekan kualitas." 
-                      : "Admin sedang melakukan pengecekan kondisi kostum. Mohon tunggu proses pengembalian deposit.",
+                      ? "The costume is on its way back / returned. Waiting for admin to check the quality." 
+                      : "Admin is checking the costume's condition. Please wait for the deposit refund process.",
                   style: const TextStyle(fontFamily: 'Inter', fontSize: 13, color: Color(0xFF713F12), height: 1.5), // yellow-900
                 ),
               ),
@@ -1334,7 +1334,7 @@ class _RentalsListTab extends StatelessWidget {
     else if (rental.status == "Returned" || rental.status == "Checking") currentStep = 3;
     else if (rental.status == "Completed") currentStep = 4;
 
-    final steps = ["Dikemas", "Dikirim", "Disewa", "Selesai"];
+    final steps = ["Packed", "Shipped", "Rented", "Completed"];
 
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),

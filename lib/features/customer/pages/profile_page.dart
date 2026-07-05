@@ -72,7 +72,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _userPostal = data['postal'] ?? '';
           _isAdmin = data['isAdmin'] ?? false;
           _depositBalance = (data['deposit_balance'] ?? 0).toInt();
-          _cosmoPoints = (data['cosmo_points'] ?? 0).toInt();
           final statusVal = (data['verificationStatus'] ?? 'unverified').toString();
           final ktpVal = data['ktpNumber']?.toString() ?? '';
           if (ktpVal.trim().isEmpty) {
@@ -92,7 +91,6 @@ class _ProfilePageState extends State<ProfilePage> {
           'isAdmin': false,
           'verificationStatus': 'unverified',
           'deposit_balance': 0,
-          'cosmo_points': 0,
         });
       }
     } catch (e) {
@@ -110,7 +108,6 @@ class _ProfilePageState extends State<ProfilePage> {
   String _userPostal = "";
   bool _isAdmin = false;
   int _depositBalance = 0;
-  int _cosmoPoints = 0;
   String _verificationStatus = 'unverified';
 
   @override
@@ -316,18 +313,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         value: NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(_depositBalance),
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const DepositBalancePage()));
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // â”€â”€ Cosmo Points â”€â”€
-                    Expanded(
-                      child: _WalletCard(
-                        icon: Icons.star_outline_rounded,
-                        label: "Cosmo Points",
-                        value: "$_cosmoPoints KP",
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CosmoPointsPage()));
                         },
                       ),
                     ),
