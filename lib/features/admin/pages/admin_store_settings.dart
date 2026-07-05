@@ -22,7 +22,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
   final TextEditingController _kotaController = TextEditingController(text: 'Jakarta Selatan');
   final TextEditingController _whatsappController = TextEditingController(text: '0812-3456-7890');
   final TextEditingController _depositController = TextEditingController(text: 'Rp 50.000');
-  final TextEditingController _ongkirController = TextEditingController(text: 'Rp 15.000');
+  final TextEditingController _alamatController = TextEditingController(text: 'Cosvoria HQ\nJl. Kemang Raya No. 10, RT.1/RW.7\nBangka, Kec. Mampang Prpt.\nJakarta Selatan, DKI Jakarta 12730');
 
   // Status untuk tombol Switch
   bool isModeTokoAktif = true;
@@ -45,7 +45,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
       _kotaController.text = data['city']?.toString() ?? _kotaController.text;
       _whatsappController.text = data['whatsapp']?.toString() ?? _whatsappController.text;
       _depositController.text = data['deposit']?.toString() ?? _depositController.text;
-      _ongkirController.text = data['shipping']?.toString() ?? _ongkirController.text;
+      _alamatController.text = data['address']?.toString() ?? _alamatController.text;
       isModeTokoAktif = data['isStoreActive'] ?? true;
       isWajibKtp = data['requiresKtpVerification'] ?? true;
     } catch (e) {
@@ -65,7 +65,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
     _kotaController.dispose();
     _whatsappController.dispose();
     _depositController.dispose();
-    _ongkirController.dispose();
+    _alamatController.dispose();
     super.dispose();
   }
 
@@ -108,7 +108,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                     _buildInputField('Kota Utama', _kotaController),
                     _buildInputField('Nomor WhatsApp CS', _whatsappController),
                     _buildInputField('Biaya Deposit Default', _depositController),
-                    _buildInputField('Ongkir Default', _ongkirController),
+                    _buildInputField('Alamat Lengkap Toko', _alamatController, maxLines: 4),
                     
                     const SizedBox(height: 10),
                     const Divider(color: _grey200, height: 1),
@@ -142,7 +142,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                               'city': _kotaController.text.trim(),
                               'whatsapp': _whatsappController.text.trim(),
                               'deposit': _depositController.text.trim(),
-                              'shipping': _ongkirController.text.trim(),
+                              'address': _alamatController.text.trim(),
                               'isStoreActive': isModeTokoAktif,
                               'requiresKtpVerification': isWajibKtp,
                             });
@@ -180,7 +180,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
   }
 
 
-  Widget _buildInputField(String label, TextEditingController controller) {
+  Widget _buildInputField(String label, TextEditingController controller, {int? maxLines = 1}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18.0),
       child: Column(
@@ -198,6 +198,7 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
           const SizedBox(height: 8),
           TextFormField(
             controller: controller,
+            maxLines: maxLines,
             style: const TextStyle(color: _black, fontFamily: 'Inter', fontSize: 16),
             decoration: InputDecoration(
               filled: true,
