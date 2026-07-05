@@ -192,7 +192,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ManageOrdersPage(),
+                            builder: (_) =>
+                                const ManageOrdersPage(initialFilter: 'Active'),
                           ),
                         );
                       },
@@ -210,7 +211,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ManageOrdersPage(),
+                            builder: (_) => const ManageOrdersPage(
+                                initialFilter: 'Pending'),
                           ),
                         );
                       },

@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
 
 class ManageOrdersPage extends StatefulWidget {
-  const ManageOrdersPage({super.key});
+  final String? initialFilter;
+
+  const ManageOrdersPage({super.key, this.initialFilter});
 
   @override
   State<ManageOrdersPage> createState() => _ManageOrdersPageState();
@@ -17,7 +19,13 @@ class _ManageOrdersPageState extends State<ManageOrdersPage> {
   static const Color _grey200 = Color(0xFFE8E8E8);
   static const Color _primaryPurple = Color(0xFF6A11CB);
 
-  String _selectedFilter = 'All';
+  late String _selectedFilter;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedFilter = widget.initialFilter ?? 'All';
+  }
 
   @override
   Widget build(BuildContext context) {
