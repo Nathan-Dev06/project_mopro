@@ -4,6 +4,8 @@ import 'package:project_mopro/core/models/user_profile.dart';
 import 'package:project_mopro/features/admin/pages/manage_orders_page.dart';
 import 'package:project_mopro/features/admin/pages/manage_costumes_page.dart';
 import 'package:project_mopro/features/admin/pages/admin_walkin_order_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_income_page.dart';
+import 'package:project_mopro/features/admin/pages/admin_financial_report_page.dart';
 
 class AdminDashboard extends StatefulWidget {
   final VoidCallback? onSeeAllPressed;
@@ -149,7 +151,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ManageOrdersPage(),
+                            builder: (_) =>
+                                const AdminIncomePage(initialPeriod: 'today'),
                           ),
                         );
                       },
@@ -167,7 +170,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ManageOrdersPage(),
+                            builder: (_) =>
+                                const AdminIncomePage(initialPeriod: 'month'),
                           ),
                         );
                       },
@@ -241,6 +245,24 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
+                    _MenuCard(
+                      title: 'Laporan Keuangan',
+                      subtitle: 'Lihat laporan keuangan lengkap',
+                      icon: Icons.bar_chart_outlined,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AdminFinancialReportPage(),
+                          ),
+                        );
+                      },
+                      gradientColors: const [
+                        Color(0xFF6A11CB),
+                        Color(0xFF2575FC)
+                      ],
+                    ),
+                    const SizedBox(height: 12),
                     _MenuCard(
                       title: 'Buat Pesanan Walk-in',
                       subtitle: 'Pesanan manual untuk customer langsung',
