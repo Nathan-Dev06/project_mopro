@@ -103,21 +103,12 @@ class _StoreSettingsPageState extends State<StoreSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-<<<<<<< HEAD
                     _buildInputField('Store Name', _namaTokoController),
                     _buildInputField('Primary Province', _provinsiController),
                     _buildInputField('Primary City', _kotaController),
                     _buildInputField('CS WhatsApp Number', _whatsappController),
                     _buildInputField('Default Deposit Fee', _depositController),
-                    _buildInputField('Default Shipping Fee', _ongkirController),
-=======
-                    _buildInputField('Nama Toko', _namaTokoController),
-                    _buildInputField('Provinsi Utama', _provinsiController),
-                    _buildInputField('Kota Utama', _kotaController),
-                    _buildInputField('Nomor WhatsApp CS', _whatsappController),
-                    _buildInputField('Biaya Deposit Default', _depositController),
-                    _buildInputField('Alamat Lengkap Toko', _alamatController, maxLines: 4),
->>>>>>> 5b481e8a4b00d2543a98a5235975a1c141022140
+                    _buildInputField('Store Address', _alamatController, maxLines: 4),
                     
                     const SizedBox(height: 10),
                     const Divider(color: _grey200, height: 1),
