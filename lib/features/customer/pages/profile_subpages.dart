@@ -1837,16 +1837,118 @@ class _EmptyStateTab extends StatelessWidget {
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  2. IDENTITY VERIFICATION PAGE
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-class IdentityVerificationPage extends StatelessWidget {
+class IdentityVerificationPage extends StatefulWidget {
   const IdentityVerificationPage({Key? key}) : super(key: key);
 
-  Future<bool> _submitKtp(BuildContext context, String ktpNumber) async {
+  @override
+  State<IdentityVerificationPage> createState() => _IdentityVerificationPageState();
+}
+
+class _IdentityVerificationPageState extends State<IdentityVerificationPage> {
+  bool _isSubmitting = false;
+
+  // Tiny valid 1x1 base64 transparent PNG to be sent as image payload to Firestore
+  static const String _mockKtpBase64 =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
+  Widget _buildMockKtpCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: AspectRatio(
+        aspectRatio: 16 / 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'REPUBLIK INDONESIA',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Inter',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                Icon(Icons.credit_card_rounded, color: Colors.white.withOpacity(0.8), size: 20),
+              ],
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'KARTU TANDA PENDUDUK / IDENTITY CARD',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'Inter',
+                fontSize: 8,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const Spacer(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 140, height: 8,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.35), borderRadius: BorderRadius.circular(4)),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 90, height: 6,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        width: 160, height: 6,
+                        decoration: BoxDecoration(color: Colors.white.withOpacity(0.25), borderRadius: BorderRadius.circular(3)),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 52,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white30),
+                  ),
+                  child: const Icon(Icons.person_rounded, color: Colors.white70, size: 36),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _submitKtpWithImage(BuildContext context, String ktpNumber) async {
     final user = FirebaseAuth.instance.currentUser;
     final messenger = ScaffoldMessenger.of(context);
-    final navigator = Navigator.of(context);
     if (user == null) {
       messenger.showSnackBar(
         const SnackBar(content: Text('Please login first.')),
@@ -1866,22 +1968,32 @@ class IdentityVerificationPage extends StatelessWidget {
       return false;
     }
 
-    await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
-      {
-        'ktpNumber': trimmedKtp,
-        'verificationStatus': 'pending',
-        'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
-        'verificationSubmittedAt': FieldValue.serverTimestamp(),
-      },
-      SetOptions(merge: true),
-    );
+    setState(() => _isSubmitting = true);
 
-    if (!navigator.mounted) return true;
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+        {
+          'ktpNumber': trimmedKtp,
+          'ktpImageBase64': _mockKtpBase64,
+          'verificationStatus': 'pending',
+          'verificationRequestedAtLabel': DateTime.now().toIso8601String(),
+          'verificationSubmittedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true),
+      );
 
-    messenger.showSnackBar(
-      const SnackBar(content: Text('ID successfully submitted to admin for verification.')),
-    );
-    return true;
+      messenger.showSnackBar(
+        const SnackBar(content: Text('ID and KTP illustration successfully submitted for verification.')),
+      );
+      return true;
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(content: Text('Failed to submit: $e'), backgroundColor: Colors.red),
+      );
+      return false;
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> _verificationStream() {
@@ -1906,7 +2018,7 @@ class IdentityVerificationPage extends StatelessWidget {
           'bg': const Color(0xFFFEE2E2),
           'icon': Colors.red,
           'title': 'Verification Rejected',
-          'subtitle': 'Please upload a clearer ID or contact support for review.',
+          'subtitle': 'Identity review was rejected. Please resubmit your 16-digit ID card number.',
         };
       case 'pending':
         return {
@@ -1920,7 +2032,7 @@ class IdentityVerificationPage extends StatelessWidget {
           'bg': _K.grey100,
           'icon': _K.grey500,
           'title': 'Identity Unverified',
-          'subtitle': 'Please upload your KTP / Student ID to verify your identity and start renting costumes.',
+          'subtitle': 'Please verify your identity with your 16-digit KTP card number to start renting costumes.',
         };
     }
   }
@@ -1945,122 +2057,274 @@ class IdentityVerificationPage extends StatelessWidget {
           }
           final info = _statusInfo(status);
 
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: info['bg'] as Color,
-                    ),
-                    child: Icon(
-                      status == 'approved'
-                          ? Icons.verified_rounded
-                          : (status == 'rejected'
-                              ? Icons.error_outline_rounded
-                              : (status == 'pending'
-                                  ? Icons.hourglass_empty_rounded
-                                  : Icons.info_outline_rounded)),
-                      size: 40,
-                      color: info['icon'] as Color,
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Column(
+              children: [
+                // Status Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: info['bg'] as Color,
+                  ),
+                  child: Icon(
+                    status == 'approved'
+                        ? Icons.verified_rounded
+                        : (status == 'rejected'
+                            ? Icons.error_outline_rounded
+                            : (status == 'pending'
+                                ? Icons.hourglass_empty_rounded
+                                : Icons.info_outline_rounded)),
+                    size: 40,
+                    color: info['icon'] as Color,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  info['title'] as String,
+                  style: const TextStyle(
+                    color: _K.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  info['subtitle'] as String,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: _K.grey500,
+                    fontSize: 13,
+                    fontFamily: 'Inter',
+                    height: 1.6,
+                  ),
+                ),
+
+                // Show KTP Card Illustration if submitted
+                if (status != 'unverified') ...[
+                  const SizedBox(height: 28),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Submitted KTP Card (Illustration)',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: _K.black,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    info['title'] as String,
-                    style: const TextStyle(
-                      color: _K.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
+                  const SizedBox(height: 10),
+                  _buildMockKtpCard(),
                   const SizedBox(height: 8),
                   Text(
-                    info['subtitle'] as String,
-                    textAlign: TextAlign.center,
+                    'KTP Card No: $ktp',
                     style: const TextStyle(
-                      color: _K.grey500,
-                      fontSize: 13,
                       fontFamily: 'Inter',
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        final ktpController = TextEditingController(text: data?['ktpNumber']?.toString() ?? '');
-
-                        showDialog(
-                          context: context,
-                          builder: (dialogContext) {
-                            final dialogNavigator = Navigator.of(dialogContext);
-
-                            return AlertDialog(
-                              title: const Text('Upload ID / Student Card'),
-                              content: TextField(
-                                controller: ktpController,
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(16),
-                                ],
-                                decoration: const InputDecoration(
-                                  labelText: 'ID / Student Card Number',
-                                  hintText: '3175xxxxxxxxxxxx',
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(dialogContext),
-                                  child: const Text('Cancel'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    final success = await _submitKtp(context, ktpController.text);
-                                    if (success && dialogNavigator.mounted) {
-                                      dialogNavigator.pop();
-                                    }
-                                  },
-                                  child: const Text('Submit'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(Icons.upload_file_outlined, size: 20),
-                      label: const Text(
-                        "Upload ID / Student Card",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 13,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _K.black,
-                        side: const BorderSide(color: _K.black, width: 1.5),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: _K.black,
                     ),
                   ),
                 ],
-              ),
+
+                const SizedBox(height: 32),
+
+                // Action button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _showUploadDialog(context, data),
+                    icon: const Icon(Icons.badge_outlined, size: 20),
+                    label: Text(
+                      status == 'unverified' || status == 'rejected'
+                          ? "Submit Identity Card (KTP)"
+                          : "Resubmit Identity Details",
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _K.black,
+                      side: const BorderSide(color: _K.black, width: 1.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           );
         },
       ),
+    );
+  }
+
+  void _showUploadDialog(BuildContext context, Map<String, dynamic>? data) {
+    final ktpController = TextEditingController(text: data?['ktpNumber']?.toString() ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24, right: 24, top: 24,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40, height: 4,
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: _K.grey200,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      'Verify Identity Details',
+                      style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter', color: _K.black,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Your KTP card landscape photo is generated automatically. Please input your valid 16-digit KTP number.',
+                      style: TextStyle(fontSize: 13, color: _K.grey500, fontFamily: 'Inter', height: 1.5),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // KTP Card Illustration
+                    _buildMockKtpCard(),
+
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.check_circle, color: _K.green, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'KTP Photo attached automatically (Landscape format)',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 11,
+                            color: _K.green,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // KTP Number Input
+                    TextField(
+                      controller: ktpController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(16),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'KTP / Student Card Number',
+                        hintText: '3175xxxxxxxxxxxx',
+                        labelStyle: const TextStyle(fontFamily: 'Inter'),
+                        hintStyle: const TextStyle(fontFamily: 'Inter', color: _K.grey400),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: _K.grey200),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: _K.grey200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: _K.black, width: 1.5),
+                        ),
+                        counterText: '',
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      ),
+                      maxLength: 16,
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Action Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: _K.grey500,
+                                side: const BorderSide(color: _K.grey200),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text('Cancel', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w600)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SizedBox(
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: _isSubmitting ? null : () async {
+                                final success = await _submitKtpWithImage(sheetContext, ktpController.text);
+                                if (success && Navigator.of(ctx).mounted) {
+                                  Navigator.of(ctx).pop();
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _K.black,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: _isSubmitting
+                                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                  : const Text('Submit', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

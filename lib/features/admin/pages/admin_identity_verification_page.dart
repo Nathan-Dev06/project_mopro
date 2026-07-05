@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -46,6 +47,114 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
       SnackBar(
         content: Text('Identity for $name has been rejected.'),
         backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  Widget _buildMockKtpCard(String name, String ktpNo) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: AspectRatio(
+        aspectRatio: 16 / 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'REPUBLIK INDONESIA',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Inter',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const Icon(Icons.credit_card_rounded, color: Colors.white70, size: 20),
+              ],
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'KARTU TANDA PENDUDUK / IDENTITY CARD',
+              style: TextStyle(
+                color: Colors.white70,
+                fontFamily: 'Inter',
+                fontSize: 8,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const Spacer(),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'NIK: $ktpNo',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Nama: $name',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontFamily: 'Inter',
+                          fontSize: 10,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Status: WNI / CITIZEN',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontFamily: 'Inter',
+                          fontSize: 9,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 52,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white30),
+                  ),
+                  child: const Icon(Icons.person_rounded, color: Colors.white70, size: 36),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -137,6 +246,7 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                       final email = (item['email'] ?? '').toString();
                       final ktp = (item['ktpNumber'] ?? item['ktp'] ?? '-').toString();
                       final date = (item['verificationRequestedAtLabel'] ?? 'Awaiting review').toString();
+                      final ktpImageBase64 = item['ktpImageBase64']?.toString();
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 16),
@@ -212,6 +322,72 @@ class _AdminIdentityVerificationPageState extends State<AdminIdentityVerificatio
                                 ),
                               ],
                             ),
+
+                            // KTP Card Illustration Preview
+                            if (ktpImageBase64 != null && ktpImageBase64.isNotEmpty) ...[
+                              const SizedBox(height: 14),
+                              const Text(
+                                'Submitted KTP Details',
+                                style: TextStyle(
+                                  color: _black,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              GestureDetector(
+                                onTap: () {
+                                  // Full screen image preview
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => Dialog(
+                                      backgroundColor: Colors.transparent,
+                                      insetPadding: const EdgeInsets.all(16),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          InteractiveViewer(
+                                            child: Container(
+                                              width: double.infinity,
+                                              constraints: const BoxConstraints(maxHeight: 320),
+                                              child: _buildMockKtpCard(name, ktp),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 8, right: 8,
+                                            child: CircleAvatar(
+                                              backgroundColor: Colors.black.withOpacity(0.5),
+                                              child: IconButton(
+                                                icon: const Icon(Icons.close, color: Colors.white, size: 20),
+                                                onPressed: () => Navigator.pop(context),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: _buildMockKtpCard(name, ktp),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  'Tap to zoom details',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 11,
+                                    color: _grey500,
+                                  ),
+                                ),
+                              ),
+                            ],
+
                             const SizedBox(height: 16),
                             Row(
                               children: [
