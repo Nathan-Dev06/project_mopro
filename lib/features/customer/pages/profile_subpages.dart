@@ -9,6 +9,7 @@ import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 import 'package:project_mopro/features/customer/pages/pending_payment_page.dart';
 import 'package:intl/intl.dart';
@@ -2804,7 +2805,7 @@ class WishlistPage extends StatelessWidget {
 
           // Filter costumes
           final List<CostumeData> results =
-              kCostumes.where((c) => wishlist.contains(c.title)).toList();
+              CostumeManager.instance.costumesNotifier.value.where((c) => wishlist.contains(c.title)).toList();
 
           return GridView.builder(
             padding: const EdgeInsets.all(20),

@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_mopro/features/customer/pages/booking_page.dart';
+import 'package:project_mopro/features/customer/pages/home_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 import 'package:intl/intl.dart';
 import 'package:project_mopro/features/customer/pages/review_details_page.dart';
 
@@ -41,8 +43,17 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
 
-  // Shortcut accessor
-  Map<String, dynamic> get data => widget.costumeData;
+  // Shortcut accessor (retrieves live data from CostumeManager if possible)
+  Map<String, dynamic> get data {
+    final title = widget.costumeData['title'];
+    try {
+      final liveCostume = CostumeManager.instance.costumesNotifier.value.firstWhere((c) => c.title == title);
+      return liveCostume.toMap();
+    } catch (_) {
+      return widget.costumeData;
+    }
+  }
+
   bool get isReady => data['isReady'] == true;
   
   List<String> get images {
@@ -57,8 +68,14 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   @override
   void initState() {
     super.initState();
-    // Inisialisasi size dari data kostum, fallback ke 'M'
-    _selectedSize = _normalizeSize(widget.costumeData['size'] ?? 'M');
+    // Inisialisasi size dari data kostum, fallback ke first available size
+    final title = widget.costumeData['title'];
+    CostumeData? match;
+    try {
+      match = CostumeManager.instance.costumesNotifier.value.firstWhere((c) => c.title == title);
+    } catch (_) {}
+    final sizes = match?.sizeList ?? ['M'];
+    _selectedSize = sizes.contains('M') ? 'M' : sizes.first;
     _favController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -109,7 +126,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => BookingPage(costumeData: this.data),
+            builder: (context) => BookingPage(
+              costumeData: this.data,
+              selectedSize: _selectedSize,
+            ),
           ),
         );
       } else if (status == 'pending') {
@@ -214,54 +234,60 @@ class _DetailCostumePageState extends State<DetailCostumePage>
     );
   }
 
-  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // ──────────────────────────────────────────────────────────────────────────────────
   //  BUILD
-  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // ──────────────────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bgColor,
-      body: Stack(
-        children: [
-          // â”€â”€ Scrollable Content â”€â”€
-          CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              _buildSliverAppBar(context),
-              SliverToBoxAdapter(child: _buildMainInfo()),
-              SliverToBoxAdapter(child: _buildRatingRow()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildPriceSection()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildSpecifications()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildConditionMinus()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildSizeGuide()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildShippingInfo()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildIncludeList()),
-              SliverToBoxAdapter(child: _buildTrustBanner()),
-              SliverToBoxAdapter(child: _buildRentalPolicy()),
-              SliverToBoxAdapter(child: _buildDivider()),
-              SliverToBoxAdapter(child: _buildCustomerReviews()),
-              // Bottom padding so content doesnt hide behind sticky bar
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 120),
+    return ValueListenableBuilder<List<CostumeData>>(
+      valueListenable: CostumeManager.instance.costumesNotifier,
+      builder: (context, _, __) {
+        return Scaffold(
+          backgroundColor: _bgColor,
+          body: Stack(
+            children: [
+              // ── Scrollable Content ──
+              CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  _buildSliverAppBar(context),
+                  SliverToBoxAdapter(child: _buildMainInfo()),
+                  SliverToBoxAdapter(child: _buildRatingRow()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildPriceSection()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildSpecifications()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildConditionMinus()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildSizeGuide()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildShippingInfo()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildIncludeList()),
+                  SliverToBoxAdapter(child: _buildTrustBanner()),
+                  SliverToBoxAdapter(child: _buildRentalPolicy()),
+                  SliverToBoxAdapter(child: _buildDivider()),
+                  SliverToBoxAdapter(child: _buildCustomerReviews()),
+                  // Bottom padding so content doesnt hide behind sticky bar
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 120),
+                  ),
+                ],
+              ),
+
+          // â”€â”€ Sticky Bottom Action Bar â”€â”€
+              // Sticky Bottom Action Bar
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _buildStickyBottomBar(context),
               ),
             ],
           ),
-
-          // â”€â”€ Sticky Bottom Action Bar â”€â”€
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: _buildStickyBottomBar(context),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -649,6 +675,13 @@ class _DetailCostumePageState extends State<DetailCostumePage>
   }
 
   Widget _buildSizeGuide() {
+    final title = widget.costumeData['title'];
+    CostumeData? match;
+    try {
+      match = CostumeManager.instance.costumesNotifier.value.firstWhere((c) => c.title == title);
+    } catch (_) {}
+    final sizes = match?.sizeList ?? ['M'];
+    
     // Ambil info ukuran berdasarkan size yang sedang aktif dipilih
     final sizeInfo = _getSizeInfo(_selectedSize);
 
@@ -657,7 +690,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // â”€â”€ Header: Judul + Size Chips â”€â”€
+          // ── Header: Judul + Size Chips ──
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -679,10 +712,10 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                   ),
                 ],
               ),
-              // â”€â”€ Interactive Size Chips â”€â”€
+              // ── Interactive Size Chips ──
               Row(
                 mainAxisSize: MainAxisSize.min,
-                children: _availableSizes.map((s) {
+                children: sizes.map((s) {
                   final bool isActive = _selectedSize == s;
                   return Padding(
                     padding: const EdgeInsets.only(left: 6),
@@ -696,7 +729,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         curve: Curves.easeInOut,
-                        width: 40,
+                        width: 54,
                         height: 34,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
@@ -710,7 +743,7 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                         child: Text(
                           s,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: isActive ? Colors.white : _textSecondary,
                           ),
@@ -745,6 +778,45 @@ class _DetailCostumePageState extends State<DetailCostumePage>
                 value: sizeInfo['TB']!,
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          // Stock indicator container
+          Builder(
+            builder: (context) {
+              final stock = match?.activeStocks[_selectedSize] ?? 5;
+              final isOutOfStock = stock <= 0;
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isOutOfStock ? const Color(0xFFFEE2E2) : const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: isOutOfStock ? const Color(0xFFFECACA) : const Color(0xFFBBF7D0)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isOutOfStock ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
+                      size: 16,
+                      color: isOutOfStock ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        isOutOfStock
+                            ? 'Stok untuk ukuran $_selectedSize habis!'
+                            : 'Stok tersedia untuk ukuran $_selectedSize: $stock pcs',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isOutOfStock ? const Color(0xFF991B1B) : const Color(0xFF15803D),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 16),
           // Fit Notes
@@ -1602,29 +1674,42 @@ class _DetailCostumePageState extends State<DetailCostumePage>
           const SizedBox(width: 16),
 
           // Right: CTA Button
-          Expanded(
-            child: SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => _checkIdentityAndProceed(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _textPrimary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
+          Builder(
+            builder: (context) {
+              final title = widget.costumeData['title'];
+              CostumeData? match;
+              try {
+                match = CostumeManager.instance.costumesNotifier.value.firstWhere((c) => c.title == title);
+              } catch (_) {}
+              final stock = match?.activeStocks[_selectedSize] ?? 5;
+              final isOutOfStock = stock <= 0;
+              final bool isDisabled = !isReady || isOutOfStock;
+
+              return Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: isDisabled ? null : () => _checkIdentityAndProceed(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDisabled ? const Color(0xFFD1D5DB) : _textPrimary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      isOutOfStock ? 'Stok Habis' : (!isReady ? 'Rented' : 'Cek & Pilih Tanggal'),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
                   ),
                 ),
-                child: const Text(
-                  'Cek & Pilih Tanggal',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),

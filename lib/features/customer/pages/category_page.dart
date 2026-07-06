@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_mopro/features/customer/pages/home_page.dart'; // import kCostumes and CostumeData
 import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 class CategoryPage extends StatelessWidget {
   final String categoryName;
@@ -11,7 +12,7 @@ class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Filter data berdasarkan categoryName
-    final List<CostumeData> results = kCostumes
+    final List<CostumeData> results = CostumeManager.instance.costumesNotifier.value
         .where((c) => c.category.toLowerCase() == categoryName.toLowerCase())
         .toList();
 

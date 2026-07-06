@@ -3,6 +3,7 @@ import 'package:project_mopro/features/customer/pages/home_page.dart';
 import 'package:project_mopro/features/customer/pages/detail_costume_page.dart';
 import 'package:project_mopro/features/customer/pages/category_page.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -61,7 +62,7 @@ class _SearchPageState extends State<SearchPage> {
     // Filter costumes based on search query and ready status
     final filteredCostumes = _searchQuery.isEmpty
         ? <CostumeData>[]
-        : kCostumes.where((c) {
+        : CostumeManager.instance.costumesNotifier.value.where((c) {
             if (_showReadyOnly && !c.isReady) return false;
             return c.title.toLowerCase().contains(_searchQuery) ||
                 c.series.toLowerCase().contains(_searchQuery) ||
@@ -368,7 +369,7 @@ class _SearchPageState extends State<SearchPage> {
         SizedBox(
           height: 280,
           child: Builder(builder: (context) {
-            final dummyItems = kCostumes
+            final dummyItems = CostumeManager.instance.costumesNotifier.value
                 .where((c) => !_showReadyOnly || c.isReady)
                 .take(4)
                 .toList();
@@ -403,7 +404,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildCategoryCarousel(String categoryName) {
-    final List<CostumeData> categoryItems = kCostumes
+    final List<CostumeData> categoryItems = CostumeManager.instance.costumesNotifier.value
         .where((c) => c.category.toLowerCase() == categoryName.toLowerCase())
         .where((c) => !_showReadyOnly || c.isReady)
         .toList();

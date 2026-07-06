@@ -8,8 +8,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookingPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
+  final String selectedSize;
 
-  const BookingPage({Key? key, required this.costumeData}) : super(key: key);
+  const BookingPage({
+    Key? key,
+    required this.costumeData,
+    required this.selectedSize,
+  }) : super(key: key);
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -460,6 +465,16 @@ class _BookingPageState extends State<BookingPage> {
                                 color: accentMint,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Ukuran: ${widget.selectedSize}",
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                color: textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -1054,7 +1069,10 @@ class _BookingPageState extends State<BookingPage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => PaymentPage(
-                            costumeData: widget.costumeData,
+                            costumeData: {
+                              ...widget.costumeData,
+                              'size': widget.selectedSize,
+                            },
                             startDate: _rangeStart!,
                             endDate: _rangeEnd ?? _rangeStart!,
                             totalDays: _totalDays,

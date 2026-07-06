@@ -4,6 +4,7 @@ import 'package:project_mopro/features/customer/pages/notification_page.dart';
 import 'package:project_mopro/features/customer/pages/profile_page.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/wishlist_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // =============================================
@@ -25,6 +26,7 @@ class CostumeData {
   final String category;
   final double rating;
   final int reviewCount;
+  final Map<String, int>? sizeStocks;
 
   const CostumeData({
     required this.title,
@@ -38,9 +40,23 @@ class CostumeData {
     this.category = 'Anime',
     this.rating = 4.8,
     this.reviewCount = 12,
+    this.sizeStocks,
   });
 
-  /// Size list from string. "All Size" â†’ ['All Size']
+  Map<String, int> get activeStocks {
+    if (sizeStocks != null) return sizeStocks!;
+    final defaultMap = <String, int>{};
+    for (var sz in sizeList) {
+      defaultMap[sz] = 5;
+    }
+    return defaultMap;
+  }
+
+  int get totalStock {
+    return activeStocks.values.fold(0, (sum, val) => sum + val);
+  }
+
+  /// Size list from string. "All Size" → ['All Size']
   List<String> get sizeList {
     if (size == 'All Size') return ['All Size'];
     if (size.contains('|')) {
@@ -57,13 +73,19 @@ class CostumeData {
 
   bool get hasMultipleSizes => sizeList.length > 1;
 
-  /// Compact size display: "S|M" â†’ "S|M"
+  /// Compact size display: "S|M" → "S|M"
   String get sizeDisplay {
     if (size == 'All Size') return 'All Size';
     return sizeList.join('|');
   }
 
   factory CostumeData.fromMap(Map<String, dynamic> map) {
+    Map<String, int>? sizeStocks;
+    if (map['sizeStocks'] != null && map['sizeStocks'] is Map) {
+      sizeStocks = Map<String, int>.from(
+        (map['sizeStocks'] as Map).map((k, v) => MapEntry(k.toString(), v as int)),
+      );
+    }
     return CostumeData(
       title: map['title'] ?? '',
       series: map['series'] ?? '',
@@ -76,6 +98,7 @@ class CostumeData {
       category: map['category'] ?? 'Anime',
       rating: (map['rating'] ?? 4.8).toDouble(),
       reviewCount: map['reviewCount'] ?? 12,
+      sizeStocks: sizeStocks,
     );
   }
 
@@ -91,6 +114,7 @@ class CostumeData {
         'category': category,
         'rating': rating,
         'reviewCount': reviewCount,
+        'sizeStocks': sizeStocks,
       };
 }
 
@@ -1321,46 +1345,51 @@ class _MainHomePageState extends State<MainHomePage> {
   Widget _buildCatalogGrid() {
     final searchQuery = _searchController.text.trim().toLowerCase();
 
-    // Filter costumes berdasarkan tab yang dipilih dan search query
-    final filteredCostumes = kCostumes.where((costume) {
-      final matchesTab = _selectedTab == 'All' || costume.category == _selectedTab;
-      final matchesSearch = searchQuery.isEmpty ||
-          costume.title.toLowerCase().contains(searchQuery) ||
-          costume.series.toLowerCase().contains(searchQuery) ||
-          costume.category.toLowerCase().contains(searchQuery);
-      return matchesTab && matchesSearch;
-    }).toList();
+    return ValueListenableBuilder<List<CostumeData>>(
+      valueListenable: CostumeManager.instance.costumesNotifier,
+      builder: (context, allCostumes, child) {
+        // Filter costumes berdasarkan tab yang dipilih dan search query
+        final filteredCostumes = allCostumes.where((costume) {
+          final matchesTab = _selectedTab == 'All' || costume.category == _selectedTab;
+          final matchesSearch = searchQuery.isEmpty ||
+              costume.title.toLowerCase().contains(searchQuery) ||
+              costume.series.toLowerCase().contains(searchQuery) ||
+              costume.category.toLowerCase().contains(searchQuery);
+          return matchesTab && matchesSearch;
+        }).toList();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: filteredCostumes.isEmpty
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 40),
-                child: Text(
-                  'No costumes available in this category',
-                  style: TextStyle(
-                    color: _C.grey500,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: filteredCostumes.isEmpty
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 40),
+                    child: Text(
+                      'No costumes available in this category',
+                      style: TextStyle(
+                        color: _C.grey500,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
+                )
+              : GridView.builder(
+                  key: const Key('costume_catalog_grid'),
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: filteredCostumes.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.60,
+                  ),
+                  itemBuilder: (context, index) =>
+                      _CatalogProductCard(data: filteredCostumes[index]),
                 ),
-              ),
-            )
-          : GridView.builder(
-              key: const Key('costume_catalog_grid'),
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: filteredCostumes.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.60,
-              ),
-              itemBuilder: (context, index) =>
-                  _CatalogProductCard(data: filteredCostumes[index]),
-            ),
+        );
+      },
     );
   }
 }

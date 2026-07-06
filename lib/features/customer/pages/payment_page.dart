@@ -4,6 +4,7 @@ import 'package:project_mopro/features/customer/pages/receipt_page.dart';
 import 'package:project_mopro/features/customer/pages/pending_payment_page.dart';
 import 'package:project_mopro/core/managers/voucher_manager.dart';
 import 'package:project_mopro/core/managers/rental_manager.dart';
+import 'package:project_mopro/core/managers/costume_manager.dart';
 
 class PaymentPage extends StatefulWidget {
   final Map<String, dynamic> costumeData;
@@ -606,6 +607,11 @@ class _PaymentPageState extends State<PaymentPage> {
     if (widget.voucherCode != null) {
       VoucherManager.instance.useVoucher(widget.voucherCode!);
     }
+
+    // Decrement stock in CostumeManager
+    final title = widget.costumeData['title'] ?? '';
+    final size = widget.costumeData['size'] ?? 'L';
+    CostumeManager.instance.decrementStock(title, size);
 
     final targetTrxId = widget.existingTransactionId ??
         "TRX-${DateTime.now().millisecondsSinceEpoch.toString().substring(6)}";
